@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Widgets/CustomAppBar.dart';
+import '../../Resource/Strings.dart';
+import '../../Resource/colors.dart';
+import '../Login/SubmitButtonWidget.dart';
+import 'WalletItem.dart';
+
+class WalletListing extends StatefulWidget {
+  const WalletListing({Key? key}) : super(key: key);
+
+  @override
+  State<WalletListing> createState() => _WalletListingState();
+}
+
+class _WalletListingState extends State<WalletListing> {
+  List<String> walletTypes = [
+    "Credit",
+    "Debit",
+    "Debit",
+    "Credit",
+    "Credit",
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(label: Strings.walletTitle, showBackButton: true, showCloseIcon: false,),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          margin: EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                        colors: [
+                          colorPrimary,
+                          colorPrimaryDark1,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: [0.1, 1.0],
+                        tileMode: TileMode.clamp),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:[
+                        SizedBox(height: 10,),
+                        Container(
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("100",
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.w800,
+                                  )),
+
+                              Text(Strings.oneCoinEquals,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  )),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10,),
+                        Container(
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          child: Text(Strings.totalCoinsAvailable,
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              )),
+                        ),
+                        SizedBox(height: 15,),
+
+                        Container(
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          child: Text(Strings.maxAmountInfo,
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              )),
+                        ),
+                        SizedBox(height: 10,),
+                        SubmitButtonWidget(
+                          onTap:(){
+
+                          },
+                          text:Strings.addMoneyascoin,
+                        ),
+                        SizedBox(height: 10,),
+                      ]
+                  )
+              ),
+              SizedBox(height: 20,),
+              Text(Strings.transactions,
+                  style: GoogleFonts.inter(
+                    color: Colors.black,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  )),
+              ListView.builder(
+                itemCount: 5,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return WalletItem(type: walletTypes[index],);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
