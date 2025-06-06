@@ -1,0 +1,347 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../Resource/Colors.dart';
+
+class MapController extends FullLifeCycleController with FullLifeCycleMixin {
+  Set<Marker> marker = {};
+  GoogleMapController? mapController;
+  LatLng? currentPosition = const LatLng(37.7749, -122.4194); // Example coordinates
+  RxString location = ''.obs;
+  Placemark? place;
+  var isLoading = true.obs;
+  var isLoading1 = true.obs;
+  RxBool isSearch = false.obs;
+  String kplacesApiKey = "AIzaSyDFSyZhayfNWiFj0zdROZO7zi4Od5WiER0";
+  List<dynamic> placeList = <String>[].obs;
+  Dio dio = Dio();
+  String route = "";
+  TextEditingController searchController = TextEditingController();
+  bool permissionDenied = false;
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+//Permission
+  Future<bool> _handleLocationPermissionAndroid() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+        content: const Text(
+            "Location services are disabled. Please enable the services"),
+        action: SnackBarAction(
+            label: "OK",
+            onPressed: () {
+              Geolocator.openLocationSettings().then((value) => _handleLocationPermissionAndroid());
+            }),
+      ));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied&&permissionDenied==false) {
+      permission = await Geolocator.requestPermission();
+      permissionDenied = true;
+      if (permission == LocationPermission.denied&&permissionDenied) {
+        dynamic value;
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+          content: const Text(
+            "Location services are disabled. Please enable the services",
+          ),
+          action: SnackBarAction(
+              label: "OK",
+              onPressed: () async {
+                value = await Geolocator.openAppSettings().then((value) { getCurrentPosition();});
+                return value;
+              }),
+        ));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      dynamic value;
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+        content: const Text("Location services are disabled. Please enable the services"),
+        action: SnackBarAction(
+            label: "OK",
+            onPressed: () async {
+              value = await Geolocator.openAppSettings().then((value) { getCurrentPosition();});
+              return value;
+            }),
+      ));
+      return false;
+    }
+    return true;
+  }
+
+//Permission
+  Future<bool> handleLocationPermissionIos() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      requestLocationPermission(Get.context!);
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied&&permissionDenied ==false) {
+      permission = await Geolocator.requestPermission();
+      permissionDenied = true;
+      if (permission == LocationPermission.denied&&permissionDenied) {
+        // requestLocationPermission(Get.context!);
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // requestLocationPermission(Get.context!);
+      return false;
+    }
+    return true;
+  }
+  showLocationAlertDialog(BuildContext context) {
+    dynamic value;
+    // set up the button
+    Widget okButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () async {
+        value = await Geolocator.openAppSettings().then((value) {
+          if(permissionDenied){
+            if(Platform.isIOS) {
+              Get.back();
+              Get.back();
+            }
+            // permissionDenied = false;
+          }
+          getCurrentPosition();});
+        return value;
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Enable Location Permission"),
+      content: const Text(
+          "This app need location permission to show the nearest facilities."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  Future<bool> requestLocationPermission(BuildContext context) async {
+    var permissionStatus = await Permission.location.request();
+    // try {
+    if (permissionStatus.isGranted) {
+      return true;
+    } else if (permissionStatus.isDenied) {
+      return false;
+    } else if (permissionStatus.isPermanentlyDenied) {
+      return Platform.isAndroid
+          ? await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text("Enable Location Service"),
+          content: const Text(
+              "Please go to Settings and enable location services for  MedChoice Healthcare Jobs"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("CANCEL"),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            // TextButton(
+            //   child: const Text("OPEN SETTINGS"),
+            //   onPressed: () {
+            //     Navigator.pop(context, false);
+            //     openAppSettings();
+            //   },
+            // ),
+          ],
+        ),
+      ) ??
+          false
+          : await showCupertinoDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text("Enable Location Service"),
+          content: const Text(
+              "Please go to Settings and enable location services for MedChoice Healthcare Jobs"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("CANCEL",style: TextStyle(color: colorPrimary),),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            // TextButton(
+            //   child: const Text("OPEN SETTINGS"),
+            //   onPressed: () {
+            //     Navigator.pop(context, false);
+            //     openAppSettings();
+            //   },
+            // ),
+          ],
+        ),
+      ) ??
+          false;
+    } else {
+      return true;
+    }
+    // }
+    // on PlatformException {
+    //   return true;
+    // }
+  }
+
+//Fetching location
+  Future<void> getCurrentPosition({double? lat, double? long}) async {
+
+    if (Platform.isAndroid?await _handleLocationPermissionAndroid():await handleLocationPermissionIos()) {
+      try {
+        if (lat == null && long == null) {
+          Position? position;
+          position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+          currentPosition = LatLng(position.latitude, position.longitude);
+          marker.clear();
+          marker.add(Marker(
+              markerId: const MarkerId('location'),
+              position: LatLng(position.latitude, position.longitude)));
+          if (mapController != null) {
+            // Get.back();
+            mapController!
+                .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+              target: LatLng(
+                position.latitude,
+                position.longitude,
+              ),
+              zoom: 18,
+            )));
+          }
+        } else {
+          currentPosition = LatLng(lat!, long!);
+          marker.clear();
+          marker.add(Marker(
+              markerId: const MarkerId('location'),
+              position: LatLng(lat, long)));
+          if (mapController != null) {
+            mapController!
+                .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+              target: LatLng(lat, long),
+              zoom: 18,
+            )));
+          }
+        }
+        getAddressFromLatLng(currentPosition!);
+        isLoading(false);
+        update();
+      } catch (e) {
+        // Get.back();
+        debugPrint(e.toString());
+        // update();
+      }
+    }
+  }
+
+//Fetching locality
+  Future<void> getAddressFromLatLng(LatLng position) async {
+    await placemarkFromCoordinates(position.latitude, position.longitude)
+        .then((List<Placemark> placemarks) {
+      place = placemarks[0];
+      location.value = [
+        place?.locality,
+        place?.subLocality,
+        place?.administrativeArea,
+        place?.postalCode,
+      ].where((value) => value != null && value.isNotEmpty).join(', ');
+      update();
+    }).catchError((e) {
+      debugPrint(e.toString());
+    });
+  }
+
+//Place Search
+  Future getSuggestion(String input) async {
+    print("Called");
+    isLoading1(true);
+    placeList.clear();
+    String baseURL =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+    String requests =
+        '$baseURL?input=$input&key=$kplacesApiKey&components=country:IN&language';
+    // &components=country:IN
+    //for country specific add this &components=country:SOM
+    try {
+      var response = await dio.get(requests);
+      print(response.data);
+      var palace = response.data['predictions'];
+      palace.map((e) async {
+        placeList.add(e['description']);
+      }).toList();
+      update();
+    } catch (error) {
+      print(error);
+    } finally {
+      isLoading1(false);
+    }
+  }
+
+  @override
+  void onDetached() {
+    // TODO: implement onDetached
+  }
+
+  @override
+  void onHidden() {
+    // TODO: implement onHidden
+  }
+
+  @override
+  void onInactive() {
+    // TODO: implement onInactive
+  }
+
+  @override
+  void onPaused() {
+    // TODO: implement onPaused
+  }
+
+  @override
+  void onResumed() async {
+    // TODO: implement onResumed
+    // var latitude = await getSavedObject("latitude");
+    // var longitude = await getSavedObject("longitude");
+    // if (latitude == null && longitude == null) {
+    //   getCurrentPosition();
+    // } else {
+    //   getCurrentPosition(lat: latitude, long: longitude);
+    // }
+
+  }
+}
