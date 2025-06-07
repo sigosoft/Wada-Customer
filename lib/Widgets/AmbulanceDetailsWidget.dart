@@ -162,7 +162,10 @@ class AmbulanceDetailsWidget extends StatelessWidget {
           SizedBox(height: 15),
           moreOptions
               ? TwoSuibmitButtonsWidget(onAllServicesTapped:onAllServicesTapped!)
-              : SubmitButtonWidget(text: buttonText, onTap: () {  },),
+              : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: SubmitButtonWidget(text: buttonText, onTap: () {  },),
+              ),
           SizedBox(height: 10),
         ],
       ),

@@ -200,11 +200,14 @@ class _RequestSendingState extends State<RequestSending> {
                   ],
                 ),
                 SizedBox(height: 30),
-                SubmitButtonWidget(
-                  onTap:(){
-                    _showCancelShiftBottomSheet(context);
-                  },
-                  text:Strings.sendRequest,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SubmitButtonWidget(
+                    onTap:(){
+                      _showCancelShiftBottomSheet(context);
+                    },
+                    text:Strings.sendRequest,
+                  ),
                 ),
                 SizedBox(height: 30),
               ],

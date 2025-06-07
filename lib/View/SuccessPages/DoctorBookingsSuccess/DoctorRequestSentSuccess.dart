@@ -20,57 +20,59 @@ class _DoctorRequestSentSuccessState extends State<DoctorRequestSentSuccess> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    "lib/Assets/Images/request_success.svg",
-                    width: 140,
-                    height: 140,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    Strings.successful,
-                    style: GoogleFonts.inter(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      "lib/Assets/Images/request_success.svg",
+                      width: 140,
+                      height: 140,
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    widget.msg,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                    SizedBox(height: 10),
+                    Text(
+                      Strings.successful,
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  BookingsDoctorDetailsWidget(
-                    showButton: false,
-                    buttonText: Strings.makePayment,
-                  ),
-                ],
+                    SizedBox(height: 10),
+                    Text(
+                      widget.msg,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    BookingsDoctorDetailsWidget(
+                      showButton: false,
+                      buttonText: Strings.makePayment,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: SubmitButtonWidget(
-              onTap:(){
-
-              },
-              text:Strings.home,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0,),
+              child: SubmitButtonWidget(
+                onTap:(){
+        
+                },
+                text:Strings.home,
+              ),
             ),
-          ),
-          SizedBox(height: 30,)
-        ],
+            SizedBox(height: 10)
+          ],
+        ),
       ),
     );
   }

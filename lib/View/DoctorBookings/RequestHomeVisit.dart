@@ -171,12 +171,15 @@ class _RequestHomeVisitState extends State<RequestHomeVisit> {
                 ),
               ),
               SizedBox(height: 80),
-              SubmitButtonWidget(
-                onTap: () {
-                  Get.to(BookingDetails(
-                    bookingType: "home"));
-                },
-                text: Strings.confirm,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5 ),
+                child: SubmitButtonWidget(
+                  onTap: () {
+                    Get.to(BookingDetails(
+                      bookingType: "home"));
+                  },
+                  text: Strings.confirm,
+                ),
               ),
             ],
           ),

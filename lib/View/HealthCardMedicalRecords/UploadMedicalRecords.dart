@@ -43,69 +43,74 @@ class _UploadMedicalRecordsState extends State<UploadMedicalRecords> {
       backgroundColor: Colors.white,
       appBar:  CustomAppBar(label: Strings.uploadmedicalRecords, showCloseIcon: false),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
-            TextStyleInterForSplash(
-              text: Strings.chooseMember,
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-              size: 14.0,
-            ),
-            SizedBox(height: 5),
-            MemberDropdownField(),
-            SizedBox(height: 15),
-            TextInputWidget(label: Strings.recordName,type: TextInputType.text,height: 50),
-            SizedBox(height: 15),
-            TextInputWidget(label: Strings.notes,type: TextInputType.text,height: 80),
-            SizedBox(height: 15),
-            TextStyleInterForSplash(
-              text: Strings.uploadRecord,
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-              size: 14.00,
-            ),
-            SizedBox(height: 10),
-            TextStyleInterForSplash(
-              text: Strings.documentFormat,
-              color: blackTextColor,
-              fontWeight: FontWeight.w500,
-              size: 12.00,
-            ),
-            SizedBox(height: 15),
-            UploadRecordWidget(),
-            SizedBox(height: 10),
-            Center(
-              child: TextStyleInterForSplash(
-                text: Strings.or,
-                color: blackTextColor,
-                fontWeight: FontWeight.w500,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              TextStyleInterForSplash(
+                text: Strings.chooseMember,
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                size: 14.0,
+              ),
+              SizedBox(height: 5),
+              MemberDropdownField(),
+              SizedBox(height: 15),
+              TextInputWidget(label: Strings.recordName,type: TextInputType.text,height: 50),
+              SizedBox(height: 15),
+              TextInputWidget(label: Strings.notes,type: TextInputType.text,height: 80),
+              SizedBox(height: 15),
+              TextStyleInterForSplash(
+                text: Strings.uploadRecord,
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
                 size: 14.00,
               ),
-            ),
-            SizedBox(height: 5),
-            SubmitButtonWithBorderColor(
-              text: Strings.openCamera,
-            ),
-            SizedBox(height: 10),
-            TextStyleInterForSplash(
-              text: Strings.uploaded,
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-              size: 14.00,
-            ),
-            SizedBox(height: 10),
-            UploadedFilesListView(),
-            SizedBox(height: 20),
-            SubmitButtonWidget(
-              onTap:(){
-
-              },
-              text:Strings.save,
-            ),
-            SizedBox(height: 30),
-          ],
+              SizedBox(height: 10),
+              TextStyleInterForSplash(
+                text: Strings.documentFormat,
+                color: blackTextColor,
+                fontWeight: FontWeight.w500,
+                size: 12.00,
+              ),
+              SizedBox(height: 15),
+              UploadRecordWidget(),
+              SizedBox(height: 10),
+              Center(
+                child: TextStyleInterForSplash(
+                  text: Strings.or,
+                  color: blackTextColor,
+                  fontWeight: FontWeight.w500,
+                  size: 14.00,
+                ),
+              ),
+              SizedBox(height: 5),
+              SubmitButtonWithBorderColor(
+                text: Strings.openCamera,
+              ),
+              SizedBox(height: 10),
+              TextStyleInterForSplash(
+                text: Strings.uploaded,
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                size: 14.00,
+              ),
+              SizedBox(height: 10),
+              UploadedFilesListView(),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: SubmitButtonWidget(
+                  onTap:(){
+          
+                  },
+                  text:Strings.save,
+                ),
+              ),
+              SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );

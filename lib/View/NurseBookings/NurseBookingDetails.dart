@@ -213,11 +213,14 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                     margin: EdgeInsets.only(left: 5, right: 5,top: 10),
                     child: TextInputWidget(label: Strings.notes,type: TextInputType.text,height: 80)),
                 SizedBox(height: 30),
-                SubmitButtonWidget(
-                  onTap:(){
-                   Get.to(RequestSending());
-                  },
-                  text:Strings.confirm,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SubmitButtonWidget(
+                    onTap:(){
+                     Get.to(RequestSending());
+                    },
+                    text:Strings.confirm,
+                  ),
                 ),
                 SizedBox(height: 30),
               ],

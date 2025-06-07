@@ -71,11 +71,14 @@ class _CompleteHealthCardsState extends State<CompleteHealthCards> {
           SizedBox(height: 15),
           TextInputWidget(label: Strings.fullAddress,type: TextInputType.text,height: 80),
           SizedBox(height: 50),
-          SubmitButtonWidget(
-            onTap:(){
-              Get.to(HealthCardMedicalRecords());
-            },
-            text:Strings.save,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: SubmitButtonWidget(
+              onTap:(){
+                Get.to(HealthCardMedicalRecords());
+              },
+              text:Strings.save,
+            ),
           ),
           SizedBox(height: 15),
         ],

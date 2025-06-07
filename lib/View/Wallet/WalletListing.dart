@@ -65,7 +65,6 @@ class _WalletListingState extends State<WalletListing> {
                                     fontSize: 23,
                                     fontWeight: FontWeight.w800,
                                   )),
-
                               Text(Strings.oneCoinEquals,
                                   style: GoogleFonts.inter(
                                     color: Colors.white,
@@ -97,11 +96,14 @@ class _WalletListingState extends State<WalletListing> {
                               )),
                         ),
                         SizedBox(height: 10,),
-                        SubmitButtonWidget(
-                          onTap:(){
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: SubmitButtonWidget(
+                            onTap:(){
 
-                          },
-                          text:Strings.addMoneyascoin,
+                            },
+                            text:Strings.addMoneyascoin,
+                          ),
                         ),
                         SizedBox(height: 10,),
                       ]
