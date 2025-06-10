@@ -40,136 +40,134 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: _controller,
-              itemCount: onboardingData.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [colorPrimary, colorPrimaryDark1],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _controller,
+            itemCount: onboardingData.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [colorPrimary, colorPrimaryDark1],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  // borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      onboardingData[index]["image"]!,
+                      width: 300,
+                      height: 330,
                     ),
-                    // borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        onboardingData[index]["image"]!,
-                        width: 300,
-                        height: 330,
-                      ),
-                      // SizedBox(height: 20),
-                      Text(
-                        onboardingData[index]["title"]!,
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        onboardingData[index]["description"]!,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                          color: white,
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      SmoothPageIndicator(
-                        controller: _controller,
-                        count: onboardingData.length,
-                        effect: ExpandingDotsEffect(
-                          dotColor: white,
-                          activeDotColor: colorPrimary,
-                          dotHeight: 8,
-                          dotWidth: 8,
-                          expansionFactor: 3,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            Positioned(
-              top: 40,
-              right: 10,
-              child: _currentPage == onboardingData.length - 1?Container():IconButton(
-                icon: Icon(Icons.close, color: Colors.white),
-                onPressed: () {
-                 Get.offAll(Register());
-                },
-              ),
-            ),
-            Positioned(
-              bottom: 40,
-              left: 20,
-              right: 20,
-              child: Row(
-                children: [
-                  if (_currentPage == 1 || _currentPage == 2)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: InkWell(
-                        onTap: (){
-                          Get.back();
-                        },
-                        child: SvgPicture.asset(
-                          "lib/Assets/Images/cancelbutton.svg",
-                          width: 50,
-                          height: 50,
-                        ),
+                    // SizedBox(height: 20),
+                    Text(
+                      onboardingData[index]["title"]!,
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                    SizedBox(height: 10),
+                    Text(
+                      onboardingData[index]["description"]!,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: white,
                       ),
-                      onPressed: () {
-                        if (_currentPage == onboardingData.length - 1) {
-                          Get.offAll(Register());
-                        } else {
-                          _controller.nextPage(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.ease,
-                          );
-                        }
+                    ),
+                    SizedBox(height: 15),
+                    SmoothPageIndicator(
+                      controller: _controller,
+                      count: onboardingData.length,
+                      effect: ExpandingDotsEffect(
+                        dotColor: white,
+                        activeDotColor: colorPrimary,
+                        dotHeight: 8,
+                        dotWidth: 8,
+                        expansionFactor: 3,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Positioned(
+            top: 40,
+            right: 10,
+            child: _currentPage == onboardingData.length - 1?Container():IconButton(
+              icon: Icon(Icons.close, color: Colors.white),
+              onPressed: () {
+               Get.offAll(Register());
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 40,
+            left: 20,
+            right: 20,
+            child: Row(
+              children: [
+                if (_currentPage == 1 || _currentPage == 2)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: InkWell(
+                      onTap: (){
+                        Get.back();
                       },
-                      child: Text(
-                       Strings.next,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: colorPrimary,
-                        ),
+                      child: SvgPicture.asset(
+                        "lib/Assets/Images/cancelbutton.svg",
+                        width: 50,
+                        height: 50,
                       ),
                     ),
                   ),
-                ],
-              ),
-            )
-          ],
-        ),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (_currentPage == onboardingData.length - 1) {
+                        Get.offAll(Register());
+                      } else {
+                        _controller.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      }
+                    },
+                    child: Text(
+                     Strings.next,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: colorPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
