@@ -4,16 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../Resource/Strings.dart';
 
-
 class Maintenance extends StatelessWidget {
   const Maintenance({super.key});
 
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Colors.white,
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -22,32 +19,27 @@ class Maintenance extends StatelessWidget {
           children: [
             SizedBox(
               height: 200,
-              child: SvgPicture.asset(
-                'lib/Assets/Images/WaadaSymbol.svg',
-              ),
+              child: SvgPicture.asset('lib/Assets/Images/maintenance.svg'),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Text(
               Strings.wellBeBackSoon,
               style: GoogleFonts.inter(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black),
+                fontSize: 25,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Text(
-             Strings.sorryWereDownForMaintenanceWellBeBackUpShortly,
+              Strings.sorryWereDownForMaintenanceWellBeBackUpShortly,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black),
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                color: Colors.black,
+              ),
             ),
-
           ],
         ),
       ),

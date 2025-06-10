@@ -6,16 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 import '../../Resource/Strings.dart';
 
-
 class NeedAnUpdate extends StatelessWidget {
   const NeedAnUpdate({super.key});
 
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Colors.white,
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -25,50 +22,43 @@ class NeedAnUpdate extends StatelessWidget {
               children: [
                 SizedBox(
                   height: 200,
-                  child: SvgPicture.asset(
-                    'lib/Assets/Images/WaadaSymbol.svg',
-                  ),
+                  child: SvgPicture.asset('lib/Assets/Images/WaadaSymbol.svg'),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Text(
                   Strings.needsAnUpdate,
                   style: GoogleFonts.inter(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
                 ),
-                const SizedBox(
-                  height: 10,
+                const SizedBox(height: 10),
+                Text(
+                  Strings.aNewUpdateIsAvailableForThisAppPleaseDownload,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.baloo2(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  ),
                 ),
-                 Text(
-                   Strings.aNewUpdateIsAvailableForThisAppPleaseDownload,
-                   textAlign: TextAlign.center,
-                   style: GoogleFonts.baloo2(
-                       fontSize: 15,
-                       fontWeight: FontWeight.w400,
-                       color: Colors.black),
-                ),
-
               ],
             ),
             Container(
-              margin: EdgeInsets.only(left: 10,right: 10),
-              child: SubmitButtonWidget(
-                text: Strings.update, onTap: () {  },
-              ),
-            )
+              margin: EdgeInsets.only(left: 10, right: 10),
+              child: SubmitButtonWidget(text: Strings.update, onTap: () {}),
+            ),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30),
-          child: Platform.isIOS
-              ? Image.asset('lib/Assets/Images/appstore.png',width: 150,
-          )
-              : Image.asset("lib/Assets/Images/google_play.png",width: 150,)
+        padding: const EdgeInsets.symmetric(vertical: 30),
+        child:
+            Platform.isIOS
+                ? Image.asset('lib/Assets/Images/appstore.png', width: 150)
+                : Image.asset("lib/Assets/Images/google_play.png", width: 150),
       ),
     );
   }
