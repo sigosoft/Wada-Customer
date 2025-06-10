@@ -126,7 +126,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     padding: const EdgeInsets.only(right: 10),
                     child: InkWell(
                       onTap: (){
-                        Get.back();
+                        _controller.previousPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
                       },
                       child: SvgPicture.asset(
                         "lib/Assets/Images/cancelbutton.svg",
