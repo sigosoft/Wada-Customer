@@ -239,9 +239,9 @@ class Strings {
   static const String ok = "Ok";
   static const String refferals = "Referral Code";
   static const String wellBeBackSoon = "We'll Be Back Soon";
-  static const String sorryWereDownForMaintenanceWellBeBackUpShortly = "Sorry, we're down for maintenance  We'll be back up shortly.";
+  static const String sorryWereDownForMaintenanceWellBeBackUpShortly = "Sorry, we're down for maintenance\nWe'll be back up shortly.";
   static const String serverDown = "Server Down";
-  static const String gotIt = "Got It";
+  static const String gotIt = "GOT IT";
   static const String noInternetConnection = "No Internet Connection";
   static const String pleaseCheckYourInternetConnectionAndTryAgain = "Please check your internet connection and try again.";
   static const String tryAgain = "Try Again";
@@ -254,9 +254,9 @@ class Strings {
   static const String emailUs= "Email us at";
   static const String companyOffice= "Company Office";
   static const String faqs= "FAQs";
-  static const String needsAnUpdate= "Needs An Update";
-  static const String aNewUpdateIsAvailableForThisAppPleaseDownload= "A new update is available for this app. Please download the latest version to continue using the app.";
-  static const String update= "Update";
+  static const String needsAnUpdate= "The WADA Needs An Update";
+  static const String aNewUpdateIsAvailableForThisAppPleaseDownload= "A new update is available for this app.\nPlease download the latest version to\ncontinue using the app.";
+  static const String update= "UPDATE";
   static const String feedback = "For feedback or suggestions";
   static const String logoutmsg = "Are you sure you want to logout?";
   static const String becomeserviceProvider= "Become a Service Provider";

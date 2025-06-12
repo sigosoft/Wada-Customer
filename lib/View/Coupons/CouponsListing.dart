@@ -36,6 +36,7 @@ class _CouponsListingState extends State<CouponsListing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(label: Strings.coupons, showCloseIcon: false),
       body: Padding(
         padding: const EdgeInsets.only(left: 15.0,right: 15, top: 20, bottom: 80),

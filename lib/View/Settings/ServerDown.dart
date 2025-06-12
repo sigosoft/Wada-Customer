@@ -5,16 +5,13 @@ import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 
 import '../../Resource/Strings.dart';
 
-
 class ServerDown extends StatelessWidget {
   const ServerDown({super.key});
 
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Colors.white,
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -24,34 +21,27 @@ class ServerDown extends StatelessWidget {
               children: [
                 SizedBox(
                   height: 200,
-                  child: SvgPicture.asset(
-                    'lib/Assets/Images/WadaSymbol.svg',
-                  ),
+                  child: SvgPicture.asset('lib/Assets/Images/serverdown.svg'),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Text(
                   Strings.serverDown,
                   style: GoogleFonts.inter(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black),
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-
+                const SizedBox(height: 10),
               ],
             ),
-
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:  Container(
-        margin: EdgeInsets.only(left: 10,right: 10,bottom: 30),
-        child: SubmitButtonWidget(text: Strings.gotIt, onTap: () {  },),
+      floatingActionButton: Container(
+        margin: EdgeInsets.only(left: 10, right: 10, bottom: 30),
+        child: SubmitButtonWidget(text: Strings.gotIt, onTap: () {}),
       ),
     );
   }
