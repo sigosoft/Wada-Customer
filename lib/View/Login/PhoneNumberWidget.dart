@@ -5,15 +5,19 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
+import 'package:get/get.dart';
+import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:waada_customerapp/Controller/RegisterController.dart';
+
 class CountryCodeAndPhoneNUmber extends StatelessWidget {
-  const CountryCodeAndPhoneNUmber({super.key,required this.name});
+  const CountryCodeAndPhoneNUmber({super.key, required this.name});
   final String name;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child:SizedBox(
+      child: SizedBox(
         height: 50,
         width: double.infinity,
         child: Row(
@@ -26,7 +30,7 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                 border: Border.all(color: Colors.transparent),
               ),
               child: Padding(
-                padding: EdgeInsets.only(top: 10,bottom: 10),
+                padding: EdgeInsets.only(top: 10, bottom: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -39,39 +43,64 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                     // ),
                     Expanded(
                       child: DropdownButtonFormField<String>(
+                        onTap: () {
+                          if (Get.isRegistered<LoginController>()) {
+                            Get.find<LoginController>().fetchCountryCodes();
+                          } else if (Get.isRegistered<Registercontroller>()) {
+                            Get.find<Registercontroller>().fetchCountryCodes();
+                          }
+                        },
+                        hint: Text(
+                          Strings.countryCode,
+                          style: GoogleFonts.inter(
+                            color: blackTextColor,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 10,
+                          ),
+                        ),
                         icon: SizedBox.shrink(),
                         isExpanded: true,
                         decoration: InputDecoration(
-                          labelText: Strings.countryCode,
-                          labelStyle: GoogleFonts.inter(
-                            textStyle: Theme.of(context).textTheme.displayLarge,
-                            color: blackTextColor,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            fontStyle: FontStyle.normal,
-                          ),
                           filled: true,
                           fillColor: const Color(0xFFF3F3F3),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 5,
+                          ),
                         ),
-                        items: ['+91', '+1', '+44', '+61'].map((code) {
-                          return DropdownMenuItem<String>(
-                            value: code,
-                            child: Text(
-                              code,
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {},
+                        items:
+                            (Get.isRegistered<LoginController>()
+                                    ? Get.find<LoginController>().countryCodes
+                                    : Get.isRegistered<Registercontroller>()
+                                    ? Get.find<Registercontroller>()
+                                        .countryCodes
+                                    : [])
+                                .map((code) {
+                                  return DropdownMenuItem<String>(
+                                    value: code,
+                                    child: Text(
+                                      code,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 10,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  );
+                                })
+                                .toList(),
+                        onChanged: (value) {
+                          if (Get.isRegistered<LoginController>()) {
+                            Get.find<LoginController>().selectedCountryCode =
+                                value;
+                          } else if (Get.isRegistered<Registercontroller>()) {
+                            // Registercontroller logic if needed
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -88,7 +117,7 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                   border: Border.all(color: Colors.transparent),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                  padding: EdgeInsets.only(top: 10, bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -100,6 +129,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                       // ),
                       Expanded(
                         child: TextFormField(
+                          controller:
+                              Get.isRegistered<LoginController>()
+                                  ? Get.find<LoginController>().phoneController
+                                  : null,
                           keyboardType: TextInputType.phone,
                           maxLines: 1,
                           inputFormatters: [
@@ -114,7 +147,8 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           decoration: InputDecoration(
                             labelText: name,
                             labelStyle: GoogleFonts.inter(
-                              textStyle: Theme.of(context).textTheme.displayLarge,
+                              textStyle:
+                                  Theme.of(context).textTheme.displayLarge,
                               color: blackTextColor,
                               fontWeight: FontWeight.w400,
                               fontSize: 12,
@@ -126,7 +160,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                           ),
                           onChanged: (value) {
                             if (value.length > 10) {
@@ -142,7 +179,7 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }

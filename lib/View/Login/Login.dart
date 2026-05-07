@@ -24,19 +24,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar:  AppBar(
+      appBar: AppBar(
         surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
-        leading:SizedBox(),
+        leading: SizedBox(),
         titleSpacing: 0,
         toolbarHeight: 50,
         centerTitle: false,
-        actions:  [
+        actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: InkWell(
@@ -79,25 +78,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       size: 14.00,
                     ),
                     SizedBox(height: 20),
-                    CountryCodeAndPhoneNUmber(name: Strings.phoneNumber,),
+                    CountryCodeAndPhoneNUmber(name: Strings.phoneNumber),
                     SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: SubmitButtonWidget(
-                        onTap:(){
-                          Get.to(OtpScreen2 ());
+                        onTap: () {
+                          controller.sendLoginOtp();
                         },
-                        text:Strings.next,
+                        text: Strings.next,
                       ),
                     ),
                     SizedBox(height: 15),
-                   RichTextWidget(
-                     text1:Strings.donHaveAnAccount,
-                     text2: Strings.register,
-                     onTap:(){
-                       Get.to(Register());
-                     },
-                   )
+                    RichTextWidget(
+                      text1: Strings.donHaveAnAccount,
+                      text2: Strings.register,
+                      onTap: () {
+                        Get.to(Register());
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -106,7 +105,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-
-
-

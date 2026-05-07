@@ -6,4 +6,6 @@ class ApiConfigs {
 
 class ApiEndPoints {
   static String login = "";
+  static String getCountryCodes = "getCountryCodes";
+  static String sendLoginOtp = "send_login_otp";
 }
