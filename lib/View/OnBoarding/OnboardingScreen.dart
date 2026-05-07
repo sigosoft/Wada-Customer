@@ -26,7 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "description": Strings.dummy,
     },
     {
-      "image":"lib/Assets/Images/onboardingimage2.svg",
+      "image": "lib/Assets/Images/onboardingimage2.svg",
       "title": "Lorem ipsum",
       "description": Strings.dummy,
     },
@@ -109,12 +109,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Positioned(
               top: 40,
               right: 10,
-              child: _currentPage == onboardingData.length - 1?Container():IconButton(
-                icon: Icon(Icons.close, color: Colors.white),
-                onPressed: () {
-                 Get.offAll(Register());
-                },
-              ),
+              child:
+                  _currentPage == onboardingData.length - 1
+                      ? Container()
+                      : IconButton(
+                        icon: Icon(Icons.close, color: Colors.white),
+                        onPressed: () {
+                          Get.offAll(LoginScreen());
+                        },
+                      ),
             ),
             Positioned(
               bottom: 40,
@@ -126,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
                       child: InkWell(
-                        onTap: (){
+                        onTap: () {
                           Get.back();
                         },
                         child: SvgPicture.asset(
@@ -147,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       onPressed: () {
                         if (_currentPage == onboardingData.length - 1) {
-                          Get.offAll(Register());
+                          Get.offAll(LoginScreen());
                         } else {
                           _controller.nextPage(
                             duration: Duration(milliseconds: 300),
@@ -156,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       },
                       child: Text(
-                       Strings.next,
+                        Strings.next,
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -167,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

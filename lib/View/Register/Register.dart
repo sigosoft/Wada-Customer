@@ -30,12 +30,11 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar:  AppBar(
+      appBar: AppBar(
         surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         leading: InkWell(
@@ -51,7 +50,7 @@ class _RegisterState extends State<Register> {
         titleSpacing: 0,
         toolbarHeight: 50,
         centerTitle: false,
-        actions:  [
+        actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: InkWell(
@@ -73,60 +72,68 @@ class _RegisterState extends State<Register> {
         init: Registercontroller(),
         builder:
             (controller) => SingleChildScrollView(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20),
-                TextStyleInterForSplash(
-                  text: Strings.registration,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 22.00,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    TextStyleInterForSplash(
+                      text: Strings.registration,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 22.00,
+                    ),
+                    SizedBox(height: 20),
+                    TextStyleInterForSplash(
+                      text: Strings.createAccount,
+                      color: blackTextColor,
+                      fontWeight: FontWeight.w500,
+                      size: 14.00,
+                    ),
+                    SizedBox(height: 20),
+                    TextInputWidget(
+                      label: Strings.firstname,
+                      type: TextInputType.text,
+                      height: 50,
+                    ),
+                    SizedBox(height: 15),
+                    TextInputWidget(
+                      label: Strings.email,
+                      type: TextInputType.emailAddress,
+                      height: 50,
+                    ),
+                    SizedBox(height: 15),
+                    CountryCodeAndPhoneNUmber(name: Strings.phoneNumber),
+                    SizedBox(height: 15),
+                    DateOfBirthField(),
+                    SizedBox(height: 15),
+                    GenderDropdownField(name: Strings.gender),
+                    SizedBox(height: 15),
+                    TextInputWidget(
+                      label: Strings.refferal_code,
+                      type: TextInputType.text,
+                      height: 50,
+                    ),
+                    SizedBox(height: 15),
+                    AgreeWithTermsWidget(),
+                    SizedBox(height: 50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: SubmitButtonWidget(
+                        onTap: () {
+                          Get.to(OtpScreen2());
+                        },
+                        text: Strings.verify,
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                  ],
                 ),
-                SizedBox(height: 20),
-                TextStyleInterForSplash(
-                  text: Strings.createAccount,
-                  color: blackTextColor,
-                  fontWeight: FontWeight.w500,
-                  size: 14.00,
-                ),
-                SizedBox(height: 20),
-                TextInputWidget(label: Strings.firstname,type: TextInputType.text,height: 50),
-                SizedBox(height: 15),
-                TextInputWidget(label: Strings.email,type: TextInputType.emailAddress,height: 50),
-                SizedBox(height: 15),
-                CountryCodeAndPhoneNUmber(name: Strings.phoneNumber,),
-                SizedBox(height: 15),
-                DateOfBirthField(),
-                SizedBox(height: 15),
-                GenderDropdownField(name: Strings.gender,),
-                SizedBox(height: 15),
-                TextInputWidget(label: Strings.refferal_code,type: TextInputType.text,height: 50,),
-                SizedBox(height: 15),
-                AgreeWithTermsWidget(),
-                SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SubmitButtonWidget(
-                    onTap:(){
-                     Get.to(LoginScreen());
-                    },
-                    text:Strings.verify,
-                  ),
-                ),
-                SizedBox(height: 15),
-              ],
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
 }
-
-
-
-
