@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:super_tooltip/super_tooltip.dart';
 
 import '../Resource/Colors.dart';
-
 
 class Plusfour extends StatefulWidget {
   final String data;
   final int length;
   const Plusfour({Key? key, required this.data, required this.length})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<Plusfour> createState() => _PlusfourState();
@@ -34,85 +30,94 @@ class _PlusfourState extends State<Plusfour> {
 
     return widget.length >= 3
         ? WillPopScope(
-            onWillPop: _willPopCallback,
-            child: GestureDetector(
-              onTap: () async {
-                await _controller.showTooltip();
-              },
-              child: SuperTooltip(
-                  minimumOutsideMargin: 0,
-                  shadowBlurRadius: 0,
-                  shadowColor: Colors.white,
-                  showBarrier: true,
-                  controller: _controller,
-                  popupDirection: TooltipDirection.up,
-                  backgroundColor: Colors.white,
-                  arrowTipDistance: 0.0,
-                  arrowBaseWidth: 15.0,
-                  arrowLength: 20.0,
-                  borderRadius: 0,
-                  borderColor: Colors.white,
-                  constraints: const BoxConstraints(
-                    minHeight: 0.0,
-                    maxHeight: double.infinity,
-                    minWidth: 0.0,
-                    maxWidth: double.infinity,
-                  ),
-                  showCloseButton: false,
-                  touchThroughAreaShape: ClipAreaShape.rectangle,
-                  barrierColor: const Color.fromARGB(26, 47, 45, 47),
-                  content: SizedBox(
-                    height: 30,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            widget.data,
-                            softWrap: true,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
-                                fontFamily: 'Poppins-Regular'),
-                          ),
+          onWillPop: _willPopCallback,
+          child: GestureDetector(
+            onTap: () async {
+              await _controller.showTooltip();
+            },
+            child: SuperTooltip(
+              positionConfig: const PositionConfiguration(
+                minimumOutsideMargin: 0,
+                preferredDirection: TooltipDirection.up,
+              ),
+              style: const TooltipStyle(
+                shadowBlurRadius: 0,
+                shadowColor: Colors.white,
+                backgroundColor: Colors.white,
+                borderRadius: 0,
+                borderColor: Colors.white,
+              ),
+              barrierConfig: const BarrierConfiguration(
+                show: true,
+                color: Color.fromARGB(26, 47, 45, 47),
+              ),
+              controller: _controller,
+              arrowConfig: const ArrowConfiguration(
+                tipDistance: 0.0,
+                baseWidth: 15.0,
+                length: 20.0,
+              ),
+              constraints: const BoxConstraints(
+                minHeight: 0.0,
+                maxHeight: double.infinity,
+                minWidth: 0.0,
+                maxWidth: double.infinity,
+              ),
+              closeButtonConfig: const CloseButtonConfiguration(show: false),
+              touchThroughAreaShape: ClipAreaShape.rectangle,
+              content: SizedBox(
+                height: 30,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.data,
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 10,
+                          fontFamily: 'Poppins-Regular',
                         ),
-                        InkWell(
-                          onTap: () {
-                            _controller.hideTooltip();
-                          },
-                          child: Container(
-                              margin: const EdgeInsets.only(left: 10),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.close,
-                                  size: 20,
-                                ),
-                              )),
-                        )
-                      ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _controller.hideTooltip();
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 10),
+                        child: const Center(child: Icon(Icons.close, size: 20)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: greyTextColour),
+                ),
+                width: 19,
+                height: 19,
+                child: Center(
+                  child: Text(
+                    "+$lang",
+                    style: const TextStyle(
+                      color: greyTextColour,
+                      fontSize: 12,
+                      fontFamily: 'Poppins-Regular',
                     ),
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: greyTextColour)),
-                    width: 19,
-                    height: 19,
-                    child: Center(
-                        child: Text(
-                      "+$lang",
-                      style: const TextStyle(
-                          color: greyTextColour,
-                          fontSize: 12,
-                          fontFamily: 'Poppins-Regular'),
-                    )),
-                  )),
+                ),
+              ),
             ),
-          )
+          ),
+        )
         : Container();
   }
 

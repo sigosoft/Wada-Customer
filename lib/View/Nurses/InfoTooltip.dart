@@ -31,15 +31,23 @@ class _InfoTooltipState extends State<InfoTooltip> {
         },
         child: SuperTooltip(
           controller: _tooltipController,
-          popupDirection: TooltipDirection.down,
-          backgroundColor: Colors.white,
-          borderColor: Colors.grey.shade300,
-          borderRadius: 8.0,
-          arrowTipDistance: 10.0,
-          arrowBaseWidth: 15.0,
-          arrowLength: 10.0,
-          showBarrier: true,
-          barrierColor: Colors.black.withOpacity(0.1),
+          positionConfig: const PositionConfiguration(
+            preferredDirection: TooltipDirection.down,
+          ),
+          style: TooltipStyle(
+            backgroundColor: Colors.white,
+            borderColor: Colors.grey.shade300,
+            borderRadius: 8.0,
+          ),
+          arrowConfig: const ArrowConfiguration(
+            tipDistance: 10.0,
+            baseWidth: 15.0,
+            length: 10.0,
+          ),
+          barrierConfig: BarrierConfiguration(
+            show: true,
+            color: Colors.black.withOpacity(0.1),
+          ),
           content: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.5,
