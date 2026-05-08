@@ -23,6 +23,104 @@ class HomeController extends GetxController {
     super.onInit();
     print("HomeController initialized");
     fetchHomeData();
+    fetchSpecializations();
+    fetchOtherServices();
+  }
+
+  Future<void> fetchOtherServices() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.otherServiceNames}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Other Services) ---");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Other Services) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        final List otherServices = response.data['data'] ?? [];
+        if (otherServices.isNotEmpty) {
+          final localIcons = [
+            "lib/Assets/Images/OtherServicesIcon1.svg",
+            "lib/Assets/Images/OtherServicesIcon2.svg",
+            "lib/Assets/Images/OtherServicesIcon3.svg",
+            "lib/Assets/Images/OtherServicesIcon4.svg",
+            "lib/Assets/Images/OtherServicesIcon5.svg",
+            "lib/Assets/Images/OtherServicesIcon6.svg",
+          ];
+          otherServicesList =
+              otherServices.asMap().entries.map((entry) {
+                final i = entry.key;
+                final s = entry.value;
+                final name = s['name']?.toString() ?? '';
+                final imageUrl = _fullImageUrl(s['image']?.toString());
+                final icon =
+                    imageUrl.isNotEmpty
+                        ? imageUrl
+                        : (i < localIcons.length
+                            ? localIcons[i]
+                            : localIcons.last);
+                return <String, dynamic>{
+                  'icon': icon,
+                  'name': name,
+                  'route': _routeFor(name),
+                };
+              }).toList();
+          update();
+        }
+      }
+    } catch (e) {
+      print("--- API Error (Other Services) ---");
+      print("Error fetching other services: $e");
+    }
+  }
+
+  List<dynamic> specializationsList = [];
+
+  Future<void> fetchSpecializations() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.specializations}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Specializations) ---");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Specializations) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200) {
+        // The API might return a list directly or wrapped in 'data'
+        if (response.data is List) {
+          specializationsList = response.data;
+        } else if (response.data['status'].toString() == "true") {
+          specializationsList = response.data['data'] ?? [];
+        }
+        update();
+      }
+    } catch (e) {
+      print("--- API Error (Specializations) ---");
+      print("Error fetching specializations: $e");
+    }
   }
 
   @override
@@ -46,17 +144,17 @@ class HomeController extends GetxController {
     {
       'icon': "lib/Assets/Images/HomeScreenRowIcon1.svg",
       'name': 'Doctor',
-      'description': 'Browse by specialty, availability, and location.'
+      'description': 'Browse by specialty, availability, and location.',
     },
     {
       'icon': 'lib/Assets/Images/HomeScreenRowIcon2.svg',
       'name': 'Nurses',
-      'description': 'Home care services & appointment booking.'
+      'description': 'Home care services & appointment booking.',
     },
     {
       'icon': 'lib/Assets/Images/HomeScreenRowIcon3.svg',
       'name': 'Blood Bank',
-      'description': 'Home care services & appointment booking.'
+      'description': 'Home care services & appointment booking.',
     },
   ];
 
@@ -112,8 +210,14 @@ class HomeController extends GetxController {
     final n = name.toLowerCase();
     if (n.contains('ambulance')) return Ambulance();
     if (n.contains('nurse') || n.contains('nursing')) return BookNurse();
-    if (n.contains('lab') || n.contains('pathology') || n.contains('diagnostic')) return Laboratory();
-    if (n.contains('store') || n.contains('medical store') || n.contains('pharmacy')) return MedicalStore();
+    if (n.contains('lab') ||
+        n.contains('pathology') ||
+        n.contains('diagnostic'))
+      return Laboratory();
+    if (n.contains('store') ||
+        n.contains('medical store') ||
+        n.contains('pharmacy'))
+      return MedicalStore();
     if (n.contains('blood')) return BloodBankListing();
     if (n.contains('doctor')) return DoctorsListingListing();
     return const Scaffold(body: Center(child: Text("Service coming soon")));
@@ -123,11 +227,19 @@ class HomeController extends GetxController {
   Function _routeFor(String name) {
     final n = name.toLowerCase();
     if (n.contains('ambulance')) return () => Get.to(() => Ambulance());
-    if (n.contains('nurse') || n.contains('nursing')) return () => Get.to(() => BookNurse());
-    if (n.contains('lab') || n.contains('pathology') || n.contains('diagnostic')) return () => Get.to(() => Laboratory());
-    if (n.contains('store') || n.contains('medical store') || n.contains('pharmacy')) return () => Get.to(() => MedicalStore());
+    if (n.contains('nurse') || n.contains('nursing'))
+      return () => Get.to(() => BookNurse());
+    if (n.contains('lab') ||
+        n.contains('pathology') ||
+        n.contains('diagnostic'))
+      return () => Get.to(() => Laboratory());
+    if (n.contains('store') ||
+        n.contains('medical store') ||
+        n.contains('pharmacy'))
+      return () => Get.to(() => MedicalStore());
     if (n.contains('blood')) return () => Get.to(() => BloodBankListing());
-    if (n.contains('doctor')) return () => Get.to(() => DoctorsListingListing());
+    if (n.contains('doctor'))
+      return () => Get.to(() => DoctorsListingListing());
     return () {};
   }
 
@@ -159,10 +271,7 @@ class HomeController extends GetxController {
       print("Headers: $headers");
       print("Token: $token");
 
-      final response = await _dio.get(
-        url,
-        options: Options(headers: headers),
-      );
+      final response = await _dio.get(url, options: Options(headers: headers));
 
       print("--- API Response (Home) ---");
       print("Status Code: ${response.statusCode}");
@@ -178,11 +287,14 @@ class HomeController extends GetxController {
 
         // --- Parse main_sliders (first carousel) ---
         final mainSliders = homeData?['main_sliders'];
-        if (mainSliders != null && mainSliders is List && mainSliders.isNotEmpty) {
-          final parsedUrls = mainSliders
-              .map((s) => _fullImageUrl(s['image']?.toString()))
-              .where((u) => u.isNotEmpty)
-              .toList();
+        if (mainSliders != null &&
+            mainSliders is List &&
+            mainSliders.isNotEmpty) {
+          final parsedUrls =
+              mainSliders
+                  .map((s) => _fullImageUrl(s['image']?.toString()))
+                  .where((u) => u.isNotEmpty)
+                  .toList();
           if (parsedUrls.isNotEmpty) {
             imageUrls = List<String>.from(parsedUrls);
             print("main_sliders parsed: $imageUrls");
@@ -191,11 +303,14 @@ class HomeController extends GetxController {
 
         // --- Parse bottom_sliders (second carousel) ---
         final bottomSliders = homeData?['bottom_sliders'];
-        if (bottomSliders != null && bottomSliders is List && bottomSliders.isNotEmpty) {
-          final parsedUrls = bottomSliders
-              .map((s) => _fullImageUrl(s['image']?.toString()))
-              .where((u) => u.isNotEmpty)
-              .toList();
+        if (bottomSliders != null &&
+            bottomSliders is List &&
+            bottomSliders.isNotEmpty) {
+          final parsedUrls =
+              bottomSliders
+                  .map((s) => _fullImageUrl(s['image']?.toString()))
+                  .where((u) => u.isNotEmpty)
+                  .toList();
           if (parsedUrls.isNotEmpty) {
             imageUrls2 = List<String>.from(parsedUrls);
             print("bottom_sliders parsed: $imageUrls2");
@@ -204,38 +319,49 @@ class HomeController extends GetxController {
 
         // --- Parse mainServiceNames (horizontal scroll) ---
         final mainServices = homeData?['mainServiceNames'];
-        if (mainServices != null && mainServices is List && mainServices.isNotEmpty) {
+        if (mainServices != null &&
+            mainServices is List &&
+            mainServices.isNotEmpty) {
           final localIcons = [
             "lib/Assets/Images/HomeScreenRowIcon1.svg",
             "lib/Assets/Images/HomeScreenRowIcon2.svg",
             "lib/Assets/Images/HomeScreenRowIcon3.svg",
           ];
-          homeRowWidgetItems = mainServices.asMap().entries.map((entry) {
-            final i = entry.key;
-            final s = entry.value;
-            final imageUrl = _fullImageUrl(s['image']?.toString());
-            // Use network image if available, else fall back to local SVG icon
-            final icon = imageUrl.isNotEmpty
-                ? imageUrl
-                : (i < localIcons.length ? localIcons[i] : localIcons.last);
-            return {
-              'icon': icon,
-              'name': s['name']?.toString() ?? '',
-              'description': s['description']?.toString() ?? '',
-            };
-          }).toList();
-          
+          homeRowWidgetItems =
+              mainServices.asMap().entries.map((entry) {
+                final i = entry.key;
+                final s = entry.value;
+                final imageUrl = _fullImageUrl(s['image']?.toString());
+                // Use network image if available, else fall back to local SVG icon
+                final icon =
+                    imageUrl.isNotEmpty
+                        ? imageUrl
+                        : (i < localIcons.length
+                            ? localIcons[i]
+                            : localIcons.last);
+                return {
+                  'icon': icon,
+                  'name': s['name']?.toString() ?? '',
+                  'description': s['description']?.toString() ?? '',
+                };
+              }).toList();
+
           // Dynamically build screenWidgets matching mainServiceNames
-          screenWidgets = mainServices.map((s) {
-            return _widgetFor(s['name']?.toString() ?? '');
-          }).toList();
-          
-          print("mainServiceNames parsed: ${homeRowWidgetItems.map((e) => e['name']).toList()}");
+          screenWidgets =
+              mainServices.map((s) {
+                return _widgetFor(s['name']?.toString() ?? '');
+              }).toList();
+
+          print(
+            "mainServiceNames parsed: ${homeRowWidgetItems.map((e) => e['name']).toList()}",
+          );
         }
 
         // --- Parse otherServiceNames (grid) ---
         final otherServices = homeData?['otherServiceNames'];
-        if (otherServices != null && otherServices is List && otherServices.isNotEmpty) {
+        if (otherServices != null &&
+            otherServices is List &&
+            otherServices.isNotEmpty) {
           final localIcons = [
             "lib/Assets/Images/OtherServicesIcon1.svg",
             "lib/Assets/Images/OtherServicesIcon2.svg",
@@ -244,21 +370,27 @@ class HomeController extends GetxController {
             "lib/Assets/Images/OtherServicesIcon5.svg",
             "lib/Assets/Images/OtherServicesIcon6.svg",
           ];
-          otherServicesList = otherServices.asMap().entries.map((entry) {
-            final i = entry.key;
-            final s = entry.value;
-            final name = s['name']?.toString() ?? '';
-            final imageUrl = _fullImageUrl(s['image']?.toString());
-            final icon = imageUrl.isNotEmpty
-                ? imageUrl
-                : (i < localIcons.length ? localIcons[i] : localIcons.last);
-            return <String, dynamic>{
-              'icon': icon,
-              'name': name,
-              'route': _routeFor(name),
-            };
-          }).toList();
-          print("otherServiceNames parsed: ${otherServicesList.map((e) => e['name']).toList()}");
+          otherServicesList =
+              otherServices.asMap().entries.map((entry) {
+                final i = entry.key;
+                final s = entry.value;
+                final name = s['name']?.toString() ?? '';
+                final imageUrl = _fullImageUrl(s['image']?.toString());
+                final icon =
+                    imageUrl.isNotEmpty
+                        ? imageUrl
+                        : (i < localIcons.length
+                            ? localIcons[i]
+                            : localIcons.last);
+                return <String, dynamic>{
+                  'icon': icon,
+                  'name': name,
+                  'route': _routeFor(name),
+                };
+              }).toList();
+          print(
+            "otherServiceNames parsed: ${otherServicesList.map((e) => e['name']).toList()}",
+          );
         }
       } else {
         print("--- Home API returned non-success status ---");

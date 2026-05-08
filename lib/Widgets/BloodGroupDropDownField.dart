@@ -4,10 +4,12 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 
 class BloodGroupDropDownField extends StatefulWidget {
-  const BloodGroupDropDownField({super.key});
+  final ValueChanged<String?>? onChanged;
+  const BloodGroupDropDownField({super.key, this.onChanged});
 
   @override
-  State<BloodGroupDropDownField> createState() => _BloodGroupDropDownFieldState();
+  State<BloodGroupDropDownField> createState() =>
+      _BloodGroupDropDownFieldState();
 }
 
 class _BloodGroupDropDownFieldState extends State<BloodGroupDropDownField> {
@@ -16,26 +18,32 @@ class _BloodGroupDropDownFieldState extends State<BloodGroupDropDownField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 10,right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: DropdownButtonFormField<String>(
         value: _selectedBloodGroup,
-        items: ['A+', 'B+', 'O+','AB+']
-            .map((gender) => DropdownMenuItem(
-          value: gender,
-          child: Text(
-            gender,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ))
-            .toList(),
+        items:
+            ['A+', 'B+', 'O+', 'AB+']
+                .map(
+                  (gender) => DropdownMenuItem(
+                    value: gender,
+                    child: Text(
+                      gender,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
         onChanged: (value) {
           setState(() {
             _selectedBloodGroup = value;
           });
+          if (widget.onChanged != null) {
+            widget.onChanged!(value);
+          }
         },
 
         decoration: InputDecoration(
@@ -53,7 +61,10 @@ class _BloodGroupDropDownFieldState extends State<BloodGroupDropDownField> {
             borderSide: BorderSide.none,
           ),
 
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
+          ),
           suffixIcon: Container(
             margin: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -74,7 +85,7 @@ class _BloodGroupDropDownFieldState extends State<BloodGroupDropDownField> {
         ),
         isDense: true,
         icon: null,
-        iconSize: 0,// Hides the default dropdown arrow
+        iconSize: 0, // Hides the default dropdown arrow
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
+import 'package:waada_customerapp/Controller/BottomNavController.dart';
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String label;
   final bool showCloseIcon;
@@ -30,7 +32,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading:  showBackButton
           ? InkWell(
         onTap: () {
-          Get.back();
+          if (Navigator.canPop(context)) {
+            Get.back();
+          } else if (Get.isRegistered<BottomNavController>()) {
+            Get.find<BottomNavController>().backToHome();
+          }
         },
         child: SvgPicture.asset(
           "lib/Assets/Images/BackButton.svg",

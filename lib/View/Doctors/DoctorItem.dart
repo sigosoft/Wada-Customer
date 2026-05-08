@@ -11,16 +11,29 @@ import '../../Resource/Strings.dart';
 import '../../Widgets/Plusfour.dart';
 import '../../Widgets/ShiftDetailsWidget.dart';
 
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+
 class DoctorItem extends StatelessWidget {
-  const DoctorItem({super.key});
+  final dynamic doctor;
+  const DoctorItem({super.key, this.doctor});
 
   @override
   Widget build(BuildContext context) {
+    String name = doctor?['name']?.toString() ?? "Doctor";
+    String specialty = doctor?['specialization']?.toString() ?? "";
+    String fee = doctor?['fee']?.toString() ?? "0";
+    String experience = doctor?['experience']?.toString() ?? "0";
+    String location = doctor?['city']?.toString() ?? "";
+    String languages = doctor?['languages']?.toString() ?? "";
+    String image = doctor?['image'] != null 
+        ? "${ApiConfigs.IMAGE_URL}${doctor['image']}" 
+        : 'lib/Assets/Images/nurse.png';
+
     return Container(
       margin: const EdgeInsets.only(left: 15.0,right: 15,bottom: 15),
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Color(0xFFEAF3FA),
+        color: const Color(0xFFEAF3FA),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -41,13 +54,24 @@ class DoctorItem extends StatelessWidget {
                     width: 85, // Optional: Adjust width
                     height: 75,
                     decoration: BoxDecoration(
-                      color: Color(0xFFE4E4E7), // Background color
+                      color: const Color(0xFFE4E4E7), // Background color
                       borderRadius: BorderRadius.circular(8), // Corner radius
                     ),
-                    child: Image.asset(
-                      'lib/Assets/Images/nurse.png', // Replace with your image path
-                      fit: BoxFit.contain, // Ensures the image covers the container
-                     // Optional: Adjust height
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: image.startsWith('http') 
+                        ? Image.network(
+                            image,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
+                              'lib/Assets/Images/nurse.png',
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : Image.asset(
+                            image,
+                            fit: BoxFit.contain,
+                          ),
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -64,7 +88,7 @@ class DoctorItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis, // Ensures text wraps to the next line
                       ),
                       Text(
-                        "₹500",
+                        " ₹$fee",
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: Colors.black,
@@ -77,7 +101,7 @@ class DoctorItem extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 10),
               // Details Section
               Expanded(
                 child: Column(
@@ -85,7 +109,7 @@ class DoctorItem extends StatelessWidget {
                   children: [
                     const SizedBox(height: 2),
                     Text(
-                      "Dr. Ahmed Khan",
+                      name,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -99,7 +123,7 @@ class DoctorItem extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            "Cardiologist  |",
+                            "$specialty  |",
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
@@ -113,7 +137,7 @@ class DoctorItem extends StatelessWidget {
                         SvgPicture.asset("lib/Assets/Images/years.svg",height: 13,width: 13,),
                         const SizedBox(width: 5),
                         Text(
-                          "2 Years",
+                          "$experience Years",
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: greyTextColour,
@@ -131,7 +155,7 @@ class DoctorItem extends StatelessWidget {
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            "Raipur, Chhattisgarh",
+                            location,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
@@ -148,17 +172,21 @@ class DoctorItem extends StatelessWidget {
                       children: [
                         SvgPicture.asset("lib/Assets/Images/language.svg"),
                         const SizedBox(width: 5),
-                        Text(
-                          "English, Hindi",
-                          style: GoogleFonts.inter(fontSize: 12,color: greyTextColour,fontWeight: FontWeight.w500),
+                        Flexible(
+                          child: Text(
+                            languages,
+                            style: GoogleFonts.inter(fontSize: 12,color: greyTextColour,fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(
                           width: 8,
                         ),
-                        Plusfour(
-                          data: "Tamil, Malayalam",
-                          length: 4,
-                        )
+                        // Plusfour(
+                        //   data: "Tamil, Malayalam",
+                        //   length: 4,
+                        // )
                       ],
                     ),
                   ],

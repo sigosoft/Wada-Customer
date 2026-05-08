@@ -5,15 +5,35 @@ import '../../Resource/Colors.dart';
 import '../../Resource/Strings.dart';
 
 class BloodBankItem extends StatelessWidget {
-  const BloodBankItem({super.key});
+  final dynamic donor;
+  const BloodBankItem({super.key, this.donor});
+
+  String _getBloodGroup(dynamic id) {
+    switch (id.toString()) {
+      case "1": return "A+ve";
+      case "2": return "A-ve";
+      case "3": return "B+ve";
+      case "4": return "B-ve";
+      case "5": return "O+ve";
+      case "6": return "O-ve";
+      case "7": return "AB+ve";
+      case "8": return "AB-ve";
+      default: return "Unknown";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    String name = donor?['donor_name']?.toString() ?? "Donor";
+    String location = donor?['location']?.toString() ?? "";
+    String gender = (donor?['gender']?.toString() == "1") ? "Male" : "Female";
+    String bloodGroup = _getBloodGroup(donor?['blood_group_id']);
+
     return Container(
       margin: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Color(0xFFEAF3FA),
+        color: const Color(0xFFEAF3FA),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -29,15 +49,9 @@ class BloodBankItem extends StatelessWidget {
               Container(
                 width: 50, // Optional: Adjust width
                 height: 50,
-                // decoration: BoxDecoration(
-                //   color: Color(0xFFE4E4E7), // Background color
-                //   borderRadius: BorderRadius.circular(8), // Corner radius
-                // ),
                 child: Image.asset(
                   'lib/Assets/Images/profile.png',
-                  // Replace with your image path
-                  fit: BoxFit.contain, // Ensures the image covers the container
-                  // Optional: Adjust height
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(width: 8),
@@ -48,7 +62,7 @@ class BloodBankItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "John Jacob",
+                      name,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -68,32 +82,28 @@ class BloodBankItem extends StatelessWidget {
                         const SizedBox(width: 3),
                         Flexible(
                           child: Text(
-                            "Raipur, Chhattisgarh",
+                            location,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
-                            overflow:
-                                TextOverflow
-                                    .ellipsis, // Ensures text wraps to the next line
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "Male",
+                      gender,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: greyTextColour,
                         fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
-                      overflow:
-                          TextOverflow
-                              .ellipsis, // Ensures text wraps to the next line
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -112,12 +122,12 @@ class BloodBankItem extends StatelessWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: Color(0xFFCF3535), // Background color
+                    color: const Color(0xFFCF3535), // Background color
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                   ),
                   child: Center(
                     child: Text(
-                      "A+ve",
+                      bloodGroup,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -127,7 +137,7 @@ class BloodBankItem extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 10,),
+              const SizedBox(width: 10,),
               Expanded(
                 flex: 3,
                 child: SizedBox(
@@ -154,16 +164,14 @@ class BloodBankItem extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        // Add spacing between text and icon
-                        Icon(
+                        const Icon(
                           Icons.phone, // Phone icon
                           color: Colors.white,
                           size: 16,
                         ),
                       ],
                     ),
-                    icon:
-                        const SizedBox.shrink(), // Empty icon to satisfy ElevatedButton.icon
+                    icon: const SizedBox.shrink(),
                   ),
                 ),
               ),

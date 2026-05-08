@@ -64,49 +64,37 @@ class _HomeItemState extends State<HomeItem> {
                                 size: 16.00,
                               ),
                               const SizedBox(height: 10),
-                              if (controller.homeData?['specializations'] !=
-                                      null &&
-                                  (controller.homeData?['specializations']
-                                          as List)
-                                      .isNotEmpty)
-                                ...(controller.homeData?['specializations']
-                                        as List)
-                                    .map((spec) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 10,
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            Get.to(
-                                              () =>
-                                                  ShareLocationBookingDetails(),
-                                            );
-                                          },
-                                          child: HomeNurseDetailsWidget(
-                                            name:
-                                                spec['specialist']
-                                                    ?.toString() ??
-                                                "Specialist",
-                                            qualification:
-                                                spec['specialization']
-                                                    ?.toString() ??
-                                                "Qualification",
-                                            imagePath:
-                                                spec['image'] != null
-                                                    ? "${ApiConfigs.IMAGE_URL}${spec['image']}"
-                                                    : 'lib/Assets/Images/nurse.png',
-                                            onTapButton: () {
-                                              Get.to(() => ChooseLocation());
-                                            },
-                                            showButton: true,
-                                            buttonText:
-                                                Strings.shareYourLocation,
-                                          ),
-                                        ),
-                                      );
-                                    })
-                                    .toList()
+                              if (controller.specializationsList.isNotEmpty)
+                                ...controller.specializationsList.map((spec) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Get.to(
+                                          () => ShareLocationBookingDetails(),
+                                        );
+                                      },
+                                      child: HomeNurseDetailsWidget(
+                                        name:
+                                            spec['specialist']?.toString() ??
+                                            "Specialist",
+                                        qualification:
+                                            spec['specialization']
+                                                ?.toString() ??
+                                            "Qualification",
+                                        imagePath:
+                                            spec['image'] != null
+                                                ? "${ApiConfigs.IMAGE_URL}${spec['image']}"
+                                                : 'lib/Assets/Images/nurse.png',
+                                        onTapButton: () {
+                                          Get.to(() => ChooseLocation());
+                                        },
+                                        showButton: true,
+                                        buttonText: Strings.shareYourLocation,
+                                      ),
+                                    ),
+                                  );
+                                }).toList()
                               else
                                 InkWell(
                                   onTap: () {

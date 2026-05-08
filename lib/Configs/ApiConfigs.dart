@@ -11,4 +11,8 @@ class ApiEndPoints {
   static String logout = "logout";
   static String sendRegOtp = "send_reg_otp";
   static String home = "home";
+  static String specializations = "specializations";
+  static String otherServiceNames = "otherServiceNames";
+  static String doctorsList = "doctorsList";
+  static String donorsList = "donors/list";
 }

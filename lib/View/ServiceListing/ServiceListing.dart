@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:waada_customerapp/Controller/BottomNavController.dart';
 import 'package:waada_customerapp/Controller/ServiceListingController.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Home/OtherServicesGridWidget.dart';
@@ -24,7 +25,11 @@ class _ServiceListingState extends State<ServiceListing> {
         centerTitle: false,
         leading: InkWell(
           onTap: () {
-            Get.back();
+            if (Navigator.canPop(context)) {
+              Get.back();
+            } else if (Get.isRegistered<BottomNavController>()) {
+              Get.find<BottomNavController>().backToHome();
+            }
           },
           child: SvgPicture.asset(
             "lib/Assets/Images/BackButton.svg",
@@ -42,22 +47,23 @@ class _ServiceListingState extends State<ServiceListing> {
           size: 20.00,
         ),
         toolbarHeight: 50,
-        elevation:0,
+        elevation: 0,
         scrolledUnderElevation: 0.0,
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child:  Padding(
-          padding: const EdgeInsets.symmetric(vertical: 15,horizontal: 5),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
           child: GetBuilder(
             init: ServiceListingController(),
-            builder:(controller) => OtherServicesGrid(
-              otherServicesList:controller.otherServicesList,
-            )
+            builder:
+                (controller) => OtherServicesGrid(
+                  otherServicesList: controller.otherServicesList,
+                ),
           ),
         ),
-      ));
-
+      ),
+    );
   }
 }

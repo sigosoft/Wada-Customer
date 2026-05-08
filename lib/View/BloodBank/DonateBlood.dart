@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Controller/DonateBloodController.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
@@ -32,6 +33,12 @@ class DonateBlood extends StatefulWidget {
 }
 
 class _DonateBloodState extends State<DonateBlood> {
+  @override
+  void initState() {
+    super.initState();
+    Get.put(DonateBloodController());
+  }
+
   void _showLocationBottomSheet(BuildContext context) {
     final TextEditingController _searchController = TextEditingController();
 
@@ -49,9 +56,9 @@ class _DonateBloodState extends State<DonateBlood> {
             void _onSearchChanged(String query) {
               setState(() {
                 _searchResults =
-                query.isEmpty
-                    ? []
-                    : List.generate(5, (index) => "$query Result $index");
+                    query.isEmpty
+                        ? []
+                        : List.generate(5, (index) => "$query Result $index");
               });
             }
 
@@ -84,7 +91,7 @@ class _DonateBloodState extends State<DonateBlood> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       Text(
                         Strings.chooseLocation,
                         style: GoogleFonts.inter(
@@ -99,7 +106,7 @@ class _DonateBloodState extends State<DonateBlood> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color:  Color(0xFFF3F3F3),
+                      color: Color(0xFFF3F3F3),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -127,48 +134,51 @@ class _DonateBloodState extends State<DonateBlood> {
                   ),
                   SizedBox(height: 20),
                   // Popular Searches or Search Results
-                    SizedBox(
-                      height: 300, // Set a fixed height for the ListView
-                      child: ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                      'lib/Assets/Images/locationIcon.svg',
-                                      width: 20,
-                                      height: 20,
-                                      color: Colors.black,
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        _searchResults[index],
-                                        style: GoogleFonts.inter(fontSize: 14,fontWeight: FontWeight.w500),
+                  SizedBox(
+                    height: 300, // Set a fixed height for the ListView
+                    child: ListView.builder(
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'lib/Assets/Images/locationIcon.svg',
+                                    width: 20,
+                                    height: 20,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      _searchResults[index],
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 10,),
-                                Container(
-                                  width: double.infinity,
-                                  height: 1,
-                                  margin: EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFE5E5E5),
-                                    borderRadius: BorderRadius.circular(8),
                                   ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: double.infinity,
+                                height: 1,
+                                margin: EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE5E5E5),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
+                  ),
                 ],
               ),
             );
@@ -177,65 +187,93 @@ class _DonateBloodState extends State<DonateBlood> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: CustomAppBar(label: Strings.donateblood, showCloseIcon: false),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SingleChildScrollView(
+      body: GetBuilder<DonateBloodController>(
+        builder:
+            (controller) => SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  TextInputWidget(label: Strings.donarname, type: TextInputType.text, height: 50),
-                  SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Expanded(child: BloodGroupDropDownField()),
-                      Expanded(child: GenderDropdownField(name: Strings.genderwithstar)),
-                    ],
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        TextInputWidget(
+                          label: Strings.donarname,
+                          type: TextInputType.text,
+                          height: 50,
+                          controller: controller.nameController,
+                        ),
+                        const SizedBox(height: 15),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: BloodGroupDropDownField(
+                                onChanged: (value) {
+                                  controller.selectedBloodGroup = value;
+                                  controller.update();
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: GenderDropdownField(
+                                name: Strings.genderwithstar,
+                                onChanged: (value) {
+                                  controller.selectedGender = value;
+                                  controller.update();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        const CountryCodeAndPhoneNUmber(
+                          name: Strings.phonenumberwithstar,
+                        ),
+                        const SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            _showLocationBottomSheet(context);
+                          },
+                          child: TextInputWidget(
+                            label: Strings.yourlocation,
+                            type: TextInputType.text,
+                            height: 50,
+                            controller: controller.locationController,
+                            onTap: () {
+                              _showLocationBottomSheet(context);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 15),
-                  CountryCodeAndPhoneNUmber(name: Strings.phonenumberwithstar),
-                  SizedBox(height: 15),
-                  InkWell(
-                    onTap: () {
-                      _showLocationBottomSheet(context);
-                    },
-                    child: TextInputWidget(
-                      label: Strings.yourlocation,
-                      type: TextInputType.text,
-                      height: 50,
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: SubmitButtonWidget(
                       onTap: () {
-                        _showLocationBottomSheet(context);
+                        _showInfoBottomSheet(context);
                       },
+                      text: Strings.sent,
                     ),
                   ),
                 ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(bottom: 20),
-              child: SubmitButtonWidget(
-                onTap: () {
-                  _showInfoBottomSheet(context);
-                },
-                text: Strings.sent,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
+
   void _showInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -291,7 +329,3 @@ class _DonateBloodState extends State<DonateBlood> {
     );
   }
 }
-
-
-
-

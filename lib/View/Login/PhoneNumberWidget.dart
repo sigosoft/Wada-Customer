@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/Controller/RegisterController.dart';
 
+import 'package:waada_customerapp/Controller/DonateBloodController.dart';
+
 class CountryCodeAndPhoneNUmber extends StatelessWidget {
   const CountryCodeAndPhoneNUmber({super.key, required this.name});
   final String name;
@@ -30,32 +32,33 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                 border: Border.all(color: Colors.transparent),
               ),
               child: Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // TextStyleInterForSplash(
-                    //   text: Strings.countryCode,
-                    //   color: blackTextColor,
-                    //   fontWeight: FontWeight.w400,
-                    //   size: 9,
-                    // ),
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         onTap: () {
-                          if (Get.isRegistered<Registercontroller>()) {
+                          if (Get.isRegistered<DonateBloodController>()) {
+                            Get.find<DonateBloodController>()
+                                .fetchCountryCodes();
+                          } else if (Get.isRegistered<Registercontroller>()) {
                             Get.find<Registercontroller>().fetchCountryCodes();
                           } else if (Get.isRegistered<LoginController>()) {
                             Get.find<LoginController>().fetchCountryCodes();
                           }
                         },
                         value:
-                            Get.isRegistered<Registercontroller>()
+                            Get.isRegistered<DonateBloodController>()
+                                ? Get.find<DonateBloodController>()
+                                    .selectedCountryCode
+                                : Get.isRegistered<Registercontroller>()
                                 ? Get.find<Registercontroller>()
                                     .selectedCountryCode
                                 : Get.isRegistered<LoginController>()
-                                ? Get.find<LoginController>().selectedCountryCode
+                                ? Get.find<LoginController>()
+                                    .selectedCountryCode
                                 : null,
                         hint: Text(
                           Strings.countryCode,
@@ -65,7 +68,7 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             fontSize: 10,
                           ),
                         ),
-                        icon: SizedBox.shrink(),
+                        icon: const SizedBox.shrink(),
                         isExpanded: true,
                         decoration: InputDecoration(
                           filled: true,
@@ -80,7 +83,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           ),
                         ),
                         items:
-                            (Get.isRegistered<Registercontroller>()
+                            (Get.isRegistered<DonateBloodController>()
+                                    ? Get.find<DonateBloodController>()
+                                        .countryCodes
+                                    : Get.isRegistered<Registercontroller>()
                                     ? Get.find<Registercontroller>()
                                         .countryCodes
                                     : Get.isRegistered<LoginController>()
@@ -101,12 +107,22 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                                 })
                                 .toList(),
                         onChanged: (value) {
-                          if (Get.isRegistered<Registercontroller>()) {
+                          if (Get.isRegistered<DonateBloodController>()) {
+                            var controller = Get.find<DonateBloodController>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
+                            }
+                            controller.update();
+                          } else if (Get.isRegistered<Registercontroller>()) {
                             var controller = Get.find<Registercontroller>();
                             controller.selectedCountryCode = value;
                             int index = controller.countryCodes.indexOf(value!);
                             if (index != -1) {
-                              controller.selectedCountryId = controller.countryIds[index];
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
                             }
                             controller.update();
                           } else if (Get.isRegistered<LoginController>()) {
@@ -114,7 +130,8 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             controller.selectedCountryCode = value;
                             int index = controller.countryCodes.indexOf(value!);
                             if (index != -1) {
-                              controller.selectedCountryId = controller.countryIds[index];
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
                             }
                             controller.update();
                           }
@@ -135,21 +152,19 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                   border: Border.all(color: Colors.transparent),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // TextStyleInterForSplash(
-                      //   text: Strings.phoneNumber,
-                      //   color: blackTextColor,
-                      //   fontWeight: FontWeight.w400,
-                      //   size: 9,
-                      // ),
                       Expanded(
                         child: TextFormField(
                           controller:
-                              Get.isRegistered<Registercontroller>()
-                                  ? Get.find<Registercontroller>().phoneController
+                              Get.isRegistered<DonateBloodController>()
+                                  ? Get.find<DonateBloodController>()
+                                      .phoneController
+                                  : Get.isRegistered<Registercontroller>()
+                                  ? Get.find<Registercontroller>()
+                                      .phoneController
                                   : Get.isRegistered<LoginController>()
                                   ? Get.find<LoginController>().phoneController
                                   : null,

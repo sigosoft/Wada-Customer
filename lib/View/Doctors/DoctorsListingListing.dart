@@ -9,8 +9,6 @@ import 'package:waada_customerapp/Widgets/CustomAppBar.dart';
 import '../../Controller/DoctorListingController.dart';
 import '../../Resource/Colors.dart';
 
-
-
 class DoctorsListingListing extends StatelessWidget {
   const DoctorsListingListing({super.key});
 
@@ -21,51 +19,62 @@ class DoctorsListingListing extends StatelessWidget {
       appBar: CustomAppBar(label: Strings.doctors, showCloseIcon: false),
       body: GetBuilder<DoctorListingController>(
         init: DoctorListingController(),
-        builder: (controller) => Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF3F8FD),
-                    border: Border.all(color: Color(0xFFD8EBFF), width: 1.0),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      prefixIcon: SvgPicture.asset(
-                        'lib/Assets/Images/search.svg',
-                        color: profileText,
-                        fit: BoxFit.scaleDown,
+        builder:
+            (controller) => Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF3F8FD),
+                        border: Border.all(
+                          color: Color(0xFFD8EBFF),
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      hintText: Strings.searchDoctors,
-                      hintStyle: GoogleFonts.inter(
-                        textStyle: Theme.of(context).textTheme.displayLarge,
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w400,
-                        fontStyle: FontStyle.normal,
+                      child: TextField(
+                        cursorColor: Colors.black,
+                        decoration: InputDecoration(
+                          prefixIcon: SvgPicture.asset(
+                            'lib/Assets/Images/search.svg',
+                            color: profileText,
+                            fit: BoxFit.scaleDown,
+                          ),
+                          hintText: Strings.searchDoctors,
+                          hintStyle: GoogleFonts.inter(
+                            textStyle: Theme.of(context).textTheme.displayLarge,
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
-                ),
+                  Expanded(
+                    child:
+                        controller.isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : controller.doctors.isEmpty
+                            ? const Center(child: Text("No doctors found"))
+                            : ListView.builder(
+                              itemCount: controller.doctors.length,
+                              itemBuilder: (context, index) {
+                                return DoctorItem(
+                                  doctor: controller.doctors[index],
+                                );
+                              },
+                            ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: controller.doctors.length,
-                  itemBuilder: (context, index) {
-                    return DoctorItem();
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
