@@ -9,8 +9,15 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Profile/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
+import 'package:dio/dio.dart';
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+import 'package:waada_customerapp/View/Login/Login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ProfileController extends GetxController {
+  final Dio _dio = Dio();
+
   @override
   void onInit() {
     super.onInit();
@@ -227,7 +234,7 @@ class ProfileController extends GetxController {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-
+                          logout();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorPrimary,
@@ -260,5 +267,52 @@ class ProfileController extends GetxController {
 
 
 
+  Future<void> logout() async {
+    try {
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.logout}";
+      
+      print("--- API Request (Logout) ---");
+      print("URL: $url");
+      print("Method: GET");
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      final dio = Dio();
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      print("--- API Response (Logout) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 && response.data['status'].toString() == "true") {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('auth_token');
+        
+        Get.offAll(const LoginScreen());
+      } else {
+        if (Get.context != null) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(content: Text(response.data['message'] ?? "Logout failed")),
+          );
+        }
+      }
+    } catch (e) {
+      print("--- API Error (Logout) ---");
+      print("Error during logout: $e");
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Something went wrong. Please try again.")),
+        );
+      }
+    }
+  }
 }
 

@@ -11,17 +11,42 @@ import '../../Resource/Strings.dart';
 import '../../Widgets/Plusfour.dart';
 
 class HomeNurseDetailsWidget extends StatelessWidget {
-  const HomeNurseDetailsWidget({super.key,required this.showButton,required this.buttonText,this.onTapButton});
+  const HomeNurseDetailsWidget({
+    super.key,
+    required this.showButton,
+    required this.buttonText,
+    this.onTapButton,
+    this.name = "David Thomas",
+    this.location = "Raipur, Chhattisgarh",
+    this.languages = "English, Hindi",
+    this.qualification = "Diploma in General Nursing",
+    this.experience = "5 Years of Experience",
+    this.imagePath = 'lib/Assets/Images/nurse.png',
+    this.checkInDate = "08 Feb 2025",
+    this.checkInTime = "09:30 AM",
+    this.plusLanguages = "Tamil, Malayalam",
+  });
+
   final bool showButton;
   final dynamic buttonText;
   final dynamic onTapButton;
+  final String name;
+  final String location;
+  final String languages;
+  final String qualification;
+  final String experience;
+  final String imagePath;
+  final String checkInDate;
+  final String checkInTime;
+  final String plusLanguages;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
-      padding: const EdgeInsets.only(top: 5,bottom: 5),
+      padding: const EdgeInsets.only(top: 5, bottom: 5),
       decoration: BoxDecoration(
-        color: Color(0xFFEAF3FA),
+        color: const Color(0xFFEAF3FA),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -36,19 +61,27 @@ class HomeNurseDetailsWidget extends StatelessWidget {
               children: [
                 // Image and Availability
                 Container(
-                  width: 110, // Optional: Adjust width
+                  width: 110,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xFFE4E4E7), // Background color
-                    borderRadius: BorderRadius.circular(8), // Corner radius
+                    color: const Color(0xFFE4E4E7),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Image.asset(
-                    'lib/Assets/Images/nurse.png',
-                    // Replace with your image path
-                    fit:
-                        BoxFit
-                            .contain, // Ensures the image covers the container
-                    // Optional: Adjust height
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: imagePath.startsWith('http')
+                        ? Image.network(
+                            imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset(
+                              'lib/Assets/Images/nurse.png',
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : Image.asset(
+                            imagePath,
+                            fit: BoxFit.contain,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -58,7 +91,7 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "David Thomas",
+                        name,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -78,16 +111,14 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              "Raipur, Chhattisgarh",
+                              location,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: greyTextColour,
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 1,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis, // Ensures text wraps to the next line
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -98,7 +129,7 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                           SvgPicture.asset("lib/Assets/Images/language.svg"),
                           const SizedBox(width: 5),
                           Text(
-                            "English, Hindi",
+                            languages,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
@@ -106,7 +137,8 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Plusfour(data: "Tamil, Malayalam", length: 4),
+                          if (plusLanguages.isNotEmpty)
+                            Plusfour(data: plusLanguages, length: 4),
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -116,16 +148,14 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              "Diploma in General Nursing",
+                              qualification,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: greyTextColour,
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 1,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis, // Ensures text wraps to the next line
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -137,16 +167,14 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
-                              "5 Years of Experience",
+                              experience,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: greyTextColour,
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 1,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis, // Ensures text wraps to the next line
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -157,37 +185,41 @@ class HomeNurseDetailsWidget extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Container(
-            padding: const EdgeInsets.only(left: 10,right: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: HomeNurseDetailsCardRowWidget(
-                    date: "08 Feb 2025",
+                    date: checkInDate,
                     type: Strings.checkInDate,
                   ),
                 ),
-                SizedBox(width: 10,),
+                const SizedBox(width: 10),
                 Expanded(
                   child: HomeNurseDetailsCardRowWidget(
-                    date: "09:30 AM",
+                    date: checkInTime,
                     type: Strings.checkInTime,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height:showButton? 15:5),
-          showButton?
-          InkWell(
-            onTap:onTapButton,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: SubmitButtonWidget(text:buttonText, onTap: () {  },),
-              )):Container(),
-          SizedBox(height:  showButton?10:0),
+          SizedBox(height: showButton ? 15 : 5),
+          showButton
+              ? InkWell(
+                  onTap: onTapButton,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SubmitButtonWidget(
+                      text: buttonText,
+                      onTap: () {},
+                    ),
+                  ))
+              : Container(),
+          SizedBox(height: showButton ? 10 : 0),
         ],
       ),
     );

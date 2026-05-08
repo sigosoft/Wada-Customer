@@ -39,10 +39,19 @@ class CarouselSliderWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Image.asset(
-                      url,
-                      fit: BoxFit.fill,
-                    ),
+                    child: url.startsWith('http')
+                        ? Image.network(
+                            url,
+                            fit: BoxFit.fill,
+                            errorBuilder: (_, __, ___) => Image.asset(
+                              'lib/Assets/Images/carousalSliderDummy.png',
+                              fit: BoxFit.fill,
+                            ),
+                          )
+                        : Image.asset(
+                            url,
+                            fit: BoxFit.fill,
+                          ),
                   );
                 },
               );

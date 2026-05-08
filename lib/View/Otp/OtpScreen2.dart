@@ -77,7 +77,7 @@ class _OtpScreen2State extends State<OtpScreen2> {
                       child: SubmitButtonWidget(
                         text: Strings.verify,
                         onTap: () {
-                          Get.to(ChooseLocation());
+                          controller.login();
                         },
                       ),
                     ),

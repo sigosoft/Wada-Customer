@@ -5,6 +5,8 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/View/Login/Login.dart';
 import 'package:waada_customerapp/View/OnBoarding/OnboardingScreen.dart';
 import 'package:waada_customerapp/View/Splash/ButtonWidget.dart';
+import 'package:waada_customerapp/View/Home/Home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,6 +17,32 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      
+      print("--- SPLASH SCREEN TOKEN CHECK ---");
+      print("Token found: $token");
+
+      if (token != null && token.isNotEmpty) {
+        // Small delay to let the splash UI render before navigating
+        await Future.delayed(const Duration(seconds: 1));
+        Get.offAll(() => Home());
+      } else {
+        print("No valid token found. Staying on Splash.");
+      }
+    } catch (e) {
+      print("Error reading SharedPreferences: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,10 +91,11 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             SizedBox(height: 40),
             ButtonWidget(
-              onTap:(){
+              onTap: () {
                 Get.to(OnboardingScreen());
               },
-                text: "Get Started"),
+              text: "Get Started",
+            ),
           ],
         ),
       ),

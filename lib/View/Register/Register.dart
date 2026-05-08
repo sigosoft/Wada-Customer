@@ -123,7 +123,7 @@ class _RegisterState extends State<Register> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: SubmitButtonWidget(
                         onTap: () {
-                          Get.to(OtpScreen2());
+                          controller.sendRegOtp();
                         },
                         text: Strings.verify,
                       ),

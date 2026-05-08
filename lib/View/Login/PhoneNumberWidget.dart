@@ -44,12 +44,19 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         onTap: () {
-                          if (Get.isRegistered<LoginController>()) {
-                            Get.find<LoginController>().fetchCountryCodes();
-                          } else if (Get.isRegistered<Registercontroller>()) {
+                          if (Get.isRegistered<Registercontroller>()) {
                             Get.find<Registercontroller>().fetchCountryCodes();
+                          } else if (Get.isRegistered<LoginController>()) {
+                            Get.find<LoginController>().fetchCountryCodes();
                           }
                         },
+                        value:
+                            Get.isRegistered<Registercontroller>()
+                                ? Get.find<Registercontroller>()
+                                    .selectedCountryCode
+                                : Get.isRegistered<LoginController>()
+                                ? Get.find<LoginController>().selectedCountryCode
+                                : null,
                         hint: Text(
                           Strings.countryCode,
                           style: GoogleFonts.inter(
@@ -73,11 +80,11 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           ),
                         ),
                         items:
-                            (Get.isRegistered<LoginController>()
-                                    ? Get.find<LoginController>().countryCodes
-                                    : Get.isRegistered<Registercontroller>()
+                            (Get.isRegistered<Registercontroller>()
                                     ? Get.find<Registercontroller>()
                                         .countryCodes
+                                    : Get.isRegistered<LoginController>()
+                                    ? Get.find<LoginController>().countryCodes
                                     : [])
                                 .map((code) {
                                   return DropdownMenuItem<String>(
@@ -94,11 +101,22 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                                 })
                                 .toList(),
                         onChanged: (value) {
-                          if (Get.isRegistered<LoginController>()) {
-                            Get.find<LoginController>().selectedCountryCode =
-                                value;
-                          } else if (Get.isRegistered<Registercontroller>()) {
-                            // Registercontroller logic if needed
+                          if (Get.isRegistered<Registercontroller>()) {
+                            var controller = Get.find<Registercontroller>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId = controller.countryIds[index];
+                            }
+                            controller.update();
+                          } else if (Get.isRegistered<LoginController>()) {
+                            var controller = Get.find<LoginController>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId = controller.countryIds[index];
+                            }
+                            controller.update();
                           }
                         },
                       ),
@@ -130,7 +148,9 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           controller:
-                              Get.isRegistered<LoginController>()
+                              Get.isRegistered<Registercontroller>()
+                                  ? Get.find<Registercontroller>().phoneController
+                                  : Get.isRegistered<LoginController>()
                                   ? Get.find<LoginController>().phoneController
                                   : null,
                           keyboardType: TextInputType.phone,

@@ -19,7 +19,7 @@ class OtherServicesGrid extends StatelessWidget {
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
         ),
-        itemCount: 6,
+        itemCount: otherServicesList.length,
         itemBuilder: (context, index) {
           return InkWell(
             onTap: otherServicesList[index]['route'] != null
@@ -36,17 +36,32 @@ class OtherServicesGrid extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
+                    height: 50,
                     width: 50,
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: colorPrimary,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.all(10.0),
-                    child: SvgPicture.asset(
-                      otherServicesList[index]['icon'].toString(),
-                      fit: BoxFit.contain,
-                    ),
+                    child: otherServicesList[index]['icon'].toString().startsWith('http')
+                        ? Image.network(
+                            otherServicesList[index]['icon'].toString(),
+                            height: 30,
+                            width: 30,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => SvgPicture.asset(
+                              "lib/Assets/Images/OtherServicesIcon1.svg",
+                              height: 30,
+                              width: 30,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            otherServicesList[index]['icon'].toString(),
+                            height: 30,
+                            width: 30,
+                            fit: BoxFit.contain,
+                          ),
                   ),
                SizedBox(height: 5,),
                Expanded(
