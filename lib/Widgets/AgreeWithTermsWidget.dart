@@ -5,7 +5,8 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 
 class AgreeWithTermsWidget extends StatefulWidget {
-  const AgreeWithTermsWidget({super.key});
+  final ValueChanged<bool?>? onChanged;
+  const AgreeWithTermsWidget({super.key, this.onChanged});
 
   @override
   State<AgreeWithTermsWidget> createState() => _AgreeWithTermsWidgetState();
@@ -26,6 +27,9 @@ class _AgreeWithTermsWidgetState extends State<AgreeWithTermsWidget> {
             setState(() {
               _isChecked = value!;
             });
+            if (widget.onChanged != null) {
+              widget.onChanged!(value);
+            }
           },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4), // Rounded corners

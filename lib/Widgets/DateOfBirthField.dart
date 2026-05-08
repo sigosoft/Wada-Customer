@@ -4,14 +4,21 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import '../Resource/Strings.dart';
 
 class DateOfBirthField extends StatefulWidget {
-  const DateOfBirthField({super.key});
+  final TextEditingController? controller;
+  const DateOfBirthField({super.key, this.controller});
 
   @override
   State<DateOfBirthField> createState() => _DateOfBirthFieldState();
 }
 
 class _DateOfBirthFieldState extends State<DateOfBirthField> {
-  final TextEditingController _dobController = TextEditingController();
+  late TextEditingController _dobController;
+
+  @override
+  void initState() {
+    super.initState();
+    _dobController = widget.controller ?? TextEditingController();
+  }
 
   Future<void> _openDatePicker(BuildContext context) async {
     DateTime? selectedDate = await showDatePicker(

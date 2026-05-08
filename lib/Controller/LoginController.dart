@@ -53,14 +53,13 @@ class LoginController extends GetxController {
   }
 
   Future<void> sendLoginOtp() async {
-    if (selectedCountryCode == null || phoneController.text.isEmpty) {
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Please select country code and enter phone number"),
-          ),
-        );
-      }
+    if (selectedCountryCode == null || phoneController.text.trim().isEmpty) {
+      _showError("Please select country code and enter phone number");
+      return;
+    }
+
+    if (phoneController.text.trim().length < 10) {
+      _showError("Please enter a valid 10-digit phone number");
       return;
     }
 
@@ -174,6 +173,14 @@ class LoginController extends GetxController {
           ),
         );
       }
+    }
+  }
+
+  void _showError(String message) {
+    if (Get.context != null) {
+      ScaffoldMessenger.of(
+        Get.context!,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 

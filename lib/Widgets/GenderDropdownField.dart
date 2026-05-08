@@ -4,8 +4,9 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 
 class GenderDropdownField extends StatefulWidget {
-  const GenderDropdownField({super.key, required this.name});
+  const GenderDropdownField({super.key, required this.name, this.onChanged});
   final String name;
+  final ValueChanged<String?>? onChanged;
 
   @override
   State<GenderDropdownField> createState() => _GenderDropdownFieldState();
@@ -37,6 +38,9 @@ class _GenderDropdownFieldState extends State<GenderDropdownField> {
           setState(() {
             _selectedGender = value;
           });
+          if (widget.onChanged != null) {
+            widget.onChanged!(value);
+          }
         },
 
         decoration: InputDecoration(

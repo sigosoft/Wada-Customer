@@ -8,9 +8,11 @@ class TextInputWidget extends StatelessWidget {
   final TextInputType type;
   final double height;
   final VoidCallback? onTap;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const TextInputWidget({
-    super.key,required this.label,required this.type,required this.height, this.onTap
+    super.key,required this.label,required this.type,required this.height, this.onTap, this.controller, this.validator
   });
 
   @override
@@ -40,6 +42,8 @@ class TextInputWidget extends StatelessWidget {
                   // ),
                   Expanded(
                     child: TextFormField(
+                      controller: controller,
+                      validator: validator,
                       onTap: onTap,
                       keyboardType: type,
                       maxLines: 1,

@@ -10,7 +10,16 @@ class Registercontroller extends GetxController {
   List<int> countryIds = [];
   String? selectedCountryCode;
   int? selectedCountryId;
+
+  // Controllers for registration fields
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController referralCodeController = TextEditingController();
+  
+  String? selectedGender;
+  bool isAgreedToTerms = false;
 
   @override
   void onInit() {
@@ -21,7 +30,11 @@ class Registercontroller extends GetxController {
 
   @override
   void onClose() {
+    firstNameController.dispose();
+    emailController.dispose();
     phoneController.dispose();
+    dobController.dispose();
+    referralCodeController.dispose();
     print("Registercontroller disposed");
     super.onClose();
   }
@@ -33,13 +46,11 @@ class Registercontroller extends GetxController {
       print("--- API Request (Register) ---");
       print("URL: $url");
       print("Method: GET");
-      print("Headers: ${_dio.options.headers}");
 
       final response = await _dio.get(url);
 
       print("--- API Response (Register) ---");
       print("Status Code: ${response.statusCode}");
-      print("Headers: ${response.headers}");
       print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
@@ -56,14 +67,37 @@ class Registercontroller extends GetxController {
   }
 
   Future<void> sendRegOtp() async {
-    if (selectedCountryCode == null || phoneController.text.isEmpty) {
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Please select country code and enter phone number"),
-          ),
-        );
-      }
+    // Validation
+    if (firstNameController.text.trim().isEmpty) {
+      _showError("Please enter your first name");
+      return;
+    }
+    if (emailController.text.trim().isEmpty) {
+      _showError("Please enter your email");
+      return;
+    }
+    if (!GetUtils.isEmail(emailController.text.trim())) {
+      _showError("Please enter a valid email address");
+      return;
+    }
+    if (selectedCountryCode == null) {
+      _showError("Please select a country code");
+      return;
+    }
+    if (phoneController.text.trim().isEmpty) {
+      _showError("Please enter your phone number");
+      return;
+    }
+    if (dobController.text.trim().isEmpty) {
+      _showError("Please select your date of birth");
+      return;
+    }
+    if (selectedGender == null) {
+      _showError("Please select your gender");
+      return;
+    }
+    if (!isAgreedToTerms) {
+      _showError("Please agree to the Terms and Conditions");
       return;
     }
 
@@ -71,9 +105,14 @@ class Registercontroller extends GetxController {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.sendRegOtp}";
 
       FormData formData = FormData.fromMap({
+        "first_name": firstNameController.text.trim(),
+        "email": emailController.text.trim(),
         "country_code": selectedCountryId?.toString() ?? "2",
         "country_code_id": selectedCountryId?.toString() ?? "2",
-        "mobile": phoneController.text,
+        "mobile": phoneController.text.trim(),
+        "dob": dobController.text.trim(),
+        "gender": selectedGender,
+        "referral_code": referralCodeController.text.trim(),
       });
 
       print("--- API Request (Register OTP) ---");
@@ -100,24 +139,20 @@ class Registercontroller extends GetxController {
           );
         }
       } else {
-        if (Get.context != null) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(
-              content: Text(response.data['message'] ?? "Failed to send OTP"),
-            ),
-          );
-        }
+        _showError(response.data['message'] ?? "Failed to send OTP");
       }
     } catch (e) {
       print("--- API Error (Register OTP) ---");
       print("Error sending register OTP: $e");
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Something went wrong. Please try again."),
-          ),
-        );
-      }
+      _showError("Something went wrong. Please try again.");
+    }
+  }
+
+  void _showError(String message) {
+    if (Get.context != null) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 }

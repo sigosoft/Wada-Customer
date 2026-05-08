@@ -94,30 +94,44 @@ class _RegisterState extends State<Register> {
                     ),
                     SizedBox(height: 20),
                     TextInputWidget(
+                      controller: controller.firstNameController,
                       label: Strings.firstname,
                       type: TextInputType.text,
                       height: 50,
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     TextInputWidget(
+                      controller: controller.emailController,
                       label: Strings.email,
                       type: TextInputType.emailAddress,
                       height: 50,
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     CountryCodeAndPhoneNUmber(name: Strings.phoneNumber),
-                    SizedBox(height: 15),
-                    DateOfBirthField(),
-                    SizedBox(height: 15),
-                    GenderDropdownField(name: Strings.gender),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
+                    DateOfBirthField(controller: controller.dobController),
+                    const SizedBox(height: 15),
+                    GenderDropdownField(
+                      name: Strings.gender,
+                      onChanged: (value) {
+                        controller.selectedGender = value;
+                        controller.update();
+                      },
+                    ),
+                    const SizedBox(height: 15),
                     TextInputWidget(
+                      controller: controller.referralCodeController,
                       label: Strings.refferal_code,
                       type: TextInputType.text,
                       height: 50,
                     ),
-                    SizedBox(height: 15),
-                    AgreeWithTermsWidget(),
+                    const SizedBox(height: 15),
+                    AgreeWithTermsWidget(
+                      onChanged: (value) {
+                        controller.isAgreedToTerms = value ?? false;
+                        controller.update();
+                      },
+                    ),
                     SizedBox(height: 50),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
