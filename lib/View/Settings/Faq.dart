@@ -16,114 +16,133 @@ class Faq extends StatefulWidget {
 }
 
 class _FaqState extends State<Faq> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CustomAppBar(
-          label: Strings.faqs,
-          showCloseIcon: false,
-        ),
-        body: GetBuilder<SettingsController>(
-            init: SettingsController(),
-            initState: (_) {},
-            didChangeDependencies: (state) async {
-              // state.controller?.getFaq(context);
-            },
-            builder: (controller) {
-              return Column(
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(label: Strings.faqs, showCloseIcon: false),
+      body: GetBuilder<SettingsController>(
+        init: SettingsController(),
+        initState: (state) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            state.controller?.fetchFaqs();
+          });
+        },
+        builder: (controller) {
+          return controller.isLoading.value
+              ? Center(child: CircularProgressIndicator(color: colorPrimary))
+              : SingleChildScrollView(
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    controller.faqData.length == 0
-                        ? Container()
+                    controller.faqData.isEmpty
+                        ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              "No FAQs available",
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: profileText,
+                              ),
+                            ),
+                          ),
+                        )
                         : Container(
-                      margin: EdgeInsets.all(15),
+                          margin: EdgeInsets.all(15),
                           child: ListView.builder(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: controller.faqData.length,
-                              itemBuilder: (_, i) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                        color: borderLine,
-                                        border: Border.all(
-                                            color: borderLine, width: 1)),
-                                    child: ExpansionTile(
-                                      iconColor: Colors.black,
-                                      collapsedIconColor: Colors.black,
-                                      tilePadding: EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      // Remove default padding
-                                      childrenPadding: EdgeInsets.zero,
-                                      // Remove default padding from children
-                                      shape: Border(),
-                                      trailing: controller.expanded[i]
-                                          ? const Icon(Icons.remove)
-                                          : const Icon(Icons.add),
-                                      onExpansionChanged: (value) {
-                                        controller.expanded[i] =
-                                            !controller.expanded[i];
-                                        controller.update();
-                                      },
-                                      title: Text(
-                                        controller.faqData[i]["title"]
-                                                .toString() ??
-                                            "",
-                                          style: GoogleFonts.inter(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                              color: profileText)
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: controller.faqData.length,
+                            itemBuilder: (_, i) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: borderLine,
+                                    border: Border.all(
+                                      color: borderLine,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: ExpansionTile(
+                                    iconColor: Colors.black,
+                                    collapsedIconColor: Colors.black,
+                                    tilePadding: EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                    ),
+                                    // Remove default padding
+                                    childrenPadding: EdgeInsets.zero,
+                                    // Remove default padding from children
+                                    shape: Border(),
+                                    trailing:
+                                        controller.expanded[i]
+                                            ? const Icon(Icons.remove)
+                                            : const Icon(Icons.add),
+                                    onExpansionChanged: (value) {
+                                      controller.expanded[i] =
+                                          !controller.expanded[i];
+                                      controller.update();
+                                    },
+                                    title: Text(
+                                      controller.faqData[i]["title"]
+                                              .toString() ??
+                                          "",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: profileText,
                                       ),
-                                      children: [
-                                        Container(
-                                          // Wrap children to avoid auto-divider
-                                          decoration: BoxDecoration(
-                                            color: borderLine,
-                                            // Ensure no extra background color
-                                            borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(15),
-                                              bottomRight:
-                                                  Radius.circular(15),
-                                            ),
+                                    ),
+                                    children: [
+                                      Container(
+                                        // Wrap children to avoid auto-divider
+                                        decoration: BoxDecoration(
+                                          color: borderLine,
+                                          // Ensure no extra background color
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(15),
+                                            bottomRight: Radius.circular(15),
                                           ),
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 15,
-                                                    vertical: 15),
-                                            child: Container(
-                                              alignment: Alignment.topLeft,
-                                              child: Text(
-                                                controller.faqData[i]
-                                                            ["subtitle"]
-                                                        .toString() ??
-                                                    "",
-                                                textAlign: TextAlign.left,
-                                                  style: GoogleFonts.inter(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w400,
-                                                      color: profileText)
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 15,
+                                            vertical: 15,
+                                          ),
+                                          child: Container(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              controller.faqData[i]["subtitle"]
+                                                      .toString() ??
+                                                  "",
+                                              textAlign: TextAlign.left,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: profileText,
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              }),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                    SizedBox(
-                      height: 20,
-                    )
-                  ]);
-            }));
+                    SizedBox(height: 20),
+                  ],
+                ),
+              );
+        },
+      ),
+    );
   }
 }

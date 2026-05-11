@@ -10,6 +10,7 @@ import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/Controller/RegisterController.dart';
 
 import 'package:waada_customerapp/Controller/DonateBloodController.dart';
+import 'package:waada_customerapp/Controller/FamilyMemberController.dart';
 
 class CountryCodeAndPhoneNUmber extends StatelessWidget {
   const CountryCodeAndPhoneNUmber({super.key, required this.name});
@@ -40,7 +41,12 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         onTap: () {
-                          if (Get.isRegistered<DonateBloodController>()) {
+                          if (Get.isRegistered<FamilyMemberController>()) {
+                            Get.find<FamilyMemberController>()
+                                .fetchCountryCodes();
+                          } else if (Get.isRegistered<
+                            DonateBloodController
+                          >()) {
                             Get.find<DonateBloodController>()
                                 .fetchCountryCodes();
                           } else if (Get.isRegistered<Registercontroller>()) {
@@ -50,7 +56,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           }
                         },
                         value:
-                            Get.isRegistered<DonateBloodController>()
+                            Get.isRegistered<FamilyMemberController>()
+                                ? Get.find<FamilyMemberController>()
+                                    .selectedCountryCode
+                                : Get.isRegistered<DonateBloodController>()
                                 ? Get.find<DonateBloodController>()
                                     .selectedCountryCode
                                 : Get.isRegistered<Registercontroller>()
@@ -83,7 +92,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           ),
                         ),
                         items:
-                            (Get.isRegistered<DonateBloodController>()
+                            (Get.isRegistered<FamilyMemberController>()
+                                    ? Get.find<FamilyMemberController>()
+                                        .countryCodes
+                                    : Get.isRegistered<DonateBloodController>()
                                     ? Get.find<DonateBloodController>()
                                         .countryCodes
                                     : Get.isRegistered<Registercontroller>()
@@ -107,8 +119,23 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                                 })
                                 .toList(),
                         onChanged: (value) {
-                          if (Get.isRegistered<DonateBloodController>()) {
-                            var controller = Get.find<DonateBloodController>();
+                          if (Get.isRegistered<FamilyMemberController>()) {
+                            var fmController =
+                                Get.find<FamilyMemberController>();
+                            fmController.selectedCountryCode = value;
+                            int index = fmController.countryCodes.indexOf(
+                              value!,
+                            );
+                            if (index != -1) {
+                              fmController.countryCodeId =
+                                  fmController.countryIds[index].toString();
+                            }
+                            fmController.update();
+                          } else if (Get.isRegistered<
+                            DonateBloodController
+                          >()) {
+                            DonateBloodController controller =
+                                Get.find<DonateBloodController>();
                             controller.selectedCountryCode = value;
                             int index = controller.countryCodes.indexOf(value!);
                             if (index != -1) {
@@ -117,7 +144,8 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             }
                             controller.update();
                           } else if (Get.isRegistered<Registercontroller>()) {
-                            var controller = Get.find<Registercontroller>();
+                            Registercontroller controller =
+                                Get.find<Registercontroller>();
                             controller.selectedCountryCode = value;
                             int index = controller.countryCodes.indexOf(value!);
                             if (index != -1) {
@@ -126,7 +154,8 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             }
                             controller.update();
                           } else if (Get.isRegistered<LoginController>()) {
-                            var controller = Get.find<LoginController>();
+                            LoginController controller =
+                                Get.find<LoginController>();
                             controller.selectedCountryCode = value;
                             int index = controller.countryCodes.indexOf(value!);
                             if (index != -1) {
@@ -167,6 +196,9 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                                       .phoneController
                                   : Get.isRegistered<LoginController>()
                                   ? Get.find<LoginController>().phoneController
+                                  : Get.isRegistered<FamilyMemberController>()
+                                  ? Get.find<FamilyMemberController>()
+                                      .mobileController
                                   : null,
                           keyboardType: TextInputType.phone,
                           maxLines: 1,

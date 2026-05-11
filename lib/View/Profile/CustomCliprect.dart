@@ -14,7 +14,28 @@ class CustomClipRRect extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: Image.asset(imagePath, fit: BoxFit.cover),
+      child:
+          imagePath.startsWith('http')
+              ? Image.network(
+                imagePath,
+                fit: BoxFit.cover,
+                height: 60,
+                width: 60,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "lib/Assets/Images/doctorProfileImage.png",
+                    fit: BoxFit.cover,
+                    height: 60,
+                    width: 60,
+                  );
+                },
+              )
+              : Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                height: 60,
+                width: 60,
+              ),
     );
   }
 }

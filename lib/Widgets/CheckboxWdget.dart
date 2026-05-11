@@ -4,11 +4,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 
 class CheckboxWdget extends StatefulWidget {
-   CheckboxWdget({super.key, required this.content, required this.size, required this.color,required this.isChecked});
-  final  String content;
+  CheckboxWdget(
+      {super.key,
+      required this.content,
+      required this.size,
+      required this.color,
+      required this.isChecked,
+      this.onChanged});
+  final String content;
   final double size;
   final Color color;
-  bool isChecked;
+  final bool isChecked;
+  final ValueChanged<bool?>? onChanged;
   @override
   State<CheckboxWdget> createState() => _CheckboxWdgetState();
 }
@@ -23,11 +30,7 @@ class _CheckboxWdgetState extends State<CheckboxWdget> {
     children: [
       Checkbox(
         value: widget.isChecked,
-        onChanged: (value) {
-          setState(() {
-            widget.isChecked = value!;
-          });
-        },
+        onChanged: widget.onChanged,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),

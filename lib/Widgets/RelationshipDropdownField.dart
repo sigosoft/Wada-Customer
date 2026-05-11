@@ -4,39 +4,46 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 
 class RelationshipDropdownField extends StatefulWidget {
-  const RelationshipDropdownField({super.key});
+  final String? value;
+  final Function(String?)? onChanged;
+  const RelationshipDropdownField({super.key, this.value, this.onChanged});
 
   @override
-  State<RelationshipDropdownField> createState() => _RelationshipDropdownFieldState();
+  State<RelationshipDropdownField> createState() =>
+      _RelationshipDropdownFieldState();
 }
 
 class _RelationshipDropdownFieldState extends State<RelationshipDropdownField> {
-  String? selectedRelationship;
-
   @override
   Widget build(BuildContext context) {
+    final Map<String, String> relationshipMap = {
+      'Brother': '1',
+      'Sister': '2',
+      'Father': '3',
+      'Mother': '4',
+    };
+
     return Padding(
-      padding: EdgeInsets.only(left: 10,right: 10),
+      padding: EdgeInsets.only(left: 10, right: 10),
       child: DropdownButtonFormField<String>(
-        value: selectedRelationship,
-        items: ['Father', 'Mother', 'Sister']
-            .map((gender) => DropdownMenuItem(
-          value: gender,
-          child: Text(
-            gender,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ))
-            .toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedRelationship = value;
-          });
-        },
+        value: widget.value,
+        items:
+            relationshipMap.keys
+                .map(
+                  (relation) => DropdownMenuItem(
+                    value: relationshipMap[relation],
+                    child: Text(
+                      relation,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+        onChanged: widget.onChanged,
 
         decoration: InputDecoration(
           labelText: Strings.relationshipwithstar,
@@ -53,7 +60,10 @@ class _RelationshipDropdownFieldState extends State<RelationshipDropdownField> {
             borderSide: BorderSide.none,
           ),
 
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
+          ),
           suffixIcon: Container(
             margin: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -74,7 +84,7 @@ class _RelationshipDropdownFieldState extends State<RelationshipDropdownField> {
         ),
         isDense: true,
         icon: null,
-        iconSize: 0,// Hides the default dropdown arrow
+        iconSize: 0, // Hides the default dropdown arrow
       ),
     );
   }

@@ -51,11 +51,12 @@ class _ProfileState extends State<Profile> {
                     SizedBox(height: 10),
                     DoctorDetailsWidget(
                       premiumMembership: controller.premiumMembership,
+                      patientData: controller.patientData,
                       onTapQrCode: () {
                         controller.showCustomPopup(
                           context,
                           "lib/Assets/Images/QrCodeBig.png",
-                          "ID : 375467",
+                          "ID : ${controller.patientData?['id'] ?? "375467"}",
                         );
                       },
                     ),

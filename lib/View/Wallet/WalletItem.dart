@@ -12,15 +12,15 @@ import '../../Widgets/NurseBookingDetailsWidget.dart';
 import '../Bookings/BookingDoctorDetailsWidget.dart';
 
 class WalletItem extends StatelessWidget {
-
-  const WalletItem({Key? key, required this.type}) : super(key: key);
-  final String type;
+  const WalletItem({Key? key, required this.log}) : super(key: key);
+  final Map<String, dynamic> log;
 
   @override
   Widget build(BuildContext context) {
+    String type = log['type']?.toString() ?? "Credit";
     return InkWell(
       onTap: () {
-        if (type.toString() == "Credit") {
+        if (type == "Credit") {
           showCreditDetailsBottomSheet(context);
         } else {
           showDebitDetailsBottomSheet(context);
@@ -44,89 +44,89 @@ class WalletItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
-                  Text('24 Oct 2023',
+                  Text(log['created_at_formatted'] ?? log['created_at'] ?? '24 Oct 2023',
                       style: GoogleFonts.inter(
                         color: profileText,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       )),
-                  Row(
-                      children: [
-                        Expanded(child:
-                        Text('Wada Office',
-                            style: GoogleFonts.inter(
-                              color: profileText,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            )),),
-
-                       type.toString()=="Credit"?
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Row(
-                              children: [
-                                SvgPicture.asset(
-                                  "lib/Assets/Images/credit.svg",
-                                  width: 15,
-                                  height: 15,
-                                ),
-                                SizedBox(width: 5,),
-                                Text(Strings.credit,
-                                    style: GoogleFonts.inter(
-                                      color: profileText,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                              ],
-                            ),
-                            Text('+100',
-                                style: GoogleFonts.inter(
-                                  color: green,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                )),
-                          ],
-                        ):
-                       Column(
-                         mainAxisAlignment: MainAxisAlignment.end,
-                         crossAxisAlignment: CrossAxisAlignment.end,
-                         children: [
-                           Row(
-                             children: [
-                               SvgPicture.asset(
-                                 "lib/Assets/Images/debit.svg",
-                                 width: 15,
-                                 height: 15,
-                               ),
-                               SizedBox(width: 5,),
-                               Text(Strings.debit,
-                                   style: GoogleFonts.inter(
-                                     color: profileText,
-                                     fontSize: 12,
-                                     fontWeight: FontWeight.w400,
-                                   )),
-                             ],
-                           ),
-                           Text('-100',
-                               style: GoogleFonts.inter(
-                                 color: red1,
-                                 fontSize: 14,
-                                 fontWeight: FontWeight.w600,
-                               )),
-                         ],
-                       )
-
-                      ]),
-                  Text('Referral',
+                  Row(children: [
+                    Expanded(
+                      child: Text(log['title'] ?? 'Wada Office',
+                          style: GoogleFonts.inter(
+                            color: profileText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          )),
+                    ),
+                    type == "Credit"
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    "lib/Assets/Images/credit.svg",
+                                    width: 15,
+                                    height: 15,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(Strings.credit,
+                                      style: GoogleFonts.inter(
+                                        color: profileText,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      )),
+                                ],
+                              ),
+                              Text('+${log['amount'] ?? '0'}',
+                                  style: GoogleFonts.inter(
+                                    color: green,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                            ],
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    "lib/Assets/Images/debit.svg",
+                                    width: 15,
+                                    height: 15,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(Strings.debit,
+                                      style: GoogleFonts.inter(
+                                        color: profileText,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      )),
+                                ],
+                              ),
+                              Text('-${log['amount'] ?? '0'}',
+                                  style: GoogleFonts.inter(
+                                    color: red1,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                            ],
+                          )
+                  ]),
+                  Text(log['description'] ?? 'Referral',
                       style: GoogleFonts.inter(
                         color: profileText,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       )),
-
                 ],
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:waada_customerapp/Controller/ProfileController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/PasswordWidget.dart';
@@ -38,77 +39,121 @@ class _ReferralState extends State<Referral> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: CustomAppBar(label: Strings.refferal, showCloseIcon: false),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.all(15),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: borderLine, // Background color
-              borderRadius: BorderRadius.circular(10), // Rounded edges
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextStyleInterForSplash(
-                  text: Strings.refferals,
-                  fontWeight: FontWeight.w400,
-                  color: profileText, // Black text color
-                  size: 13.0,
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          TextStyleInterForSplash(
-                            text: "546321",
-                            fontWeight: FontWeight.w700,
-                            color: profileText, // Black text color
-                            size: 20.0,
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: SvgPicture.asset(
-                              'lib/Assets/Images/copy1.svg',
-                              height: 25,
-                              width: 25,
-                            ),
-                          ),
-                        ],
-                      ),
+      body: GetBuilder<ProfileController>(
+        init: ProfileController(),
+        initState: (state) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            state.controller?.fetchReferralCode();
+          });
+        },
+        builder: (controller) {
+          return controller.isLoading
+              ? Center(child: CircularProgressIndicator(color: colorPrimary))
+              : Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: borderLine, // Background color
+                      borderRadius: BorderRadius.circular(10), // Rounded edges
                     ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: () {},
-                          child: SvgPicture.asset(
-                            'lib/Assets/Images/copy2.svg',
-                            height: 25,
-                            width: 25,
-                          ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextStyleInterForSplash(
+                          text: Strings.refferals,
+                          fontWeight: FontWeight.w400,
+                          color: profileText, // Black text color
+                          size: 13.0,
                         ),
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  TextStyleInterForSplash(
+                                    text: controller.referralCode,
+                                    fontWeight: FontWeight.w700,
+                                    color: profileText, // Black text color
+                                    size: 20.0,
+                                  ),
+                                  SizedBox(width: 5),
+                                  InkWell(
+                                    onTap: () {
+                                      if (controller.referralCode.isNotEmpty) {
+                                        Clipboard.setData(
+                                          ClipboardData(
+                                            text: controller.referralCode,
+                                          ),
+                                        );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Referral code copied!",
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: SvgPicture.asset(
+                                      'lib/Assets/Images/copy1.svg',
+                                      height: 25,
+                                      width: 25,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: InkWell(
+                                  onTap: () {
+                                    if (controller.referralCode.isNotEmpty) {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: controller.referralCode,
+                                        ),
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Link copied!"),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: SvgPicture.asset(
+                                    'lib/Assets/Images/copy2.svg',
+                                    height: 25,
+                                    width: 25,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          TextStyleInterForSplash(
-            text: Strings.dummy,
-            fontWeight: FontWeight.w400,
-            color: profileText, // Black text color
-            size: 13.0,
-          ),
-        ],
+                  ),
+                  TextStyleInterForSplash(
+                    text: Strings.dummy,
+                    fontWeight: FontWeight.w400,
+                    color: profileText, // Black text color
+                    size: 13.0,
+                  ),
+                ],
+              );
+        },
       ),
     );
   }

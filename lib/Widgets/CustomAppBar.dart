@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.label,
     this.showCloseIcon = true,
-    this.showBackButton=true,
+    this.showBackButton = true,
     this.elevation,
   });
 
@@ -29,24 +29,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       shadowColor: Colors.black.withOpacity(0.3),
-      leading:  showBackButton
-          ? InkWell(
-        onTap: () {
-          if (Navigator.canPop(context)) {
-            Get.back();
-          } else if (Get.isRegistered<BottomNavController>()) {
-            Get.find<BottomNavController>().backToHome();
-          }
-        },
-        child: SvgPicture.asset(
-          "lib/Assets/Images/BackButton.svg",
-          fit: BoxFit.scaleDown,
-          color: Colors.black,
-        ),
-      )
-          : Container(),
+      leading:
+          showBackButton
+              ? InkWell(
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else if (Get.isRegistered<BottomNavController>()) {
+                    Get.find<BottomNavController>().backToHome();
+                  } else {
+                    Get.back();
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SvgPicture.asset(
+                    "lib/Assets/Images/BackButton.svg",
+                    fit: BoxFit.scaleDown,
+                    color: Colors.black,
+                  ),
+                ),
+              )
+              : Container(),
       title: Padding(
-        padding:showBackButton? EdgeInsets.zero:EdgeInsets.only(left: 20.0),
+        padding: showBackButton ? EdgeInsets.zero : EdgeInsets.only(left: 20.0),
         child: TextStyleInterForSplash(
           text: label,
           color: Colors.black,
@@ -56,24 +62,25 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       titleSpacing: -20.0, // Adjust this value to reduce the gap
       toolbarHeight: 50,
-      actions: showCloseIcon
-          ? [
-        Padding(
-          padding: const EdgeInsets.only(right: 20),
-          child: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: SvgPicture.asset(
-              "lib/Assets/Images/CloseIcon.svg",
-              fit: BoxFit.scaleDown,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ]
-          : null,
-      elevation:elevation ?? 3,
+      actions:
+          showCloseIcon
+              ? [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: SvgPicture.asset(
+                      "lib/Assets/Images/CloseIcon.svg",
+                      fit: BoxFit.scaleDown,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ]
+              : null,
+      elevation: elevation ?? 3,
       scrolledUnderElevation: 3.0,
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Controller/FamilyMemberController.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
@@ -32,51 +33,106 @@ class AddFamilyMembers extends StatefulWidget {
 }
 
 class _AddFamilyMembersState extends State<AddFamilyMembers> {
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar:  CustomAppBar(label: Strings.addfamilymembers, showCloseIcon: false),
-      body: SingleChildScrollView(
-                child: SizedBox(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20),
-          RelationshipDropdownField(),
-          SizedBox(height: 15),
-          TextInputWidget(label: Strings.firstname,type: TextInputType.text,height: 50),
-          SizedBox(height: 15),
-          DateOfBirthField(),
-          SizedBox(height: 15),
-          GenderDropdownField(name: Strings.genderwithstar,),
-          SizedBox(height: 15),
-          CountryCodeAndPhoneNUmber(name: Strings.phonenumberwithstar,),
-          SizedBox(height: 15),
-          TextInputWidget(label: Strings.fullAddress,type: TextInputType.text,height: 80),
-          SizedBox(height: 15),
-          CheckboxWdget(content: Strings.emergencycontact,size: 14,color: colorPrimary,isChecked: false,),
-          // SizedBox(height: 15),
-          CheckboxWdget(content: Strings.decalration,size: 12,color: colorPrimary,isChecked: false),
-          SizedBox(height: 50),
-          SubmitButtonWidget(
-            onTap:(){
-
-            },
-            text:Strings.save,
+    return GetBuilder<FamilyMemberController>(
+      init: FamilyMemberController(),
+      initState: (state) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          state.controller?.fetchCountryCodes();
+        });
+      },
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: CustomAppBar(
+            label:
+                controller.isEditMode
+                    ? "Update Details"
+                    : Strings.addfamilymembers,
+            showCloseIcon: false,
           ),
-          SizedBox(height: 15),
-        ],
-      ),
-                ),
+          body: SingleChildScrollView(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  RelationshipDropdownField(
+                    value: controller.relationId,
+                    onChanged: (val) {
+                      controller.relationId = val;
+                      controller.update();
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  TextInputWidget(
+                    label: Strings.firstname,
+                    type: TextInputType.text,
+                    height: 50,
+                    controller: controller.nameController,
+                  ),
+                  SizedBox(height: 15),
+                  DateOfBirthField(controller: controller.dobController),
+                  SizedBox(height: 15),
+                  GenderDropdownField(
+                    name: Strings.genderwithstar,
+                    value: controller.gender,
+                    onChanged: (val) {
+                      controller.gender = val;
+                      controller.update();
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  CountryCodeAndPhoneNUmber(name: Strings.phonenumberwithstar),
+                  SizedBox(height: 15),
+                  TextInputWidget(
+                    label: Strings.fullAddress,
+                    type: TextInputType.text,
+                    height: 80,
+                    controller: controller.addressController,
+                  ),
+                  SizedBox(height: 15),
+                  CheckboxWdget(
+                    content: Strings.emergencycontact,
+                    size: 14,
+                    color: colorPrimary,
+                    isChecked: controller.isEmergencyContact,
+                    onChanged: (val) {
+                      controller.isEmergencyContact = val ?? false;
+                      controller.update();
+                    },
+                  ),
+                  CheckboxWdget(
+                    content: Strings.decalration,
+                    size: 12,
+                    color: colorPrimary,
+                    isChecked:
+                        true, // Assuming declaration is always true for save
+                  ),
+                  SizedBox(height: 50),
+                  controller.isLoading.value
+                      ? Center(
+                        child: CircularProgressIndicator(color: colorPrimary),
+                      )
+                      : SubmitButtonWidget(
+                        onTap: () {
+                          if (controller.isEditMode) {
+                            controller.updateMember();
+                          } else {
+                            controller.addMember();
+                          }
+                        },
+                        text: Strings.save,
+                      ),
+                  SizedBox(height: 15),
+                ],
               ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
-
-
-
-

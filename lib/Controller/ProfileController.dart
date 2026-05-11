@@ -21,6 +21,7 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchProfile();
     debugPrint("ProfileController initialized");
   }
 
@@ -31,6 +32,85 @@ class ProfileController extends GetxController {
   }
 
   bool premiumMembership = true;
+  bool isLoading = false;
+  String referralCode = "";
+  Map<String, dynamic>? patientData;
+
+  Future<void> fetchProfile() async {
+    try {
+      isLoading = true;
+      update();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.profile}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Profile) ---");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Profile) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        patientData = response.data['data']['patient'];
+        print("Profile Data: $patientData");
+      }
+    } catch (e) {
+      print("--- API Error (Profile) ---");
+      print("Error fetching profile: $e");
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> fetchReferralCode() async {
+    try {
+      isLoading = true;
+      update();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.referralCode}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Referral Code) ---");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Referral Code) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        referralCode = response.data['data']['referral_code'] ?? "";
+        print("Referral Code: $referralCode");
+      }
+    } catch (e) {
+      print("--- API Error (Referral Code) ---");
+      print("Error fetching referral code: $e");
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
 
   void showDeleteAccountDialog(BuildContext context) {
     showModalBottomSheet(

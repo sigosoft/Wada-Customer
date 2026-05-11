@@ -15,4 +15,16 @@ class ApiEndPoints {
   static String otherServiceNames = "otherServiceNames";
   static String doctorsList = "doctorsList";
   static String donorsList = "donors/list";
+  static String aboutUs = "about";
+  static String terms = "terms";
+  static String privacyPolicy = "privacy_policy";
+  static String faqs = "faqs";
+  static String contactUs = "contact_us";
+  static String referralCode = "referral_code";
+  static String members = "members";
+  static String addMember = "members/add";
+  static String removeMember = "members/remove";
+  static String updateMember = "members/update";
+  static String wallet = "wallet";
+  static String profile = "profile";
 }

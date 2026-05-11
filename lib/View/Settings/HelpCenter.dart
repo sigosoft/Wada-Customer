@@ -20,116 +20,144 @@ class _HelpCenterState extends State<HelpCenter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CustomAppBar(
-          label: Strings.helpCentre,
-          showCloseIcon: false,
-        ),
-        body: GetBuilder<SettingsController>(
-          init: SettingsController(),
-          initState: (_) {},
-          builder: (controller) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.all(15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 15,),
-                      Text(Strings.feedback,
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(label: Strings.helpCentre, showCloseIcon: false),
+      body: GetBuilder<SettingsController>(
+        init: SettingsController(),
+        initState: (state) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            state.controller?.fetchContactUs();
+          });
+        },
+        builder: (controller) {
+          return controller.isLoading.value
+              ? Center(child: CircularProgressIndicator(color: colorPrimary))
+              : controller.contactUsData == null
+              ? Center(
+                child: Text(
+                  "No contact information available",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: profileText,
+                  ),
+                ),
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 15),
+                        Text(
+                          Strings.feedback,
                           style: GoogleFonts.inter(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: profileText)),
-                      SizedBox(height: 15,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                        Expanded(child: Column(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: profileText,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(Strings.callUs,
-                                style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: profileText)),
-                            SizedBox(height: 5,),
-                            Text("+968 943472138",
-                                style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: profileText)),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    Strings.callUs,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: profileText,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "${controller.contactUsData?['mobile'] ?? ''}",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: profileText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    Strings.emailUs,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: profileText,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "${controller.contactUsData?['email'] ?? ''}",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: profileText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
-                        )),
-                        Expanded(child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(Strings.emailUs,
-                                style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: profileText)),
-                            SizedBox(height: 5,),
-                            Text("customercare@.com",
-                                style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: profileText)),
-                          ],
-                        ))
-                      ],),
-
-                      SizedBox(
-                        height: 15,
-                      ),
-                    ],
+                        ),
+                        SizedBox(height: 15),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15),
-                  child: Divider(
-                    height: 1,
-                    color: Colors.grey.shade300,
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: Divider(height: 1, color: Colors.grey.shade300),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 15, right: 15,top: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Text(Strings.companyOffice,
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15, top: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 15),
+                        Text(
+                          Strings.companyOffice,
                           style: GoogleFonts.inter(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: profileText)),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                          "New Rajendra Nagar, Amlihdih, New Rajendra Nagar, Raipur, Tikrapara, Chhattisgarh 492001",
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: profileText,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "${controller.contactUsData?['address'] ?? ''}",
                           style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: profileText)),
-                      SizedBox(
-                        height: 20,
-                      ),
-                    ],
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: profileText,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
-        ));
+                ],
+              );
+        },
+      ),
+    );
   }
 }

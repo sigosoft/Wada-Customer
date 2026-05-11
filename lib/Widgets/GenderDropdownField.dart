@@ -4,8 +4,9 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 
 class GenderDropdownField extends StatefulWidget {
-  const GenderDropdownField({super.key, required this.name, this.onChanged});
+  const GenderDropdownField({super.key, required this.name, this.value, this.onChanged});
   final String name;
+  final String? value;
   final ValueChanged<String?>? onChanged;
 
   @override
@@ -13,35 +14,32 @@ class GenderDropdownField extends StatefulWidget {
 }
 
 class _GenderDropdownFieldState extends State<GenderDropdownField> {
-  String? _selectedGender;
-
   @override
   Widget build(BuildContext context) {
+    final Map<String, String> genderMap = {
+      'Male': '1',
+      'Female': '2',
+      'Other': '3',
+    };
+
     return Padding(
-      padding: EdgeInsets.only(left: 10,right: 10),
+      padding: EdgeInsets.only(left: 10, right: 10),
       child: DropdownButtonFormField<String>(
-        value: _selectedGender,
-        items: ['Male', 'Female', 'Other']
+        value: widget.value,
+        items: genderMap.keys
             .map((gender) => DropdownMenuItem(
-          value: gender,
-          child: Text(
-            gender,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ))
+                  value: genderMap[gender],
+                  child: Text(
+                    gender,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ))
             .toList(),
-        onChanged: (value) {
-          setState(() {
-            _selectedGender = value;
-          });
-          if (widget.onChanged != null) {
-            widget.onChanged!(value);
-          }
-        },
+        onChanged: widget.onChanged,
 
         decoration: InputDecoration(
           labelText: widget.name,
