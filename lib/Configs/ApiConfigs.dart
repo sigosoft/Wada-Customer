@@ -27,4 +27,5 @@ class ApiEndPoints {
   static String updateMember = "members/update";
   static String wallet = "wallet";
   static String profile = "profile";
+  static String updateProfile = "profile/update";
 }

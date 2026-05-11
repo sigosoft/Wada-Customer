@@ -30,7 +30,7 @@ class TextInputWidget extends StatelessWidget {
               border: Border.all(color: Colors.transparent),
             ),
             child: Padding(
-              padding: EdgeInsets.only(top: 10,bottom: 10),
+              padding: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

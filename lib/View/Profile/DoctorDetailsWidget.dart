@@ -90,7 +90,7 @@ class DoctorDetailsWidget extends StatelessWidget {
                           const SizedBox(height: 10),
                           InkWell(
                             onTap: () {
-                              Get.to(EditProfile());
+                              Get.to(() => EditProfile());
                             },
                             child: Row(
                               mainAxisSize: MainAxisSize.min,

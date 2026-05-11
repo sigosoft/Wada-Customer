@@ -43,7 +43,7 @@ class _ProfileState extends State<Profile> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: GetBuilder(
+          child: GetBuilder<ProfileController>(
             init: ProfileController(),
             builder:
                 (controller) => Column(

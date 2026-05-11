@@ -40,8 +40,9 @@ class DoctorListingController extends GetxController {
       print("Status Code: ${response.statusCode}");
       print("Response Body: ${response.data}");
 
-      if (response.statusCode == 200 && response.data['status'].toString() == "true") {
-        doctors = response.data['data'] ?? [];
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        doctors = response.data['data']['doctors'] ?? [];
       }
     } catch (e) {
       print("--- API Error (Doctors List) ---");

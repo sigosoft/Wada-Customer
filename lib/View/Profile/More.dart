@@ -39,7 +39,7 @@ class _MoreState extends State<More> {
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: GetBuilder(
+        child: GetBuilder<ProfileController>(
           init: ProfileController(),
           builder:
               (controller) => Column(

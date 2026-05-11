@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
-      
+
       print("--- SPLASH SCREEN TOKEN CHECK ---");
       print("Token found: $token");
 
@@ -57,46 +57,48 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: SvgPicture.asset(
-                "lib/Assets/Images/WaadaSymbol.svg",
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: SvgPicture.asset(
+                  "lib/Assets/Images/WaadaSymbol.svg",
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
+              SizedBox(height: 30),
+              SvgPicture.asset(
+                "lib/Assets/Images/splashImage.svg",
                 fit: BoxFit.scaleDown,
               ),
-            ),
-            SizedBox(height: 30),
-            SvgPicture.asset(
-              "lib/Assets/Images/splashImage.svg",
-              fit: BoxFit.scaleDown,
-            ),
-            SizedBox(height: 50),
-            TextStyleInterForSplash(
-              text: "Lorem ipsum",
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              size: 20.00,
-            ),
-            SizedBox(height: 20),
-            TextStyleInterForSplash(
-              text:
-                  "Quis autem vel eum iure reprehenderit qui in eareda voluptate velit.",
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-              size: 16.00,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 40),
-            ButtonWidget(
-              onTap: () {
-                Get.to(OnboardingScreen());
-              },
-              text: "Get Started",
-            ),
-          ],
+              SizedBox(height: 50),
+              TextStyleInterForSplash(
+                text: "Lorem ipsum",
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                size: 20.00,
+              ),
+              SizedBox(height: 20),
+              TextStyleInterForSplash(
+                text:
+                    "Quis autem vel eum iure reprehenderit qui in eareda voluptate velit.",
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+                size: 16.00,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 40),
+              ButtonWidget(
+                onTap: () {
+                  Get.to(OnboardingScreen());
+                },
+                text: "Get Started",
+              ),
+            ],
+          ),
         ),
       ),
     );
