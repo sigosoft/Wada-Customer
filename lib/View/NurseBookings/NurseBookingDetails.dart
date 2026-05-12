@@ -251,6 +251,14 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: SubmitButtonWidget(
                         onTap: () {
+                          if (controller.selectedMemberId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Please select a patient"),
+                              ),
+                            );
+                            return;
+                          }
                           if (controller.selectedCategoryIds.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

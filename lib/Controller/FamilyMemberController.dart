@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Configs/ApiConfigs.dart';
 
 class FamilyMemberController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   var isLoading = false.obs;
   List<dynamic> membersList = [];
 
@@ -53,13 +53,7 @@ class FamilyMemberController extends GetxController {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getCountryCodes}";
 
-      print("--- API Request (FM Country Codes) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url);
-
-      print("--- API Response (FM Country Codes) ---");
-      print("Status Code: ${response.statusCode}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -142,20 +136,11 @@ class FamilyMemberController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Add Member) ---");
-      print("URL: $url");
-      print("Headers: $headers");
-      print("Data: ${formData.fields}");
-
       final response = await _dio.post(
         url,
         data: formData,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Add Member) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -247,19 +232,11 @@ class FamilyMemberController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Update Member) ---");
-      print("URL: $url");
-      print("Data: ${formData.fields}");
-
       final response = await _dio.post(
         url,
         data: formData,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Update Member) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -317,14 +294,7 @@ class FamilyMemberController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Delete Member) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Delete Member) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -361,14 +331,7 @@ class FamilyMemberController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Members) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Members) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 
 class DonateBloodController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   
   List<String> countryCodes = [];
   List<int> countryIds = [];

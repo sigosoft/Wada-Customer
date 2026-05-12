@@ -12,7 +12,7 @@ import 'package:waada_customerapp/View/MedicalStore/MedicalStore.dart';
 import 'package:waada_customerapp/View/NurseBookings/BookNurse.dart';
 
 class HomeController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
 
   // Home API data
   Map<String, dynamic>? homeData;
@@ -50,16 +50,7 @@ class HomeController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Get Hours) ---");
-      print("URL: $url");
-      print("Headers: $headers");
-      print("Token: $token");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Get Hours) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -86,14 +77,7 @@ class HomeController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Other Services) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Other Services) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -147,14 +131,7 @@ class HomeController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Specializations) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Specializations) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200) {
         // The API might return a list directly or wrapped in 'data'
@@ -313,18 +290,7 @@ class HomeController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Home) ---");
-      print("URL: $url");
-      print("Method: GET");
-      print("Headers: $headers");
-      print("Token: $token");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Home) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Headers: ${response.headers}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

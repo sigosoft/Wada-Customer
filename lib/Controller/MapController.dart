@@ -14,6 +14,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../Resource/Colors.dart';
+import '../Configs/ApiConfigs.dart';
 
 class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   Set<Marker> marker = {};
@@ -29,7 +30,7 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   RxBool isSearch = false.obs;
   String kplacesApiKey = "AIzaSyDFSyZhayfNWiFj0zdROZO7zi4Od5WiER0";
   List<dynamic> placeList = <String>[].obs;
-  Dio dio = Dio();
+  Dio dio = ApiConfigs.dio;
   String route = "";
   TextEditingController searchController = TextEditingController();
   bool permissionDenied = false;

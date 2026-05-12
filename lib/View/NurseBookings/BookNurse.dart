@@ -527,6 +527,18 @@ class _BookNurseState extends State<BookNurse> {
                 margin: EdgeInsets.only(left: 5, right: 5),
                 child: SubmitButtonWidget(
                   onTap: () {
+                    if (selectedLocation.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please select a location")),
+                      );
+                      return;
+                    }
+                    if (fromDate.isEmpty || toDate.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please select a date range")),
+                      );
+                      return;
+                    }
                     Get.to(
                       () => NursesListing(),
                       arguments: {

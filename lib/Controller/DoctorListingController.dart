@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 
 class DoctorListingController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   List<dynamic> doctors = [];
   bool isLoading = false;
 
@@ -28,17 +28,10 @@ class DoctorListingController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Doctors List) ---");
-      print("URL: $url");
-
       final response = await _dio.get(
         url,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Doctors List) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

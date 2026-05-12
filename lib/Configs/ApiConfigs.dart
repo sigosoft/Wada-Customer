@@ -1,7 +1,16 @@
+import 'package:dio/dio.dart';
+import '../Utils/LoggingInterceptor.dart';
+
 class ApiConfigs {
   static String BASE_URL =
       "https://thewada.com/wada-backend/public/api/customer/";
   static String IMAGE_URL = "https://thewada.com/wada-backend/public/storage/";
+
+  static Dio get dio {
+    final dio = Dio();
+    dio.interceptors.add(LoggingInterceptor());
+    return dio;
+  }
 }
 
 class ApiEndPoints {

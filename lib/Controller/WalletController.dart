@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Configs/ApiConfigs.dart';
 
 class WalletController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   var isLoading = false.obs;
 
   double availableCoins = 0;
@@ -32,14 +32,7 @@ class WalletController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Wallet) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Wallet) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

@@ -11,7 +11,7 @@ import '../View/SuccessPages/DoctorBookingsSuccess/DoctorPaymentSuccess.dart';
 import '../Widgets/widgets.dart';
 
 class BookingsController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   List<dynamic> nurseBookings = [];
   bool isNurseLoading = false;
   Map<String, dynamic>? selectedBookingDetails;
@@ -39,16 +39,7 @@ class BookingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Booking Details) ---");
-      print("Token: $token");
-      print("Headers: $headers");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Booking Details) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 && response.data['data'] != null) {
         selectedBookingDetails = response.data['data'];
@@ -77,16 +68,7 @@ class BookingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (List Nurse Bookings) ---");
-      print("Token: $token");
-      print("Headers: $headers");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (List Nurse Bookings) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['success'].toString() == "true") {
@@ -95,8 +77,6 @@ class BookingsController extends GetxController {
         nurseBookings = [];
       }
     } catch (e) {
-      print("--- API Error (List Nurse Bookings) ---");
-      print("Error fetching nurse bookings: $e");
       nurseBookings = [];
     } finally {
       isNurseLoading = false;

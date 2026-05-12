@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Configs/ApiConfigs.dart';
 
 class SettingsController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   var isLoading = false.obs;
   bool tabValue = false;
   String aboutUsContent = "";
@@ -35,14 +35,7 @@ class SettingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (About Us) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (About Us) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -73,14 +66,7 @@ class SettingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Terms) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Terms) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -111,14 +97,7 @@ class SettingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Privacy Policy) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Privacy Policy) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -149,14 +128,7 @@ class SettingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (FAQs) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (FAQs) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -197,14 +169,7 @@ class SettingsController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Contact Us) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Contact Us) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

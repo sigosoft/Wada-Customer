@@ -5,7 +5,7 @@ import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 
 class Registercontroller extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   List<String> countryCodes = [];
   List<int> countryIds = [];
   String? selectedCountryCode;
@@ -44,15 +44,7 @@ class Registercontroller extends GetxController {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getCountryCodes}";
 
-      print("--- API Request (Register) ---");
-      print("URL: $url");
-      print("Method: GET");
-
       final response = await _dio.get(url);
-
-      print("--- API Response (Register) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -112,16 +104,7 @@ class Registercontroller extends GetxController {
         "referral_code": referralCodeController.text.trim(),
       });
 
-      print("--- API Request (Register OTP) ---");
-      print("URL: $url");
-      print("Method: POST");
-      print("Request Body: ${formData.fields}");
-
       final response = await _dio.post(url, data: formData);
-
-      print("--- API Response (Register OTP) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

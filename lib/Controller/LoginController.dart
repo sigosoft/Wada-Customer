@@ -8,7 +8,7 @@ import 'package:waada_customerapp/View/Home/Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   List<String> countryCodes = [];
   List<int> countryIds = [];
   String? selectedCountryCode;
@@ -29,17 +29,7 @@ class LoginController extends GetxController {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getCountryCodes}";
 
-      print("--- API Request ---");
-      print("URL: $url");
-      print("Method: GET");
-      print("Headers: ${_dio.options.headers}");
-
       final response = await _dio.get(url);
-
-      print("--- API Response ---");
-      print("Status Code: ${response.statusCode}");
-      print("Headers: ${response.headers}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -49,8 +39,6 @@ class LoginController extends GetxController {
         update();
       }
     } catch (e) {
-      print("--- API Error ---");
-      print("Error fetching country codes: $e");
     }
   }
 
@@ -80,18 +68,7 @@ class LoginController extends GetxController {
         "otp": "123456",
       });
 
-      print("--- API Request (Login OTP) ---");
-      print("URL: $url");
-      print("Method: POST");
-      print("Headers: ${_dio.options.headers}");
-      print("Request Body: ${formData.fields}");
-
       final response = await _dio.post(url, data: formData);
-
-      print("--- API Response (Login OTP) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Headers: ${response.headers}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -138,18 +115,7 @@ class LoginController extends GetxController {
         "otp": otpController.text,
       });
 
-      print("--- API Request (Login) ---");
-      print("URL: $url");
-      print("Method: POST");
-      print("Headers: ${_dio.options.headers}");
-      print("Request Body: ${formData.fields}");
-
       final response = await _dio.post(url, data: formData);
-
-      print("--- API Response (Login) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Headers: ${response.headers}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

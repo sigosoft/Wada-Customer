@@ -6,7 +6,7 @@ import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/Request
 import '../Configs/ApiConfigs.dart';
 
 class NurseBookingController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   List<dynamic> categories = [];
   List<int> selectedCategoryIds = [];
   List<dynamic> members = [];
@@ -21,8 +21,12 @@ class NurseBookingController extends GetxController {
   String latitude = "";
   String longitude = "";
   String amount = "0";
-  final TextEditingController checkinTimeController = TextEditingController(text: "10:00 AM");
-  final TextEditingController checkoutTimeController = TextEditingController(text: "11:00 AM");
+  final TextEditingController checkinTimeController = TextEditingController(
+    text: "10:00 AM",
+  );
+  final TextEditingController checkoutTimeController = TextEditingController(
+    text: "11:00 AM",
+  );
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController notesController = TextEditingController();
 
@@ -47,16 +51,7 @@ class NurseBookingController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Get Hours - NurseBooking) ---");
-      print("URL: $url");
-      print("Headers: $headers");
-      print("Token: $token");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Get Hours - NurseBooking) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -117,14 +112,7 @@ class NurseBookingController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Healthcare Categories) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Healthcare Categories) ---");
-      print("Status Code: ${response.statusCode}");
-      // print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -176,21 +164,11 @@ class NurseBookingController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Nurse Details) ---");
-      print("Token: $token");
-      print("Headers: $headers");
-      print("URL: $url");
-      print("Parameters: $queryParameters");
-
       final response = await _dio.get(
         url,
         queryParameters: queryParameters,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Nurse Details) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -212,6 +190,34 @@ class NurseBookingController extends GetxController {
   }
 
   Future<void> bookNurse() async {
+    // Safety validation
+    if (selectedMemberId == null) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Please select a patient")),
+        );
+      }
+      return;
+    }
+    if (selectedCategoryIds.isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text("Please select at least one service requirement"),
+          ),
+        );
+      }
+      return;
+    }
+    if (notesController.text.trim().isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(const SnackBar(content: Text("Please enter notes")));
+      }
+      return;
+    }
+
     try {
       isLoading = true;
       update();
@@ -265,21 +271,11 @@ class NurseBookingController extends GetxController {
 
       final FormData formData = FormData.fromMap(data);
 
-      print("--- API Request (Book Nurse) ---");
-      print("Token: $token");
-      print("Headers: $headers");
-      print("URL: $url");
-      print("Body Fields: ${formData.fields}");
-
       final response = await _dio.post(
         url,
         data: formData,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Book Nurse) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {

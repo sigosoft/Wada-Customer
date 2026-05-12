@@ -17,7 +17,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends GetxController {
-  final Dio _dio = Dio();
+  final Dio _dio = ApiConfigs.dio;
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -81,14 +81,7 @@ class ProfileController extends GetxController {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getCountryCodes}";
 
-      print("--- API Request (Country Codes) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url);
-
-      print("--- API Response (Country Codes) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -145,14 +138,7 @@ class ProfileController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Profile) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Profile) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -184,14 +170,7 @@ class ProfileController extends GetxController {
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      print("--- API Request (Referral Code) ---");
-      print("URL: $url");
-
       final response = await _dio.get(url, options: Options(headers: headers));
-
-      print("--- API Response (Referral Code) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -446,24 +425,15 @@ class ProfileController extends GetxController {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.logout}";
 
-      print("--- API Request (Logout) ---");
-      print("URL: $url");
-      print("Method: GET");
-
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
+      final String? token = prefs.getString('auth_token');
 
-      final dio = Dio();
-      final response = await dio.get(
+      final response = await ApiConfigs.dio.get(
         url,
         options: Options(
           headers: {if (token != null) 'Authorization': 'Bearer $token'},
         ),
       );
-
-      print("--- API Response (Logout) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
@@ -496,17 +466,17 @@ class ProfileController extends GetxController {
   Future<void> updateProfile() async {
     if (nameController.text.trim().isEmpty) {
       if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(content: Text("Please enter name")),
-        );
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(const SnackBar(content: Text("Please enter name")));
       }
       return;
     }
     if (emailController.text.trim().isEmpty) {
       if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(content: Text("Please enter email")),
-        );
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(const SnackBar(content: Text("Please enter email")));
       }
       return;
     }
@@ -556,20 +526,11 @@ class ProfileController extends GetxController {
         if (isImageRemoved) "remove_image": "1",
       });
 
-      print("--- API Request (Update Profile) ---");
-      print("URL: $url");
-      print("Method: POST");
-      print("Request Body: ${formData.fields}");
-
       final response = await _dio.post(
         url,
         data: formData,
         options: Options(headers: headers),
       );
-
-      print("--- API Response (Update Profile) ---");
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.data}");
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
