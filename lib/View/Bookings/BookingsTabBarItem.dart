@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
+import 'package:waada_customerapp/Controller/BookingsController.dart';
+import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Bookings/BookingDoctorDetailsWidget.dart';
 import 'package:waada_customerapp/View/DoctorBookings/DoctorRequestCancelled.dart';
@@ -35,159 +36,118 @@ class BookingsTabBarItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 10),
-          indexValue == 0
-              ? TextStyleInterForSplash(
-                textAlign: TextAlign.center,
-                text: Strings.pending,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                size: 14.00,
-              )
-              : Container(),
-          SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: 1,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child:
-                    swapValue
-                        ? InkWell(
-                          onTap: () {
-                            indexValue == 0
-                                ? Get.to(PendingBookingDetails())
-                                : indexValue == 1
-                                ? Get.to(UpcomingBookingDetails())
-                                : indexValue == 2
-                                ? Get.to(
-                                  OngoingBookingDetails(type: "completed"),
-                                )
-                                : Get.to(
-                                  OngoingBookingDetails(type: "cancelled"),
-                                );
-                          },
-                          child: HomeNurseDetailsWidget(
-                            showButton: false,
-                            buttonText: "",
-                          ),
-                        )
-                        : InkWell(
-                          onTap: () {
-                            indexValue == 1
-                                ? Get.to(
-                                  DoctorUpcomingBookingDetails(
-                                    bookingType: "home",
+          GetBuilder<BookingsController>(
+            builder: (controller) {
+              final bookings = controller.getBookingsForIndex(
+                indexValue as int,
+              );
+              if (controller.isNurseLoading) {
+                return const Center(
+                  child: SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: CircularProgressIndicator(
+                      color: colorPrimary,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                );
+              }
+              if (swapValue && bookings.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.3,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "No bookings found",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (indexValue == 0)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 15),
+                      child: TextStyleInterForSplash(
+                        textAlign: TextAlign.left,
+                        text: Strings.pending,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        size: 14.00,
+                      ),
+                    ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: swapValue ? bookings.length : 1,
+                    itemBuilder: (context, index) {
+                      final booking = swapValue ? bookings[index] : null;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child:
+                            swapValue
+                                ? InkWell(
+                                  onTap: () {
+                                    if (indexValue == 0)
+                                      Get.to(
+                                        PendingBookingDetails(
+                                          bookingId: booking!['booking_id'],
+                                        ),
+                                      );
+                                    else if (indexValue == 3)
+                                      Get.to(
+                                        OngoingBookingDetails(
+                                          type: "cancelled",
+                                        ),
+                                      );
+                                  },
+                                  child: HomeNurseDetailsWidget(
+                                    showButton: false,
+                                    buttonText: "",
+                                    name: booking?['name'] ?? "Nurse Name",
+                                    location:
+                                        booking?['location'] ?? "Location",
+                                    qualification:
+                                        booking?['qualification'] ??
+                                        "Qualification",
+                                    experience:
+                                        "${booking?['experience'] ?? 0} Years of Experience",
+                                    checkInDate: booking?['checkin_date'] ?? "",
+                                    checkInTime: booking?['checkin_time'] ?? "",
+                                    languages:
+                                        (booking?['languages'] as List?)?.join(
+                                          ", ",
+                                        ) ??
+                                        "Languages",
                                   ),
                                 )
-                                : indexValue == 2
-                                ? Get.to(
-                                  DoctorsRequestScreen(bookingType: "home"),
-                                )
-                                : indexValue == 3
-                                ? Get.to(
-                                  DoctorsRequestCancelledScreen(
-                                    bookingType: 'home',
+                                : InkWell(
+                                  onTap: () {
+                                    if (indexValue == 3) {
+                                      Get.to(
+                                        DoctorsRequestCancelledScreen(
+                                          bookingType: 'home',
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: BookingsDoctorDetailsWidget(
+                                    showButton: false,
+                                    buttonText: Strings.makePayment,
                                   ),
-                                )
-                                : Get.to(
-                                  DoctorsRequestCancelledScreen(
-                                    bookingType: 'home',
-                                  ),
-                                );
-                          },
-                          child: BookingsDoctorDetailsWidget(
-                            showButton: false,
-                            buttonText: Strings.makePayment,
-                          ),
-                        ),
+                                ),
+                      );
+                    },
+                  ),
+                ],
               );
             },
           ),
           SizedBox(height: 10),
-          indexValue == 0
-              ? TextStyleInterForSplash(
-                textAlign: TextAlign.center,
-                text: Strings.declined,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                size: 14.00,
-              )
-              : Container(),
-          SizedBox(height: 10),
-          indexValue == 0
-              ? ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 1,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child:
-                        swapValue
-                            ? InkWell(
-                              onTap: () {
-                                Get.to(
-                                  OngoingBookingDetails(type: "cancelled"),
-                                );
-                              },
-                              child: HomeNurseDetailsWidget(
-                                showButton: false,
-                                buttonText: "",
-                              ),
-                            )
-                            : BookingsDoctorDetailsWidget(
-                              showButton: false,
-                              buttonText: Strings.makePayment,
-                            ),
-                  );
-                },
-              )
-              : Container(),
-          SizedBox(height: 10),
-          indexValue == 0
-              ? TextStyleInterForSplash(
-                textAlign: TextAlign.center,
-                text: Strings.approved,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                size: 14.00,
-              )
-              : Container(),
-          SizedBox(height: 10),
-          indexValue == 0
-              ? ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 1,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child:
-                        swapValue
-                            ? InkWell(
-                              onTap: () {
-                                Get.to(OngoingBookingDetails(type: ""));
-                              },
-                              child: HomeNurseDetailsWidget(
-                                showButton: true,
-                                buttonText: "Make Payment",
-                              ),
-                            )
-                            : InkWell(
-                              onTap: () {
-                                Get.to(DoctorPaymentSuccess());
-                              },
-                              child: BookingsDoctorDetailsWidget(
-                                showButton: true,
-                                buttonText: Strings.makePayment,
-                              ),
-                            ),
-                  );
-                },
-              )
-              : Container(),
         ],
       ),
     );

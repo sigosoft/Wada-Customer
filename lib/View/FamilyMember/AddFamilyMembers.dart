@@ -55,108 +55,113 @@ class _AddFamilyMembersState extends State<AddFamilyMembers> {
           body: SingleChildScrollView(
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
-                  child: Form(
-                    key: controller.formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 20),
-                        RelationshipDropdownField(
-                          value: controller.relationId,
-                          onChanged: (val) {
-                            controller.relationId = val;
-                            controller.update();
-                          },
-                        ),
-                        SizedBox(height: 15),
-                        TextInputWidget(
-                          label: Strings.firstname,
-                          type: TextInputType.text,
-                          height: 50,
-                          controller: controller.nameController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Please enter name";
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 15),
-                        DateOfBirthField(controller: controller.dobController),
-                        SizedBox(height: 15),
-                        GenderDropdownField(
-                          name: Strings.genderwithstar,
-                          value: controller.gender,
-                          onChanged: (val) {
-                            controller.gender = val;
-                            controller.update();
-                          },
-                        ),
-                        SizedBox(height: 15),
-                        CountryCodeAndPhoneNUmber(
-                          name: Strings.phonenumberwithstar,
-                          phoneValidator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Please enter phone number";
-                            }
-                            if (value.length < 10) {
-                              return "Phone number must be 10 digits";
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 15),
-                        TextInputWidget(
-                          label: Strings.fullAddress,
-                          type: TextInputType.text,
-                          height: 80,
-                          controller: controller.addressController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Please enter address";
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 15),
-                        CheckboxWdget(
-                          content: Strings.emergencycontact,
-                          size: 14,
-                          color: colorPrimary,
-                          isChecked: controller.isEmergencyContact,
-                          onChanged: (val) {
-                            controller.isEmergencyContact = val ?? false;
-                            controller.update();
-                          },
-                        ),
-                        CheckboxWdget(
-                          content: Strings.decalration,
-                          size: 12,
-                          color: colorPrimary,
-                          isChecked:
-                              true, // Assuming declaration is always true for save
-                        ),
-                        SizedBox(height: 50),
-                        controller.isLoading.value
-                            ? Center(
-                              child: CircularProgressIndicator(
-                                color: colorPrimary,
-                              ),
-                            )
-                            : SubmitButtonWidget(
-                              onTap: () {
-                                if (controller.isEditMode) {
-                                  controller.updateMember();
-                                } else {
-                                  controller.addMember();
-                                }
-                              },
-                              text: Strings.save,
-                            ),
-                        SizedBox(height: 15),
-                      ],
+              child: Form(
+                key: controller.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    RelationshipDropdownField(
+                      value: controller.relationId,
+                      onChanged: (val) {
+                        controller.relationId = val;
+                        controller.update();
+                      },
                     ),
-                  ),
+                    SizedBox(height: 15),
+                    TextInputWidget(
+                      label: Strings.firstname,
+                      type: TextInputType.text,
+                      height: 50,
+                      controller: controller.nameController,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter name";
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    DateOfBirthField(controller: controller.dobController),
+                    SizedBox(height: 15),
+                    GenderDropdownField(
+                      name: Strings.genderwithstar,
+                      value: controller.gender,
+                      onChanged: (val) {
+                        controller.gender = val;
+                        controller.update();
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    CountryCodeAndPhoneNUmber(
+                      name: Strings.phonenumberwithstar,
+                      phoneValidator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter phone number";
+                        }
+                        if (value.length < 10) {
+                          return "Phone number must be 10 digits";
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    TextInputWidget(
+                      label: Strings.fullAddress,
+                      type: TextInputType.text,
+                      height: 80,
+                      controller: controller.addressController,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter address";
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    CheckboxWdget(
+                      content: Strings.emergencycontact,
+                      size: 14,
+                      color: colorPrimary,
+                      isChecked: controller.isEmergencyContact,
+                      onChanged: (val) {
+                        controller.isEmergencyContact = val ?? false;
+                        controller.update();
+                      },
+                    ),
+                    CheckboxWdget(
+                      content: Strings.decalration,
+                      size: 12,
+                      color: colorPrimary,
+                      isChecked:
+                          true, // Assuming declaration is always true for save
+                    ),
+                    SizedBox(height: 50),
+                    controller.isLoading.value
+                        ? const Center(
+                          child: SizedBox(
+                            width: 25,
+                            height: 25,
+                            child: CircularProgressIndicator(
+                              color: colorPrimary,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                        )
+                        : SubmitButtonWidget(
+                          onTap: () {
+                            if (controller.isEditMode) {
+                              controller.updateMember();
+                            } else {
+                              controller.addMember();
+                            }
+                          },
+                          text: Strings.save,
+                        ),
+                    SizedBox(height: 15),
+                  ],
+                ),
+              ),
             ),
           ),
         );

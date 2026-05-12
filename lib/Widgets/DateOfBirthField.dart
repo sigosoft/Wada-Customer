@@ -106,6 +106,15 @@ class _DateOfBirthFieldState extends State<DateOfBirthField> {
                       horizontal: 10,
                       vertical: 5,
                     ),
+                    errorStyle: const TextStyle(height: 0, fontSize: 0),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),

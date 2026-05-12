@@ -193,7 +193,14 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   SizedBox(height: 100),
                   ctrl.isLoading
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: CircularProgressIndicator(
+                            color: colorPrimary,
+                            strokeWidth: 3,
+                          ),
+                        )
                       : SubmitButtonWidget(
                         onTap: () {
                           ctrl.updateProfile();

@@ -61,9 +61,17 @@ class _PasswordWidgetState extends State<PasswordWidget> {
               _obscureText
                   ? "lib/Assets/Images/passwordEye.svg"
                   : "lib/Assets/Images/passwordEye.svg",
-              // You may want to use a different icon for visible
               fit: BoxFit.scaleDown,
             ),
+          ),
+          errorStyle: const TextStyle(height: 0, fontSize: 0),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
           ),
         ),
       ),

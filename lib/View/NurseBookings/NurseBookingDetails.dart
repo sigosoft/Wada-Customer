@@ -40,7 +40,12 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
         args['start_date'] ?? "",
         args['end_date'] ?? "",
         args['hour_id']?.toString() ?? "1",
+        locationStr: args['location'] ?? "",
+        latitudeStr: args['latitude']?.toString() ?? "",
+        longitudeStr: args['longitude']?.toString() ?? "",
+        amountStr: args['amount']?.toString() ?? "0",
       );
+      controller.fetchHours();
     }
   }
 
@@ -53,7 +58,14 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
         builder: (controller) {
           if (controller.isDetailsLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: colorPrimary),
+              child: SizedBox(
+                width: 25,
+                height: 25,
+                child: CircularProgressIndicator(
+                  color: colorPrimary,
+                  strokeWidth: 3,
+                ),
+              ),
             );
           }
           return SingleChildScrollView(
@@ -109,13 +121,7 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                           Expanded(
                             child: ShiftDetailsWidget(
                               text1:
-                                  controller.hourId == '1'
-                                      ? "4 Hours"
-                                      : controller.hourId == '2'
-                                      ? "8 Hours"
-                                      : controller.hourId == '3'
-                                      ? "12 Hours"
-                                      : "24 Hours",
+                                  "${controller.shiftHours.firstWhere((h) => h['id'].toString() == controller.hourId, orElse: () => {'hour': '4'})['hour']} Hours",
                               text2: Strings.shifttype,
                               showInfoButton: true,
                             ),
@@ -124,6 +130,79 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                           Expanded(child: Container()),
                         ],
                       ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      margin: const EdgeInsets.only(left: 15, right: 15),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                TimeOfDay? pickedTime = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                );
+                                if (pickedTime != null) {
+                                  controller
+                                      .checkinTimeController
+                                      .text = pickedTime.format(context);
+                                  controller.update();
+                                }
+                              },
+                              child: AbsorbPointer(
+                                child: TextInputWidget(
+                                  label: "Check-in Time",
+                                  type: TextInputType.text,
+                                  height: 50,
+                                  controller: controller.checkinTimeController,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                TimeOfDay? pickedTime = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                );
+                                if (pickedTime != null) {
+                                  controller
+                                      .checkoutTimeController
+                                      .text = pickedTime.format(context);
+                                  controller.update();
+                                }
+                              },
+                              child: AbsorbPointer(
+                                child: TextInputWidget(
+                                  label: "Check-out Time",
+                                  type: TextInputType.text,
+                                  height: 50,
+                                  controller: controller.checkoutTimeController,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextStyleInterForSplash(
+                      text: "Choose Patient",
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    const SizedBox(height: 10),
+                    MemberDropdownField(
+                      members: controller.members,
+                      selectedMemberId: controller.selectedMemberId,
+                      onChanged: (id) {
+                        controller.selectedMemberId = id;
+                        controller.update();
+                      },
                     ),
                     const SizedBox(height: 15),
                     TextStyleInterForSplash(
@@ -173,16 +252,24 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                       child: SubmitButtonWidget(
                         onTap: () {
                           if (controller.selectedCategoryIds.isEmpty) {
-                            Get.snackbar(
-                              "Error",
-                              "Please select at least one service requirement",
-                              snackPosition: SnackPosition.BOTTOM,
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Please select at least one service requirement",
+                                ),
+                              ),
                             );
                             return;
                           }
-                          if (controller.formKey.currentState!.validate()) {
-                            Get.to(const RequestSending());
+                          if (controller.notesController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Please enter notes"),
+                              ),
+                            );
+                            return;
                           }
+                          Get.to(const RequestSending());
                         },
                         text: Strings.confirm,
                       ),

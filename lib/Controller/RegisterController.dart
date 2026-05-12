@@ -68,8 +68,28 @@ class Registercontroller extends GetxController {
   }
 
   Future<void> sendRegOtp() async {
-    // Validation
-    if (!formKey.currentState!.validate()) {
+    if (firstNameController.text.trim().isEmpty) {
+      _showError("Please enter first name");
+      return;
+    }
+    if (emailController.text.trim().isEmpty) {
+      _showError("Please enter email");
+      return;
+    }
+    if (!GetUtils.isEmail(emailController.text.trim())) {
+      _showError("Please enter a valid email");
+      return;
+    }
+    if (phoneController.text.trim().isEmpty) {
+      _showError("Please enter phone number");
+      return;
+    }
+    if (dobController.text.trim().isEmpty) {
+      _showError("Please select date of birth");
+      return;
+    }
+    if (selectedGender == null) {
+      _showError("Please select gender");
       return;
     }
     

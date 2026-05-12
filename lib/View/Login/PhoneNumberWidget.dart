@@ -92,7 +92,15 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           horizontal: 5,
                           vertical: 5,
                         ),
-                        errorStyle: TextStyle(fontSize: 8),
+                        errorStyle: const TextStyle(height: 0, fontSize: 0),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                       items:
                           (Get.isRegistered<FamilyMemberController>()
@@ -233,7 +241,15 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             horizontal: 10,
                             vertical: 5,
                           ),
-                          errorStyle: TextStyle(fontSize: 8),
+                          errorStyle: const TextStyle(height: 0, fontSize: 0),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                         onChanged: (value) {
                           if (value.length > 10) {

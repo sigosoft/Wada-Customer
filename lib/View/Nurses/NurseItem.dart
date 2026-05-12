@@ -302,6 +302,15 @@ class NurseItem extends StatelessWidget {
                   'start_date': Get.arguments?['start_date'],
                   'end_date': Get.arguments?['end_date'],
                   'hour_id': Get.arguments?['hour_id'],
+                  'location': Get.arguments?['location'],
+                  'latitude': Get.arguments?['latitude'],
+                  'longitude': Get.arguments?['longitude'],
+                  'amount': (nurse['nurse_charges'] as List?)?.firstWhere(
+                    (c) =>
+                        c['hour_id'].toString() ==
+                        Get.arguments?['hour_id'].toString(),
+                    orElse: () => {'price': '0'},
+                  )['price'],
                 },
               );
             },

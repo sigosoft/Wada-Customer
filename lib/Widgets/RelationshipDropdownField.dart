@@ -76,6 +76,15 @@ class _RelationshipDropdownFieldState extends State<RelationshipDropdownField> {
               size: 20,
             ),
           ),
+          errorStyle: const TextStyle(height: 0, fontSize: 0),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
         ),
         style: GoogleFonts.inter(
           fontSize: 13,

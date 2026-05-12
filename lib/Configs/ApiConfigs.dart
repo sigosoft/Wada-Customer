@@ -31,4 +31,8 @@ class ApiEndPoints {
   static String updateProfile = "profile/update";
   static String healthcareCategories = "healthcare_categories";
   static String nurseDetails = "nurseDetails";
+  static String bookNurse = "bookNurse";
+  static String listBookings = "listBookings";
+  static String bookingDetails = "bookingDetails";
+  static String getHours = "getHours";
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Controller/BookingsController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
@@ -14,15 +15,25 @@ import 'package:waada_customerapp/Widgets/widgets.dart';
 
 import '../../Widgets/CheckboxWdget.dart';
 
-
 class PendingBookingDetails extends StatefulWidget {
-  const PendingBookingDetails({super.key});
+  final int bookingId;
+  const PendingBookingDetails({super.key, required this.bookingId});
 
   @override
   State<PendingBookingDetails> createState() => _PendingBookingDetailsState();
 }
 
 class _PendingBookingDetailsState extends State<PendingBookingDetails> {
+  final BookingsController controller = Get.find<BookingsController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchBookingDetails(widget.bookingId);
+    });
+  }
+
   void _showCancelShiftBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -45,7 +56,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
               ),
               SizedBox(height: 5),
               Text(
-               Strings.cancelbooking,
+                Strings.cancelbooking,
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -69,7 +80,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-                         Get.back();
+                          Get.back();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFE7F4FD),
@@ -94,7 +105,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.to(CancelBookingSuccess ());
+                          Get.to(CancelBookingSuccess());
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorPrimary,
@@ -113,8 +124,6 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                       ),
                     ),
                   ),
-
-
                 ],
               ),
               SizedBox(height: 20),
@@ -124,6 +133,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,20 +179,21 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                   _showCancelShiftBottomSheet(context);
                 }
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  height: 30,
-                  child: Text(
-                    Strings.cancelshift,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.red,
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem(
+                      value: 1,
+                      height: 30,
+                      child: Text(
+                        Strings.cancelshift,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.red,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                  ],
             ),
           ),
         ],
@@ -190,190 +201,292 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
         scrolledUnderElevation: 3.0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            // height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20),
-                NurseDetailsWidget(showPartiallyAvailable: false,),
-                SizedBox(height: 10),
-                TextStyleInterForSplash(
-                  text: Strings.shiftdetails,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 15.00,
+        child: GetBuilder<BookingsController>(
+          builder: (controller) {
+            if (controller.isDetailsLoading) {
+              return const Center(
+                child: SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: CircularProgressIndicator(
+                    color: colorPrimary,
+                    strokeWidth: 3,
+                  ),
                 ),
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15),
-                  child: Row(children: [
-                    Expanded(child: ShiftDetailsWidget(text1: "08 Feb 2025",text2: Strings.checkindate,showInfoButton: false,)),
-                    SizedBox(width: 10,),
-                    Expanded(child: ShiftDetailsWidget(text1: "09:30 AM",text2: Strings.checkintime,showInfoButton: false,)),
-                  ],),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15),
-                  child: Row(children: [
-                    Expanded(child: ShiftDetailsWidget(text1: "08 Feb 2025",text2: Strings.checkoutdate,showInfoButton: false,)),
-                    SizedBox(width: 10,),
-                    Expanded(child: ShiftDetailsWidget(text1: "05:00 PM",text2: Strings.checkouttime,showInfoButton: false,)),
-                  ],),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15,top: 10),
-                  child: Row(children: [
-                    Expanded(child: ShiftDetailsWidget(text1: "4 Hours",text2: Strings.shifttype ,showInfoButton: true,)),
-                    SizedBox(width: 10,),
-                    Expanded(child: ShiftDetailsWidget(text1: "25 Jan 2025",text2:  Strings.bookedon,showInfoButton: false,)),
-                  ],),
-                ),
-                SizedBox(height: 15),
-                TextStyleInterForSplash(
-                  text: Strings.patientdetails,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 15.00,
-                ),
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15),
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Merlin Joy',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
+              );
+            }
+            final details =
+                controller.selectedBookingDetails?['booking_details'];
+            final patient =
+                controller.selectedBookingDetails?['patient_details'];
+            if (details == null) {
+              return const Center(child: Text("No details found"));
+            }
+            return SingleChildScrollView(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    NurseDetailsWidget(
+                      showPartiallyAvailable: false,
+                      nurseData: {
+                        'name': details['name'],
+                        'qualification': details['qualification'],
+                        'experience': details['experience'],
+                        'image': details['image'],
+                        'location': details['location'],
+                        'languages': details['languages'],
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextStyleInterForSplash(
+                      text: Strings.shiftdetails,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      margin: const EdgeInsets.only(left: 15, right: 15),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1: details['checkin_date'] ?? "",
+                              text2: Strings.checkindate,
+                              showInfoButton: false,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1: details['checkin_time'] ?? "",
+                              text2: Strings.checkintime,
+                              showInfoButton: false,
+                            ),
+                          ),
+                        ],
                       ),
-                      children: [
-                        TextSpan(
-                          text: ' 68 (F)',
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      margin: const EdgeInsets.only(left: 15, right: 15),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1: details['checkout_date'] ?? "",
+                              text2: Strings.checkoutdate,
+                              showInfoButton: false,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1: details['checkout_time'] ?? "",
+                              text2: Strings.checkouttime,
+                              showInfoButton: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1:
+                                  details['shift_type'].toString() == '1'
+                                      ? "4 Hours"
+                                      : details['shift_type'].toString() == '2'
+                                      ? "8 Hours"
+                                      : details['shift_type'].toString() == '3'
+                                      ? "12 Hours"
+                                      : "24 Hours",
+                              text2: Strings.shifttype,
+                              showInfoButton: true,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ShiftDetailsWidget(
+                              text1: details['booked_on'] ?? "",
+                              text2: Strings.bookedon,
+                              showInfoButton: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextStyleInterForSplash(
+                      text: Strings.patientdetails,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      margin: const EdgeInsets.only(left: 15, right: 15),
+                      child: RichText(
+                        text: TextSpan(
+                          text: patient?['name'] ?? '',
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                             fontStyle: FontStyle.normal,
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  ' ${patient?['dob'] != null ? (DateTime.now().year - DateTime.parse(patient!['dob']).year) : ""} (${patient?['gender'] == 1 ? "M" : "F"})',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 5,
+                      ),
+                      child: Text(
+                        patient?['mobile'] ?? '',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                          fontStyle: FontStyle.normal,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextStyleInterForSplash(
+                      text: Strings.serviceRequirement,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    if (details['healthcare_categories'] != null)
+                      ...(details['healthcare_categories'] as List).map(
+                        (cat) => CheckboxWdget(
+                          content: cat['category_name'] ?? "",
+                          size: 13,
+                          color: Colors.black,
+                          isChecked: true,
+                        ),
+                      ),
+                    const SizedBox(height: 5),
+                    TextStyleInterForSplash(
+                      text: Strings.notes,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    const SizedBox(height: 5),
+                    TextStyleInterForSplash(
+                      text: details['note'] ?? "No notes provided",
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
+                      size: 12.0,
+                    ),
+                    const SizedBox(height: 15),
+                    TextStyleInterForSplash(
+                      text: Strings.billdetails,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      size: 15.00,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextStyleInterForSplash(
+                            text:
+                                "${details['shift_type'].toString() == '1'
+                                    ? '4'
+                                    : details['shift_type'].toString() == '2'
+                                    ? '8'
+                                    : details['shift_type'].toString() == '3'
+                                    ? '12'
+                                    : '24'} hours shift",
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                            size: 14.00,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            alignment: Alignment.topRight,
+                            child: TextStyleInterForSplash(
+                              text: "₹${details['amount'] ?? '0'}",
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              size: 14.00,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 15,right: 15,top: 5),
-                  child: Text(
-                    '+91 987654321',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.normal,
-                    ),),
-                ),
-                SizedBox(height: 15),
-                TextStyleInterForSplash(
-                  text: Strings.serviceRequirement,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 15.00,
-                ),
-                CheckboxWdget(content: "Wound Care and Dressing", size: 13, color: Colors.black,isChecked: true,),
-                SizedBox(height: 5),
-                TextStyleInterForSplash(
-                  text: Strings.notes,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 15.00,
-                ),
-                SizedBox(height: 5),
-                TextStyleInterForSplash(
-                  text: Strings.dummy,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
-                  size: 12.0,
-                ),
-                SizedBox(height: 15),
-                TextStyleInterForSplash(
-                  text: Strings.billdetails,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w700,
-                  size: 15.00,
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextStyleInterForSplash(
-                        text: "4 hours shift for 10 Days",
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                        size: 14.00,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        alignment: Alignment.topRight,
-                        child: TextStyleInterForSplash(
-                          text: "₹4,000",
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          size: 14.00,
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextStyleInterForSplash(
+                            text: Strings.totalamount,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w800,
+                            size: 14.00,
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            alignment: Alignment.topRight,
+                            child: TextStyleInterForSplash(
+                              text: "₹${details['amount'] ?? '0'}",
+                              color: Colors.black,
+                              fontWeight: FontWeight.w800,
+                              size: 14.00,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 30),
+                    SubmitButtonWidget(
+                      onTap: () {
+                        Get.to(PaymentSuccess());
+                      },
+                      text: Strings.makePayment,
+                    ),
+                    const SizedBox(height: 30),
                   ],
                 ),
-                SizedBox(height: 5),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextStyleInterForSplash(
-                        text: Strings.totalamount,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 14.00,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        alignment: Alignment.topRight,
-                        child: TextStyleInterForSplash(
-                          text: "₹4,000",
-                          color: Colors.black,
-                          fontWeight: FontWeight.w800,
-                          size: 14.00,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-                SubmitButtonWidget(
-                  onTap:(){
-                    Get.to(PaymentSuccess ());
-                  },
-                  text:Strings.makePayment,
-                ),
-                SizedBox(height: 30),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
-
-
-
-

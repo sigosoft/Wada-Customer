@@ -31,7 +31,16 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         },
         builder: (controller) {
           return controller.isLoading.value
-              ? Center(child: CircularProgressIndicator(color: colorPrimary))
+              ? const Center(
+                  child: SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: CircularProgressIndicator(
+                      color: colorPrimary,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                )
               : SingleChildScrollView(
                 child: Container(
                   margin: EdgeInsets.only(

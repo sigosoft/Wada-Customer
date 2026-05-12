@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/Controller/HomeController.dart';
+import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Bookings/Bookings.dart';
 import 'package:waada_customerapp/View/Home/CarouselSliderWidget.dart';
@@ -30,17 +31,30 @@ class _HomeItemState extends State<HomeItem> {
       backgroundColor: Colors.white,
       appBar: HomeAppBar(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: GetBuilder(
-              init: HomeController(),
-              builder:
-                  (controller) =>
+        child: GetBuilder<HomeController>(
+          init: HomeController(),
+          builder: (controller) {
+            return RefreshIndicator(
+              color: colorPrimary,
+              onRefresh: controller.onRefresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child:
                       controller.isLoading
                           ? const SizedBox(
                             height: 300,
-                            child: Center(child: CircularProgressIndicator()),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 25,
+                                height: 25,
+                                child: CircularProgressIndicator(
+                                  color: colorPrimary,
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            ),
                           )
                           : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,8 +171,10 @@ class _HomeItemState extends State<HomeItem> {
                               ),
                             ],
                           ),
-            ),
-          ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

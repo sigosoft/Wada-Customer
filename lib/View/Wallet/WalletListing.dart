@@ -29,7 +29,16 @@ class _WalletListingState extends State<WalletListing> {
           ),
           backgroundColor: Colors.white,
           body: controller.isLoading.value
-              ? Center(child: CircularProgressIndicator(color: colorPrimary))
+              ? const Center(
+                  child: SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: CircularProgressIndicator(
+                      color: colorPrimary,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                )
               : SingleChildScrollView(
                   physics: BouncingScrollPhysics(),
                   child: Container(

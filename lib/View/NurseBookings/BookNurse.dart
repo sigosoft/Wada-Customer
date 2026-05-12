@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Controller/HomeController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
@@ -36,6 +37,12 @@ class _BookNurseState extends State<BookNurse> {
   String fromDate = "";
   String toDate = "";
   String selectedHourId = "1"; // Default to 4 Hours
+
+  @override
+  void initState() {
+    super.initState();
+    homeController.fetchHours();
+  }
 
   void _showLocationBottomSheet(BuildContext context) {
     final TextEditingController _searchController = TextEditingController();
@@ -181,11 +188,16 @@ class _BookNurseState extends State<BookNurse> {
                                 longitude = position.longitude.toString();
                               });
                               try {
-                                List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+                                List<Placemark> placemarks =
+                                    await placemarkFromCoordinates(
+                                      position.latitude,
+                                      position.longitude,
+                                    );
                                 if (placemarks.isNotEmpty) {
                                   Placemark place = placemarks.first;
                                   setState(() {
-                                    selectedLocation = "${place.name}, ${place.locality}, ${place.administrativeArea}";
+                                    selectedLocation =
+                                        "${place.name}, ${place.locality}, ${place.administrativeArea}";
                                   });
                                 } else {
                                   setState(() {
@@ -210,10 +222,14 @@ class _BookNurseState extends State<BookNurse> {
                           icon: 'lib/Assets/Images/locationIcon.svg',
                           text: Strings.selectPlaces,
                           onTap: () async {
-                            final result = await Get.to(() => ChooseLocation(isPicker: true));
-                            if (result != null && result is Map<String, dynamic>) {
+                            final result = await Get.to(
+                              () => ChooseLocation(isPicker: true),
+                            );
+                            if (result != null &&
+                                result is Map<String, dynamic>) {
                               setState(() {
-                                selectedLocation = result['name'] ?? "Selected Place";
+                                selectedLocation =
+                                    result['name'] ?? "Selected Place";
                                 latitude = result['lat'] ?? "";
                                 longitude = result['long'] ?? "";
                               });
@@ -427,49 +443,84 @@ class _BookNurseState extends State<BookNurse> {
                 size: 14.00,
               ),
               SizedBox(height: 10),
-              Container(
-                margin: EdgeInsets.only(left: 15, right: 15),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ShiftTypeWidget(
-                        text: "4 Hours",
-                        isSelected: selectedHourId == "1",
-                        onTap: () => setState(() => selectedHourId = "1"),
+              GetBuilder<HomeController>(
+                builder: (controller) {
+                  if (controller.shiftHours.isEmpty) {
+                    return const Center(
+                      child: SizedBox(
+                        width: 25,
+                        height: 25,
+                        child: CircularProgressIndicator(
+                          color: colorPrimary,
+                          strokeWidth: 3,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: ShiftTypeWidget(
-                        text: "8 Hours",
-                        isSelected: selectedHourId == "2",
-                        onTap: () => setState(() => selectedHourId = "2"),
+                    );
+                  }
+
+                  // Set default selectedHourId if not set
+                  if (selectedHourId == "1" &&
+                      controller.shiftHours.isNotEmpty &&
+                      controller.shiftHours[0]['id'].toString() != "1") {
+                    // This is a safety check, but keeping "1" as default is usually fine
+                  }
+
+                  List<Widget> rows = [];
+                  for (int i = 0; i < controller.shiftHours.length; i += 2) {
+                    rows.add(
+                      Container(
+                        margin: const EdgeInsets.only(
+                          left: 15,
+                          right: 15,
+                          bottom: 10,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ShiftTypeWidget(
+                                text:
+                                    "${controller.shiftHours[i]['hour']} Hours",
+                                isSelected:
+                                    selectedHourId ==
+                                    controller.shiftHours[i]['id'].toString(),
+                                onTap:
+                                    () => setState(
+                                      () =>
+                                          selectedHourId =
+                                              controller.shiftHours[i]['id']
+                                                  .toString(),
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            if (i + 1 < controller.shiftHours.length)
+                              Expanded(
+                                child: ShiftTypeWidget(
+                                  text:
+                                      "${controller.shiftHours[i + 1]['hour']} Hours",
+                                  isSelected:
+                                      selectedHourId ==
+                                      controller.shiftHours[i + 1]['id']
+                                          .toString(),
+                                  onTap:
+                                      () => setState(
+                                        () =>
+                                            selectedHourId =
+                                                controller
+                                                    .shiftHours[i + 1]['id']
+                                                    .toString(),
+                                      ),
+                                ),
+                              )
+                            else
+                              Expanded(child: Container()),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 15, right: 15, top: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ShiftTypeWidget(
-                        text: "12 Hours",
-                        isSelected: selectedHourId == "3",
-                        onTap: () => setState(() => selectedHourId = "3"),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: ShiftTypeWidget(
-                        text: "24 Hours",
-                        isSelected: selectedHourId == "4",
-                        onTap: () => setState(() => selectedHourId = "4"),
-                      ),
-                    ),
-                  ],
-                ),
+                    );
+                  }
+                  return Column(children: rows);
+                },
               ),
               SizedBox(height: 30),
               Container(

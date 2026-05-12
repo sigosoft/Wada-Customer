@@ -95,7 +95,16 @@ class FamilyMemberController extends GetxController {
 
   Future<void> addMember() async {
     // Validation logic
-    if (!formKey.currentState!.validate()) {
+    if (nameController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please enter name");
+      return;
+    }
+    if (dobController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please select date of birth");
+      return;
+    }
+    if (mobileController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please enter mobile number");
       return;
     }
     if (gender == null) {
@@ -190,7 +199,16 @@ class FamilyMemberController extends GetxController {
 
   Future<void> updateMember() async {
     // Validation logic
-    if (!formKey.currentState!.validate()) {
+    if (nameController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please enter name");
+      return;
+    }
+    if (dobController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please select date of birth");
+      return;
+    }
+    if (mobileController.text.trim().isEmpty) {
+      _showSnackBar("Error", "Please enter mobile number");
       return;
     }
     if (gender == null) {

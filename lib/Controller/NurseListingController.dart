@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' hide FormData;
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Configs/ApiConfigs.dart';
 
@@ -38,9 +38,9 @@ class NurseListingController extends GetxController {
       print("URL: $url");
       print("Body: $searchParams");
 
-      final response = await _dio.post(
+      final response = await _dio.get(
         url,
-        data: FormData.fromMap(searchParams),
+        queryParameters: searchParams,
         options: Options(headers: headers),
       );
 

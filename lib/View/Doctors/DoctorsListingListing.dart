@@ -60,7 +60,16 @@ class DoctorsListingListing extends StatelessWidget {
                   Expanded(
                     child:
                         controller.isLoading
-                            ? const Center(child: CircularProgressIndicator())
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 25,
+                                  height: 25,
+                                  child: CircularProgressIndicator(
+                                    color: colorPrimary,
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                              )
                             : controller.doctors.isEmpty
                             ? const Center(child: Text("No doctors found"))
                             : ListView.builder(

@@ -494,7 +494,36 @@ class ProfileController extends GetxController {
   }
 
   Future<void> updateProfile() async {
-    if (!formKey.currentState!.validate()) {
+    if (nameController.text.trim().isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Please enter name")),
+        );
+      }
+      return;
+    }
+    if (emailController.text.trim().isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Please enter email")),
+        );
+      }
+      return;
+    }
+    if (phoneController.text.trim().isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Please enter phone number")),
+        );
+      }
+      return;
+    }
+    if (dobController.text.trim().isEmpty) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(content: Text("Please select date of birth")),
+        );
+      }
       return;
     }
     try {

@@ -74,7 +74,15 @@ class TextInputWidget extends StatelessWidget {
                         horizontal: 10,
                         vertical: 10,
                       ),
-                      errorStyle: const TextStyle(height: 0.8, fontSize: 11),
+                      errorStyle: const TextStyle(height: 0, fontSize: 0),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     onChanged: (value) {},
                   ),

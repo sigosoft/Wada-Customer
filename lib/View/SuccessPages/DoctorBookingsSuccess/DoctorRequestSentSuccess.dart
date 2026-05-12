@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/View/Home/Home.dart';
 import 'package:waada_customerapp/Widgets/DoctorDetailWidget.dart';
 import '../../../Resource/Strings.dart';
 import '../../Bookings/BookingDoctorDetailsWidget.dart';
@@ -8,11 +11,16 @@ import '../../Home/HomeNurseDetailsWidget.dart';
 import '../../Login/SubmitButtonWidget.dart';
 
 class DoctorRequestSentSuccess extends StatefulWidget {
-  const DoctorRequestSentSuccess({super.key, required this.bookingType, required this.msg});
-  final  String bookingType;
-  final  String msg;
+  const DoctorRequestSentSuccess({
+    super.key,
+    required this.bookingType,
+    required this.msg,
+  });
+  final String bookingType;
+  final String msg;
   @override
-  State<DoctorRequestSentSuccess> createState() => _DoctorRequestSentSuccessState();
+  State<DoctorRequestSentSuccess> createState() =>
+      _DoctorRequestSentSuccessState();
 }
 
 class _DoctorRequestSentSuccessState extends State<DoctorRequestSentSuccess> {
@@ -62,15 +70,15 @@ class _DoctorRequestSentSuccessState extends State<DoctorRequestSentSuccess> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0,),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: SubmitButtonWidget(
-                onTap:(){
-        
+                onTap: () {
+                  Get.offAll(() => const Home());
                 },
-                text:Strings.home,
+                text: Strings.home,
               ),
             ),
-            SizedBox(height: 10)
+            SizedBox(height: 10),
           ],
         ),
       ),

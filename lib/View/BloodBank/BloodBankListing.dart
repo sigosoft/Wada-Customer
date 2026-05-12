@@ -68,7 +68,16 @@ class BloodBankListing extends StatelessWidget {
               color: Colors.white,
               child:
                   controller.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(
+                          child: SizedBox(
+                            width: 25,
+                            height: 25,
+                            child: CircularProgressIndicator(
+                              color: colorPrimary,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                        )
                       : controller.donors.isEmpty
                       ? const Center(child: Text("No donors found"))
                       : ListView.builder(

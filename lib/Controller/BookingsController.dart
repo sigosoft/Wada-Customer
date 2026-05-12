@@ -1,19 +1,132 @@
-import 'package:flutter/animation.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:waada_customerapp/Resource/Colors.dart';
-import 'package:waada_customerapp/Resource/Strings.dart';
-import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
-import 'package:waada_customerapp/View/SuccessPages/DoctorBookingsSuccess/DoctorPaymentSuccess.dart';
-import 'package:waada_customerapp/Widgets/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Configs/ApiConfigs.dart';
+import '../Resource/Colors.dart';
+import '../Resource/Strings.dart';
+import '../View/Login/SubmitButtonWidget.dart';
+import '../View/SuccessPages/DoctorBookingsSuccess/DoctorPaymentSuccess.dart';
+import '../Widgets/widgets.dart';
 
 class BookingsController extends GetxController {
+  final Dio _dio = Dio();
+  List<dynamic> nurseBookings = [];
+  bool isNurseLoading = false;
+  Map<String, dynamic>? selectedBookingDetails;
+  bool isDetailsLoading = false;
+
   @override
   void onInit() {
     super.onInit();
     print("BookingsController initialized");
+    fetchNurseBookings();
+  }
+
+  Future<void> fetchBookingDetails(int bookingId) async {
+    try {
+      isDetailsLoading = true;
+      update();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.bookingDetails}?booking_id=$bookingId";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Booking Details) ---");
+      print("Token: $token");
+      print("Headers: $headers");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Booking Details) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        selectedBookingDetails = response.data['data'];
+      }
+    } catch (e) {
+      print("--- API Error (Booking Details) ---");
+      print("Error fetching booking details: $e");
+    } finally {
+      isDetailsLoading = false;
+      update();
+    }
+  }
+
+  Future<void> fetchNurseBookings() async {
+    try {
+      isNurseLoading = true;
+      update();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (List Nurse Bookings) ---");
+      print("Token: $token");
+      print("Headers: $headers");
+      print("URL: $url");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (List Nurse Bookings) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data['success'].toString() == "true") {
+        nurseBookings = response.data['data']['data'] ?? [];
+      } else {
+        nurseBookings = [];
+      }
+    } catch (e) {
+      print("--- API Error (List Nurse Bookings) ---");
+      print("Error fetching nurse bookings: $e");
+      nurseBookings = [];
+    } finally {
+      isNurseLoading = false;
+      update();
+    }
+  }
+
+  List<dynamic> get requestBookings =>
+      nurseBookings
+          .where((b) => b['booking_status'].toString() == "0")
+          .toList();
+  List<dynamic> get upcomingBookings =>
+      nurseBookings
+          .where((b) => b['booking_status'].toString() == "1")
+          .toList();
+  List<dynamic> get completedBookings =>
+      nurseBookings
+          .where((b) => b['booking_status'].toString() == "2")
+          .toList();
+  List<dynamic> get cancelledBookings =>
+      nurseBookings
+          .where((b) => b['booking_status'].toString() == "3")
+          .toList();
+
+  List<dynamic> getBookingsForIndex(int index) {
+    if (index == 0) return requestBookings;
+    if (index == 1) return upcomingBookings;
+    if (index == 2) return completedBookings;
+    if (index == 3) return cancelledBookings;
+    return [];
   }
 
   @override
@@ -152,9 +265,12 @@ class BookingsController extends GetxController {
                       ],
                     ),
                     SizedBox(height: 20),
-                    SubmitButtonWidget(text: Strings.payText, onTap: () {
-                      Get.off(DoctorPaymentSuccess());
-                    }),
+                    SubmitButtonWidget(
+                      text: Strings.payText,
+                      onTap: () {
+                        Get.off(DoctorPaymentSuccess());
+                      },
+                    ),
                   ],
                 ),
               );
@@ -222,9 +338,7 @@ class BookingsController extends GetxController {
                           side: BorderSide.none,
                           backgroundColor: colorPrimaryWith15Opacity,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              8,
-                            ),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: TextStyleInterWithoutPadding(
@@ -245,9 +359,7 @@ class BookingsController extends GetxController {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorPrimary,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              8,
-                            ),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: TextStyleInterWithoutPadding(

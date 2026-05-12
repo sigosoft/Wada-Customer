@@ -279,24 +279,46 @@ class _DonateBloodState extends State<DonateBlood> {
                     child: SubmitButtonWidget(
                       onTap: () {
                         if (controller.selectedBloodGroup == null) {
-                          Get.snackbar(
-                            "Error",
-                            "Please select blood group",
-                            snackPosition: SnackPosition.BOTTOM,
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please select blood group"),
+                            ),
                           );
                           return;
                         }
                         if (controller.selectedGender == null) {
-                          Get.snackbar(
-                            "Error",
-                            "Please select gender",
-                            snackPosition: SnackPosition.BOTTOM,
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please select gender"),
+                            ),
                           );
                           return;
                         }
-                        if (controller.formKey.currentState!.validate()) {
-                          _showInfoBottomSheet(context);
+                        if (controller.nameController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please enter donor name"),
+                            ),
+                          );
+                          return;
                         }
+                        if (controller.phoneController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please enter phone number"),
+                            ),
+                          );
+                          return;
+                        }
+                        if (controller.locationController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please select location"),
+                            ),
+                          );
+                          return;
+                        }
+                        _showInfoBottomSheet(context);
                       },
                       text: Strings.sent,
                     ),

@@ -110,11 +110,16 @@ class NursesListing extends StatelessWidget {
                   Expanded(
                     child:
                         controller.isLoading
-                            ? Center(
-                              child: CircularProgressIndicator(
-                                color: colorPrimary,
-                              ),
-                            )
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 25,
+                                  height: 25,
+                                  child: CircularProgressIndicator(
+                                    color: colorPrimary,
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                              )
                             : controller.nurses.isEmpty
                             ? Center(child: Text("No nurses found"))
                             : ListView.builder(

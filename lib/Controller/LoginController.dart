@@ -55,7 +55,16 @@ class LoginController extends GetxController {
   }
 
   Future<void> sendLoginOtp() async {
-    if (!formKey.currentState!.validate()) {
+    if (selectedCountryId == null) {
+      _showError("Please select country code");
+      return;
+    }
+    if (phoneController.text.trim().isEmpty) {
+      _showError("Please enter phone number");
+      return;
+    }
+    if (phoneController.text.trim().length < 10) {
+      _showError("Please enter a valid 10-digit phone number");
       return;
     }
 

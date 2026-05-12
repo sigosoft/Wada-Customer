@@ -25,6 +25,54 @@ class HomeController extends GetxController {
     fetchHomeData();
     fetchSpecializations();
     fetchOtherServices();
+    fetchHours();
+  }
+
+  Future<void> onRefresh() async {
+    await Future.wait([
+      fetchHomeData(),
+      fetchSpecializations(),
+      fetchOtherServices(),
+      fetchHours(),
+    ]);
+  }
+
+  List<dynamic> shiftHours = [];
+
+  Future<void> fetchHours() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getHours}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      print("--- API Request (Get Hours) ---");
+      print("URL: $url");
+      print("Headers: $headers");
+      print("Token: $token");
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      print("--- API Response (Get Hours) ---");
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        shiftHours = response.data['data']['hours'] ?? [];
+        print("Shift Hours Parsed: $shiftHours");
+        update();
+      } else {
+        print("Get Hours API failed or returned false status");
+      }
+    } catch (e) {
+      print("--- API Error (Get Hours) ---");
+      print("Error fetching hours: $e");
+    }
   }
 
   Future<void> fetchOtherServices() async {
