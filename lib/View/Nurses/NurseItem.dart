@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/View/NurseBookings/NurseBookingDetails.dart';
 import '../../Resource/Colors.dart';
 import '../../Resource/Strings.dart';
@@ -11,12 +12,13 @@ import '../../Widgets/Plusfour.dart';
 import 'InfoTooltip.dart';
 
 class NurseItem extends StatelessWidget {
-  const NurseItem({super.key});
+  final Map<String, dynamic> nurse;
+  const NurseItem({super.key, required this.nurse});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 15.0,right: 15,bottom: 15),
+      margin: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         color: Color(0xFFEAF3FA),
@@ -43,12 +45,24 @@ class NurseItem extends StatelessWidget {
                       color: Color(0xFFE4E4E7), // Background color
                       borderRadius: BorderRadius.circular(8), // Corner radius
                     ),
-                    child: Image.asset(
-                      'lib/Assets/Images/nurse.png', // Replace with your image path
-                      fit: BoxFit.contain, // Ensures the image covers the container
-                     // Optional: Adjust height
-                    ),
+                    child:
+                        (nurse['image'] != null &&
+                                nurse['image'].toString().isNotEmpty)
+                            ? Image.network(
+                              "${ApiConfigs.IMAGE_URL}${nurse['image']}",
+                              fit: BoxFit.contain,
+                              errorBuilder:
+                                  (context, error, stackTrace) => Image.asset(
+                                    'lib/Assets/Images/nurse.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                            )
+                            : Image.asset(
+                              'lib/Assets/Images/nurse.png',
+                              fit: BoxFit.contain,
+                            ),
                   ),
+                  //),
                   const SizedBox(height: 3),
                   Row(
                     children: [
@@ -60,7 +74,9 @@ class NurseItem extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis, // Ensures text wraps to the next line
+                        overflow:
+                            TextOverflow
+                                .ellipsis, // Ensures text wraps to the next line
                       ),
                       const SizedBox(width: 5),
                       Icon(Icons.info_outlined, size: 18, color: Colors.black),
@@ -76,7 +92,7 @@ class NurseItem extends StatelessWidget {
                   children: [
                     const SizedBox(height: 5),
                     Text(
-                      "David Thomas",
+                      nurse['name']?.toString() ?? "Nurse Name",
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -88,18 +104,24 @@ class NurseItem extends StatelessWidget {
                     const SizedBox(height: 7),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 16, color: greyTextColour),
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: greyTextColour,
+                        ),
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            "Raipur, Chhattisgarh",
+                            nurse['location']?.toString() ?? "Location",
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis, // Ensures text wraps to the next line
+                            overflow:
+                                TextOverflow
+                                    .ellipsis, // Ensures text wraps to the next line
                           ),
                         ),
                       ],
@@ -110,16 +132,26 @@ class NurseItem extends StatelessWidget {
                         SvgPicture.asset("lib/Assets/Images/language.svg"),
                         const SizedBox(width: 5),
                         Text(
-                          "English, Hindi",
-                          style: GoogleFonts.inter(fontSize: 12,color: greyTextColour,fontWeight: FontWeight.w500),
+                          (nurse['nurse_languages'] as List?)
+                                  ?.map((l) => l['language'])
+                                  .join(", ") ??
+                              "Languages",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: greyTextColour,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Plusfour(
-                          data: "Tamil, Malayalam",
-                          length: 4,
-                        )
+                        const SizedBox(width: 8),
+                        if ((nurse['nurse_languages'] as List?) != null &&
+                            (nurse['nurse_languages'] as List).length > 2)
+                          Plusfour(
+                            data: (nurse['nurse_languages'] as List)
+                                .skip(2)
+                                .map((l) => l['language'])
+                                .join(", "),
+                            length: (nurse['nurse_languages'] as List).length,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 5),
@@ -129,14 +161,17 @@ class NurseItem extends StatelessWidget {
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            "Diploma in General Nursing",
+                            nurse['qualification']?.toString() ??
+                                "Qualification",
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis, // Ensures text wraps to the next line
+                            overflow:
+                                TextOverflow
+                                    .ellipsis, // Ensures text wraps to the next line
                           ),
                         ),
                       ],
@@ -148,14 +183,16 @@ class NurseItem extends StatelessWidget {
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            "5 Years of Experience",
+                            "${nurse['experience'] ?? 0} Years of Experience",
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis, // Ensures text wraps to the next line
+                            overflow:
+                                TextOverflow
+                                    .ellipsis, // Ensures text wraps to the next line
                           ),
                         ),
                       ],
@@ -176,8 +213,14 @@ class NurseItem extends StatelessWidget {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
-            itemCount: 4,
+            itemCount: (nurse['nurse_charges'] as List?)?.length ?? 0,
             itemBuilder: (context, index) {
+              final charge = (nurse['nurse_charges'] as List)[index];
+              String hourText = "4 Hours";
+              if (charge['hour_id'].toString() == "1") hourText = "4 Hours";
+              if (charge['hour_id'].toString() == "2") hourText = "8 Hours";
+              if (charge['hour_id'].toString() == "3") hourText = "12 Hours";
+              if (charge['hour_id'].toString() == "4") hourText = "24 Hours";
               return Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
@@ -199,22 +242,22 @@ class NurseItem extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "₹600",
+                                    "₹${charge['price']}",
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(width: 5,),
-                                  Text(
-                                    "₹800", // Original price with strikethrough
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: greyTextColour,
-                                      decoration: TextDecoration.lineThrough,
-                                      decorationColor: greyTextColour,
-                                    ),
-                                  ),
+                                  // SizedBox(width: 5,),
+                                  // Text(
+                                  //   "₹800", // Original price with strikethrough
+                                  //   style: GoogleFonts.inter(
+                                  //     fontSize: 12,
+                                  //     color: greyTextColour,
+                                  //     decoration: TextDecoration.lineThrough,
+                                  //     decorationColor: greyTextColour,
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -226,11 +269,11 @@ class NurseItem extends StatelessWidget {
 
                     const SizedBox(height: 3),
                     Text(
-                      "4 Hours",
+                      hourText,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: greyTextColour,
-                          fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -251,10 +294,18 @@ class NurseItem extends StatelessWidget {
           const SizedBox(height: 15),
           // Book Now Button
           BookNowButton(
-            onTap:(){
-             Get.to(NurseBookingDetails ());
+            onTap: () {
+              Get.to(
+                const NurseBookingDetails(),
+                arguments: {
+                  'nurse_id': nurse['id'] ?? nurse['nurse_id'],
+                  'start_date': Get.arguments?['start_date'],
+                  'end_date': Get.arguments?['end_date'],
+                  'hour_id': Get.arguments?['hour_id'],
+                },
+              );
             },
-            text:Strings.bookNow,
+            text: Strings.bookNow,
           ),
         ],
       ),

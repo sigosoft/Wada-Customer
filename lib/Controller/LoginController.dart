@@ -16,6 +16,8 @@ class LoginController extends GetxController {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
 
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   @override
   void onInit() {
     super.onInit();
@@ -53,13 +55,7 @@ class LoginController extends GetxController {
   }
 
   Future<void> sendLoginOtp() async {
-    if (selectedCountryCode == null || phoneController.text.trim().isEmpty) {
-      _showError("Please select country code and enter phone number");
-      return;
-    }
-
-    if (phoneController.text.trim().length < 10) {
-      _showError("Please enter a valid 10-digit phone number");
+    if (!formKey.currentState!.validate()) {
       return;
     }
 

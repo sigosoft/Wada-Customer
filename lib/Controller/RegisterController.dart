@@ -10,6 +10,7 @@ class Registercontroller extends GetxController {
   List<int> countryIds = [];
   String? selectedCountryCode;
   int? selectedCountryId;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Controllers for registration fields
   final TextEditingController firstNameController = TextEditingController();
@@ -68,34 +69,10 @@ class Registercontroller extends GetxController {
 
   Future<void> sendRegOtp() async {
     // Validation
-    if (firstNameController.text.trim().isEmpty) {
-      _showError("Please enter your first name");
+    if (!formKey.currentState!.validate()) {
       return;
     }
-    if (emailController.text.trim().isEmpty) {
-      _showError("Please enter your email");
-      return;
-    }
-    if (!GetUtils.isEmail(emailController.text.trim())) {
-      _showError("Please enter a valid email address");
-      return;
-    }
-    if (selectedCountryCode == null) {
-      _showError("Please select a country code");
-      return;
-    }
-    if (phoneController.text.trim().isEmpty) {
-      _showError("Please enter your phone number");
-      return;
-    }
-    if (dobController.text.trim().isEmpty) {
-      _showError("Please select your date of birth");
-      return;
-    }
-    if (selectedGender == null) {
-      _showError("Please select your gender");
-      return;
-    }
+    
     if (!isAgreedToTerms) {
       _showError("Please agree to the Terms and Conditions");
       return;

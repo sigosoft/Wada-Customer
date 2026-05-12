@@ -28,6 +28,7 @@ class FamilyMemberController extends GetxController {
   bool isEmergencyContact = false;
   bool isEditMode = false;
   int? editingMemberId;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   List<String> countryCodes = [];
   List<int> countryIds = [];
@@ -94,12 +95,7 @@ class FamilyMemberController extends GetxController {
 
   Future<void> addMember() async {
     // Validation logic
-    if (nameController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter name");
-      return;
-    }
-    if (dobController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please select date of birth");
+    if (!formKey.currentState!.validate()) {
       return;
     }
     if (gender == null) {
@@ -108,14 +104,6 @@ class FamilyMemberController extends GetxController {
     }
     if (relationId == null) {
       _showSnackBar("Error", "Please select relationship");
-      return;
-    }
-    if (mobileController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter phone number");
-      return;
-    }
-    if (addressController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter address");
       return;
     }
 
@@ -202,12 +190,7 @@ class FamilyMemberController extends GetxController {
 
   Future<void> updateMember() async {
     // Validation logic
-    if (nameController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter name");
-      return;
-    }
-    if (dobController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please select date of birth");
+    if (!formKey.currentState!.validate()) {
       return;
     }
     if (gender == null) {
@@ -216,14 +199,6 @@ class FamilyMemberController extends GetxController {
     }
     if (relationId == null) {
       _showSnackBar("Error", "Please select relationship");
-      return;
-    }
-    if (mobileController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter phone number");
-      return;
-    }
-    if (addressController.text.trim().isEmpty) {
-      _showSnackBar("Error", "Please enter address");
       return;
     }
 

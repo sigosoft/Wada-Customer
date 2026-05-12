@@ -14,6 +14,7 @@ class ApiEndPoints {
   static String specializations = "specializations";
   static String otherServiceNames = "otherServiceNames";
   static String doctorsList = "doctorsList";
+  static String nursesList = "nurses";
   static String donorsList = "donors/list";
   static String aboutUs = "about";
   static String terms = "terms";
@@ -28,4 +29,6 @@ class ApiEndPoints {
   static String wallet = "wallet";
   static String profile = "profile";
   static String updateProfile = "profile/update";
+  static String healthcareCategories = "healthcare_categories";
+  static String nurseDetails = "nurseDetails";
 }

@@ -9,7 +9,7 @@ import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/ShareLo
 import 'package:waada_customerapp/Widgets/NurseDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/CheckboxWdget.dart';
 
 class ShareLocationBookingDetails extends StatefulWidget {

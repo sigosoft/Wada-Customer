@@ -4,7 +4,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/CallAssistantButton.dart';
 import '../../Widgets/DoctorDetailWidget.dart';
 import '../../Widgets/MemberDropdownField.dart';

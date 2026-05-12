@@ -56,6 +56,7 @@ class ProfileController extends GetxController {
   String? selectedCountryCode;
   File? pickedImage;
   bool isImageRemoved = false;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> pickImage() async {
     try {
@@ -493,6 +494,9 @@ class ProfileController extends GetxController {
   }
 
   Future<void> updateProfile() async {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
     try {
       isLoading = true;
       update();

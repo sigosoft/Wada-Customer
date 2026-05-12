@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/Widgets/NurseDetailsWidget.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 
 class ShiftLogs extends StatefulWidget {
   const ShiftLogs({super.key});

@@ -5,7 +5,7 @@ import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/Widgets/NurseDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/CheckboxWdget.dart';
 
 class UpcomingBookingDetails extends StatefulWidget {

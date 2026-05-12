@@ -15,12 +15,12 @@ import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 import 'package:waada_customerapp/Widgets/DateOfBirthField.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
-import '../../../Controller/RegisterController.dart';
-import '../../../Widgets/AgreeWithTermsWidget.dart';
-import '../../../Widgets/BloodGroupDropDownField.dart';
-import '../../../Widgets/CustomAppBar.dart';
-import '../../../Widgets/GenderDropdownField.dart';
-import '../../../Widgets/TextInputWidget.dart';
+import '../../Controller/RegisterController.dart';
+import '../../Widgets/AgreeWithTermsWidget.dart';
+import '../../Widgets/BloodGroupDropDownField.dart';
+import '../../Widgets/CustomAppBar.dart';
+import '../../Widgets/GenderDropdownField.dart';
+import '../../Widgets/TextInputWidget.dart';
 import '../../Widgets/CheckboxWdget.dart';
 import '../../Widgets/RelationshipDropdownField.dart';
 import '../../Widgets/ServiceDownField.dart';

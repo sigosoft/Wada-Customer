@@ -95,7 +95,8 @@ class Strings {
   static const String partiallyavailable = "Partially Available";
   static const String save = "Save";
   static const String completehealthcard = "Complete Your Health Profile";
-  static const String healthcardDescription = "Securely store medical documents, family records and doctor consultations.";
+  static const String healthcardDescription =
+      "Securely store medical documents, family records and doctor consultations.";
   static const String bloodgroup = "Blood Group*";
   static const String fullAddress = "Full Address*";
   static const String phonenumberwithstar = "Phone Number*";
@@ -103,13 +104,15 @@ class Strings {
   static const addfamilymembers = "Add Family Members";
   static const relationshipwithstar = "Relationship*";
   static const emergencycontact = 'Add as an emergency contact';
-  static const decalration = 'I hereby confirm that I have obtained the necessary consent from this individual to be added to my account.';
+  static const decalration =
+      'I hereby confirm that I have obtained the necessary consent from this individual to be added to my account.';
   static const String chooseMember = "Choose Member";
   static const String recordName = "Record name*";
   static const String uploadRecord = "Upload Record";
   static const String documentFormat = "Document formats: PDF, PNG, and JPEG.";
   static const String or = "Or";
-  static const String dummy = "Cupidatat irure theas Laborum magna nulla duis ullamco cillum dolor. Sed ut perspicviatis unde omnis iste natus error sit voluptatem.";
+  static const String dummy =
+      "Cupidatat irure theas Laborum magna nulla duis ullamco cillum dolor. Sed ut perspicviatis unde omnis iste natus error sit voluptatem.";
   static const String openCamera = "Open Camera";
   static const String uploaded = "Uploaded";
   static const String uploadmedicalRecords = "Upload  Medical Records";
@@ -124,14 +127,16 @@ class Strings {
   static const String bookingdetails = "Booking Details";
   static const String invoicenumber = "Invoice Number";
   static const String downloadinvoice = "Download Invoice";
-  static const String sharelocationnotes = "Share your location with the nurse to find your place.";
+  static const String sharelocationnotes =
+      "Share your location with the nurse to find your place.";
   static const String paymentmethod = "Payment Method";
   static const String sharelocation = "Share your Location";
   static const String upcoming = "Upcoming";
   static const String shiftlogs = "Shift Logs";
   static const String ongoing = "Ongoing";
   static const String cancelbooking = "Cancel Booking";
-  static const String cancelbookingmsg = "Are you sure you want to cancel shift?";
+  static const String cancelbookingmsg =
+      "Are you sure you want to cancel shift?";
   static const cancelshift = "Cancel Shift";
   static const checkindate = "Check-in Date";
   static const checkintime = "Check-in Time";
@@ -176,9 +181,11 @@ class Strings {
   static const String videoconsult = "Video Consult";
   static const String choosePatient = "Choose Patient";
   static const String callAssistant = "Call Assistant";
-  static const String chooseDateAndTime = "Choose Date and Preferred Time Range";
+  static const String chooseDateAndTime =
+      "Choose Date and Preferred Time Range";
   static const String time = "Time";
-  static const String homeTimeRange = "I will be at Home from 09:00 AM to 05:00 PM";
+  static const String homeTimeRange =
+      "I will be at Home from 09:00 AM to 05:00 PM";
   static const String requestHomeVisitNote =
       "Request home visit for doctors are subject to availability and will be confirmed based on the doctor's schedule.";
   static const String confirm = "Confirm";
@@ -198,12 +205,15 @@ class Strings {
   static const String selectserviceRequirement = "Select Service Requirements";
   static const String successful = "Successful!";
   static const String requestSent = "Your request has been successfully sent.";
-  static const String paymentSuccess = "Your payment has been processed successfully.";
-  static const String shareLocationSuccess = "Your location has been shared successfully.";
+  static const String paymentSuccess =
+      "Your payment has been processed successfully.";
+  static const String shareLocationSuccess =
+      "Your location has been shared successfully.";
   static const String shiftLogs = "Shift Logs";
   static const String in_value = "in ";
   static const String out_value = " out ";
-  static const String sentrequestmsg = "Are you sure you want to send this request?";
+  static const String sentrequestmsg =
+      "Are you sure you want to send this request?";
   static const String wadaspecialdiscounts = "Wada Special Discounts";
   static const String joinwadapremium = "Join Wada Premium Member";
   static const String verifylocation = "Verify Location";
@@ -219,7 +229,8 @@ class Strings {
   static const String walletTitle = "Wallet";
   static const String totalCoinsAvailable = "Total Coins Available";
   static const String oneCoinEquals = "1 coin = ₹1";
-  static const String maxAmountInfo = "Maximum amount that can be added is ₹10,000.";
+  static const String maxAmountInfo =
+      "Maximum amount that can be added is ₹10,000.";
   static const String transactions = "Transactions";
   static const String credit = "Credited";
   static const String debit = "Debited";
@@ -231,37 +242,43 @@ class Strings {
   static const String callnow = "Call Now";
   static const String viewAllCoupons = "View All Coupons";
   static const String apply = "Apply";
-  static const String offerdescription = "Get 30% off when you book for more than 30 days!";
+  static const String offerdescription =
+      "Get 30% off when you book for more than 30 days!";
   static const String donarname = "Donor Name*";
   static const String yourlocation = "Your Location";
   static const String sent = "Sent";
-  static const String infomsg = "This information will go public, so someone might reach out to you.";
+  static const String infomsg =
+      "This information will go public, so someone might reach out to you.";
   static const String ok = "Ok";
   static const String refferals = "Referral Code";
   static const String wellBeBackSoon = "We'll Be Back Soon";
-  static const String sorryWereDownForMaintenanceWellBeBackUpShortly = "Sorry, we're down for maintenance\nWe'll be back up shortly.";
+  static const String sorryWereDownForMaintenanceWellBeBackUpShortly =
+      "Sorry, we're down for maintenance\nWe'll be back up shortly.";
   static const String serverDown = "Server Down";
   static const String gotIt = "GOT IT";
   static const String noInternetConnection = "No Internet Connection";
-  static const String pleaseCheckYourInternetConnectionAndTryAgain = "Please check your internet connection and try again.";
+  static const String pleaseCheckYourInternetConnectionAndTryAgain =
+      "Please check your internet connection and try again.";
   static const String tryAgain = "Try Again";
   static const String supportHelp = "Support & Help";
   static const String aboutUs = "About Us";
-  static const String areYouSureYouWantToLogout="Are you sure you want to logout?";
-  static const String areYouSureYouWantToDeleteYourAccount="Are you sure you want to delete your account?";
-  static const String delete= "Delete";
-  static const String callUs= "Call us at";
-  static const String emailUs= "Email us at";
-  static const String companyOffice= "Company Office";
-  static const String faqs= "FAQs";
-  static const String needsAnUpdate= "The WADA Needs An Update";
-  static const String aNewUpdateIsAvailableForThisAppPleaseDownload= "A new update is available for this app.\nPlease download the latest version to\ncontinue using the app.";
-  static const String update= "UPDATE";
+  static const String areYouSureYouWantToLogout =
+      "Are you sure you want to logout?";
+  static const String areYouSureYouWantToDeleteYourAccount =
+      "Are you sure you want to delete your account?";
+  static const String delete = "Delete";
+  static const String callUs = "Call us at";
+  static const String emailUs = "Email us at";
+  static const String companyOffice = "Company Office";
+  static const String faqs = "FAQs";
+  static const String needsAnUpdate = "The WADA Needs An Update";
+  static const String aNewUpdateIsAvailableForThisAppPleaseDownload =
+      "A new update is available for this app.\nPlease download the latest version to\ncontinue using the app.";
+  static const String update = "UPDATE";
   static const String feedback = "For feedback or suggestions";
   static const String logoutmsg = "Are you sure you want to logout?";
-  static const String becomeserviceProvider= "Become a Service Provider";
   static const String chooseService = "Choose Service";
+  static const String becomeserviceProvider = "Become a Service Provider";
+  static const String useCurrentLocation = "Use Current Location";
+  static const String selectPlaces = "Select places";
 }
-
-
-

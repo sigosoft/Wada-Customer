@@ -10,6 +10,7 @@ class DonateBloodController extends GetxController {
   List<int> countryIds = [];
   String? selectedCountryCode;
   int? selectedCountryId;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();

@@ -60,44 +60,64 @@ class _LoginScreenState extends State<LoginScreen> {
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    TextStyleInterForSplash(
-                      text: Strings.signInWithPhoneNumber,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                      size: 22.00,
-                    ),
-                    SizedBox(height: 20),
-                    TextStyleInterForSplash(
-                      text: Strings.enterYourPhoneNumber,
-                      color: blackTextColor,
-                      fontWeight: FontWeight.w500,
-                      size: 14.00,
-                    ),
-                    SizedBox(height: 20),
-                    CountryCodeAndPhoneNUmber(name: Strings.phoneNumber),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: SubmitButtonWidget(
-                        onTap: () {
-                          controller.sendLoginOtp();
-                        },
-                        text: Strings.next,
+                child: Form(
+                  key: controller.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      TextStyleInterForSplash(
+                        text: Strings.signInWithPhoneNumber,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                        size: 22.00,
                       ),
-                    ),
-                    SizedBox(height: 15),
-                    RichTextWidget(
-                      text1: Strings.donHaveAnAccount,
-                      text2: Strings.register,
-                      onTap: () {
-                        Get.to(Register());
-                      },
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      TextStyleInterForSplash(
+                        text: Strings.enterYourPhoneNumber,
+                        color: blackTextColor,
+                        fontWeight: FontWeight.w500,
+                        size: 14.00,
+                      ),
+                      SizedBox(height: 20),
+                      CountryCodeAndPhoneNUmber(
+                        name: Strings.phoneNumber,
+                        countryValidator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Select code";
+                          }
+                          return null;
+                        },
+                        phoneValidator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please enter your phone number";
+                          }
+                          if (value.length < 10) {
+                            return "Phone number must be 10 digits";
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: SubmitButtonWidget(
+                          onTap: () {
+                            controller.sendLoginOtp();
+                          },
+                          text: Strings.next,
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      RichTextWidget(
+                        text1: Strings.donHaveAnAccount,
+                        text2: Strings.register,
+                        onTap: () {
+                          Get.to(Register());
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

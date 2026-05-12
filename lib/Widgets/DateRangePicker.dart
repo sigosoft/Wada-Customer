@@ -11,7 +11,8 @@ import 'package:intl/intl.dart';
 import '../View/Login/SubmitButtonWidget.dart';
 
 class DateRangePicker extends StatefulWidget {
-  const DateRangePicker({super.key});
+  final Function(DateTime start, DateTime end)? onDateSelected;
+  const DateRangePicker({super.key, this.onDateSelected});
 
   @override
   State<DateRangePicker> createState() => _DateRangePickerState();
@@ -144,6 +145,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     // toDateController.text =
                     //     DateFormat('dd MMM yyyy').format(endDate);
                     Get.back();
+                    if (widget.onDateSelected != null) {
+                      widget.onDateSelected!(startDate, endDate);
+                    }
                   },
                   child: Container(
                     height: 50,

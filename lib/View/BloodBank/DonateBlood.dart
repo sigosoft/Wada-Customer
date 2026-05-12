@@ -16,12 +16,12 @@ import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 import 'package:waada_customerapp/Widgets/DateOfBirthField.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
-import '../../../Controller/RegisterController.dart';
-import '../../../Widgets/AgreeWithTermsWidget.dart';
-import '../../../Widgets/BloodGroupDropDownField.dart';
-import '../../../Widgets/CustomAppBar.dart';
-import '../../../Widgets/GenderDropdownField.dart';
-import '../../../Widgets/TextInputWidget.dart';
+import '../../Controller/RegisterController.dart';
+import '../../Widgets/AgreeWithTermsWidget.dart';
+import '../../Widgets/BloodGroupDropDownField.dart';
+import '../../Widgets/CustomAppBar.dart';
+import '../../Widgets/GenderDropdownField.dart';
+import '../../Widgets/TextInputWidget.dart';
 import '../../Widgets/CheckboxWdget.dart';
 import '../../Widgets/RelationshipDropdownField.dart';
 
@@ -204,65 +204,99 @@ class _DonateBloodState extends State<DonateBlood> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        TextInputWidget(
-                          label: Strings.donarname,
-                          type: TextInputType.text,
-                          height: 50,
-                          controller: controller.nameController,
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: BloodGroupDropDownField(
-                                onChanged: (value) {
-                                  controller.selectedBloodGroup = value;
-                                  controller.update();
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: GenderDropdownField(
-                                name: Strings.genderwithstar,
-                                onChanged: (value) {
-                                  controller.selectedGender = value;
-                                  controller.update();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        const CountryCodeAndPhoneNUmber(
-                          name: Strings.phonenumberwithstar,
-                        ),
-                        const SizedBox(height: 15),
-                        InkWell(
-                          onTap: () {
-                            _showLocationBottomSheet(context);
-                          },
-                          child: TextInputWidget(
-                            label: Strings.yourlocation,
+                    child: Form(
+                      key: controller.formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          TextInputWidget(
+                            label: Strings.donarname,
                             type: TextInputType.text,
                             height: 50,
-                            controller: controller.locationController,
+                            controller: controller.nameController,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Please enter donor name";
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: BloodGroupDropDownField(
+                                  onChanged: (value) {
+                                    controller.selectedBloodGroup = value;
+                                    controller.update();
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: GenderDropdownField(
+                                  name: Strings.genderwithstar,
+                                  onChanged: (value) {
+                                    controller.selectedGender = value;
+                                    controller.update();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          const CountryCodeAndPhoneNUmber(
+                            name: Strings.phonenumberwithstar,
+                            phoneValidator: null, // Uses default if needed
+                          ),
+                          const SizedBox(height: 15),
+                          InkWell(
                             onTap: () {
                               _showLocationBottomSheet(context);
                             },
+                            child: TextInputWidget(
+                              label: Strings.yourlocation,
+                              type: TextInputType.text,
+                              height: 50,
+                              controller: controller.locationController,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return "Please select location";
+                                }
+                                return null;
+                              },
+                              onTap: () {
+                                _showLocationBottomSheet(context);
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Container(
                     margin: const EdgeInsets.only(bottom: 20),
                     child: SubmitButtonWidget(
                       onTap: () {
-                        _showInfoBottomSheet(context);
+                        if (controller.selectedBloodGroup == null) {
+                          Get.snackbar(
+                            "Error",
+                            "Please select blood group",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+                        if (controller.selectedGender == null) {
+                          Get.snackbar(
+                            "Error",
+                            "Please select gender",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+                        if (controller.formKey.currentState!.validate()) {
+                          _showInfoBottomSheet(context);
+                        }
                       },
                       text: Strings.sent,
                     ),

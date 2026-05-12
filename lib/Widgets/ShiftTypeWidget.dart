@@ -8,10 +8,14 @@ import '../View/Nurses/InfoTooltip.dart';
 
 class ShiftTypeWidget extends StatefulWidget {
   final String text;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   const ShiftTypeWidget({
     super.key,
     required this.text,
+    this.isSelected = false,
+    this.onTap,
   });
 
   @override
@@ -19,7 +23,6 @@ class ShiftTypeWidget extends StatefulWidget {
 }
 
 class _ShiftTypeWidgetState extends State<ShiftTypeWidget> {
-
   void showCustomDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -29,7 +32,12 @@ class _ShiftTypeWidgetState extends State<ShiftTypeWidget> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 15.0,right: 15,bottom: 20,top: 10),
+            padding: const EdgeInsets.only(
+              left: 15.0,
+              right: 15,
+              bottom: 20,
+              top: 10,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,14 +46,10 @@ class _ShiftTypeWidgetState extends State<ShiftTypeWidget> {
                   onTap: () => Get.back(),
                   child: Align(
                     alignment: Alignment.topRight,
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.black,
-                      size: 25,
-                    ),
+                    child: Icon(Icons.close, color: Colors.black, size: 25),
                   ),
                 ),
-                SizedBox(height: 5,),
+                SizedBox(height: 5),
                 Text(
                   Strings.dummy,
                   textAlign: TextAlign.start,
@@ -62,30 +66,35 @@ class _ShiftTypeWidgetState extends State<ShiftTypeWidget> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: Color(0xFFEAF3FA),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Text(
-              widget.text,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: widget.isSelected ? colorPrimary : Color(0xFFEAF3FA),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                widget.text,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: widget.isSelected ? Colors.white : Colors.black,
+                ),
               ),
             ),
-          ),
-          InfoTooltip(),
-        ],
+            InfoTooltip(),
+          ],
+        ),
       ),
     );
   }

@@ -18,7 +18,10 @@ import '../Resource/Colors.dart';
 class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   Set<Marker> marker = {};
   GoogleMapController? mapController;
-  LatLng? currentPosition = const LatLng(37.7749, -122.4194); // Example coordinates
+  LatLng? currentPosition = const LatLng(
+    37.7749,
+    -122.4194,
+  ); // Example coordinates
   RxString location = ''.obs;
   Placemark? place;
   var isLoading = true.obs;
@@ -37,60 +40,78 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     super.dispose();
   }
 
-//Permission
+  //Permission
   Future<bool> _handleLocationPermissionAndroid() async {
     bool serviceEnabled;
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-        content: const Text(
-            "Location services are disabled. Please enable the services"),
-        action: SnackBarAction(
-            label: "OK",
-            onPressed: () {
-              Geolocator.openLocationSettings().then((value) => _handleLocationPermissionAndroid());
-            }),
-      ));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied&&permissionDenied==false) {
-      permission = await Geolocator.requestPermission();
-      permissionDenied = true;
-      if (permission == LocationPermission.denied&&permissionDenied) {
-        dynamic value;
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(
           content: const Text(
             "Location services are disabled. Please enable the services",
           ),
           action: SnackBarAction(
+            label: "OK",
+            onPressed: () {
+              Geolocator.openLocationSettings().then(
+                (value) => _handleLocationPermissionAndroid(),
+              );
+            },
+          ),
+        ),
+      );
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied && permissionDenied == false) {
+      permission = await Geolocator.requestPermission();
+      permissionDenied = true;
+      if (permission == LocationPermission.denied && permissionDenied) {
+        dynamic value;
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: const Text(
+              "Location services are disabled. Please enable the services",
+            ),
+            action: SnackBarAction(
               label: "OK",
               onPressed: () async {
-                value = await Geolocator.openAppSettings().then((value) { getCurrentPosition();});
+                value = await Geolocator.openAppSettings().then((value) {
+                  getCurrentPosition();
+                });
                 return value;
-              }),
-        ));
+              },
+            ),
+          ),
+        );
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
       dynamic value;
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-        content: const Text("Location services are disabled. Please enable the services"),
-        action: SnackBarAction(
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "Location services are disabled. Please enable the services",
+          ),
+          action: SnackBarAction(
             label: "OK",
             onPressed: () async {
-              value = await Geolocator.openAppSettings().then((value) { getCurrentPosition();});
+              value = await Geolocator.openAppSettings().then((value) {
+                getCurrentPosition();
+              });
               return value;
-            }),
-      ));
+            },
+          ),
+        ),
+      );
       return false;
     }
     return true;
   }
 
-//Permission
+  //Permission
   Future<bool> handleLocationPermissionIos() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -100,10 +121,10 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
       return false;
     }
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied&&permissionDenied ==false) {
+    if (permission == LocationPermission.denied && permissionDenied == false) {
       permission = await Geolocator.requestPermission();
       permissionDenied = true;
-      if (permission == LocationPermission.denied&&permissionDenied) {
+      if (permission == LocationPermission.denied && permissionDenied) {
         // requestLocationPermission(Get.context!);
         return false;
       }
@@ -114,6 +135,7 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     }
     return true;
   }
+
   showLocationAlertDialog(BuildContext context) {
     dynamic value;
     // set up the button
@@ -121,14 +143,15 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
       child: const Text("OK"),
       onPressed: () async {
         value = await Geolocator.openAppSettings().then((value) {
-          if(permissionDenied){
-            if(Platform.isIOS) {
+          if (permissionDenied) {
+            if (Platform.isIOS) {
               Get.back();
               Get.back();
             }
             // permissionDenied = false;
           }
-          getCurrentPosition();});
+          getCurrentPosition();
+        });
         return value;
       },
     );
@@ -137,10 +160,9 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     AlertDialog alert = AlertDialog(
       title: const Text("Enable Location Permission"),
       content: const Text(
-          "This app need location permission to show the nearest facilities."),
-      actions: [
-        okButton,
-      ],
+        "This app need location permission to show the nearest facilities.",
+      ),
+      actions: [okButton],
     );
 
     // show the dialog
@@ -152,6 +174,7 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
       },
     );
   }
+
   Future<bool> requestLocationPermission(BuildContext context) async {
     var permissionStatus = await Permission.location.request();
     // try {
@@ -162,53 +185,60 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     } else if (permissionStatus.isPermanentlyDenied) {
       return Platform.isAndroid
           ? await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("Enable Location Service"),
-          content: const Text(
-              "Please go to Settings and enable location services for  MedChoice Healthcare Jobs"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("CANCEL"),
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-            ),
-            // TextButton(
-            //   child: const Text("OPEN SETTINGS"),
-            //   onPressed: () {
-            //     Navigator.pop(context, false);
-            //     openAppSettings();
-            //   },
-            // ),
-          ],
-        ),
-      ) ??
-          false
+                context: context,
+                builder:
+                    (BuildContext context) => AlertDialog(
+                      title: const Text("Enable Location Service"),
+                      content: const Text(
+                        "Please go to Settings and enable location services for  MedChoice Healthcare Jobs",
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text("CANCEL"),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                        // TextButton(
+                        //   child: const Text("OPEN SETTINGS"),
+                        //   onPressed: () {
+                        //     Navigator.pop(context, false);
+                        //     openAppSettings();
+                        //   },
+                        // ),
+                      ],
+                    ),
+              ) ??
+              false
           : await showCupertinoDialog<bool>(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: const Text("Enable Location Service"),
-          content: const Text(
-              "Please go to Settings and enable location services for MedChoice Healthcare Jobs"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("CANCEL",style: TextStyle(color: colorPrimary),),
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-            ),
-            // TextButton(
-            //   child: const Text("OPEN SETTINGS"),
-            //   onPressed: () {
-            //     Navigator.pop(context, false);
-            //     openAppSettings();
-            //   },
-            // ),
-          ],
-        ),
-      ) ??
-          false;
+                context: context,
+                builder:
+                    (BuildContext context) => CupertinoAlertDialog(
+                      title: const Text("Enable Location Service"),
+                      content: const Text(
+                        "Please go to Settings and enable location services for MedChoice Healthcare Jobs",
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text(
+                            "CANCEL",
+                            style: TextStyle(color: colorPrimary),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                        // TextButton(
+                        //   child: const Text("OPEN SETTINGS"),
+                        //   onPressed: () {
+                        //     Navigator.pop(context, false);
+                        //     openAppSettings();
+                        //   },
+                        // ),
+                      ],
+                    ),
+              ) ??
+              false;
     } else {
       return true;
     }
@@ -218,10 +248,11 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     // }
   }
 
-//Fetching location
+  //Fetching location
   Future<void> getCurrentPosition({double? lat, double? long}) async {
-
-    if (Platform.isAndroid?await _handleLocationPermissionAndroid():await handleLocationPermissionIos()) {
+    if (Platform.isAndroid
+        ? await _handleLocationPermissionAndroid()
+        : await handleLocationPermissionIos()) {
       try {
         if (lat == null && long == null) {
           Position? position;
@@ -230,35 +261,41 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
           );
           currentPosition = LatLng(position.latitude, position.longitude);
           marker.clear();
-          marker.add(Marker(
+          marker.add(
+            Marker(
               markerId: const MarkerId('location'),
-              position: LatLng(position.latitude, position.longitude)));
+              position: LatLng(position.latitude, position.longitude),
+            ),
+          );
           if (mapController != null) {
             // Get.back();
-            mapController!
-                .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-              target: LatLng(
-                position.latitude,
-                position.longitude,
+            mapController!.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: LatLng(position.latitude, position.longitude),
+                  zoom: 18,
+                ),
               ),
-              zoom: 18,
-            )));
+            );
           }
         } else {
           currentPosition = LatLng(lat!, long!);
           marker.clear();
-          marker.add(Marker(
+          marker.add(
+            Marker(
               markerId: const MarkerId('location'),
-              position: LatLng(lat, long)));
+              position: LatLng(lat, long),
+            ),
+          );
           if (mapController != null) {
-            mapController!
-                .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-              target: LatLng(lat, long),
-              zoom: 18,
-            )));
+            mapController!.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: LatLng(lat, long), zoom: 18),
+              ),
+            );
           }
         }
-        getAddressFromLatLng(currentPosition!);
+        await getAddressFromLatLng(currentPosition!);
         isLoading(false);
         update();
       } catch (e) {
@@ -269,26 +306,59 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     }
   }
 
-//Fetching locality
+  //Fetching locality
   Future<void> getAddressFromLatLng(LatLng position) async {
-    await placemarkFromCoordinates(position.latitude, position.longitude)
-        .then((List<Placemark> placemarks) {
-      place = placemarks[0];
-      location.value = [
-        place?.locality,
-        place?.subLocality,
-        place?.administrativeArea,
-        place?.postalCode,
-      ].where((value) => value != null && value.isNotEmpty).join(', ');
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        place = placemarks[0];
+        location.value = [
+          place?.name,
+          place?.street,
+          place?.subLocality,
+          place?.locality,
+          place?.administrativeArea,
+          place?.postalCode,
+        ].where((value) => value != null && value.isNotEmpty).join(', ');
+        if (location.value.isEmpty) {
+          location.value = "${position.latitude}, ${position.longitude}";
+        }
+      } else {
+        location.value = "${position.latitude}, ${position.longitude}";
+      }
       update();
-    }).catchError((e) {
+    } catch (e) {
       debugPrint(e.toString());
-    });
+      location.value = "${position.latitude}, ${position.longitude}";
+      update();
+    }
   }
 
-//Place Search
+  //Place Search
   Future getSuggestion(String input) async {
     print("Called");
+
+    // Check if input is a coordinate pair (e.g., "8.57, 76.93")
+    final latLongRegex = RegExp(
+      r'^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$',
+    );
+    final match = latLongRegex.firstMatch(input);
+
+    if (match != null) {
+      double? lat = double.tryParse(match.group(1)!);
+      double? long = double.tryParse(match.group(3)!);
+      if (lat != null && long != null) {
+        LatLng newPos = LatLng(lat, long);
+        await getCurrentPosition(lat: lat, long: long);
+        placeList.clear();
+        update();
+        return;
+      }
+    }
+
     isLoading1(true);
     placeList.clear();
     String baseURL =
@@ -309,6 +379,20 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
       print(error);
     } finally {
       isLoading1(false);
+    }
+  }
+
+  Future<void> resolvePlace(String placeName) async {
+    try {
+      List<Location> locations = await locationFromAddress(placeName);
+      if (locations.isNotEmpty) {
+        await getCurrentPosition(
+          lat: locations.first.latitude,
+          long: locations.first.longitude,
+        );
+      }
+    } catch (e) {
+      debugPrint("Resolve place error: $e");
     }
   }
 
@@ -342,6 +426,5 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     // } else {
     //   getCurrentPosition(lat: latitude, long: longitude);
     // }
-
   }
 }

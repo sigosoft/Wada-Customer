@@ -75,63 +75,97 @@ class _RegisterState extends State<Register> {
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    TextStyleInterForSplash(
-                      text: Strings.registration,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                      size: 22.00,
-                    ),
-                    SizedBox(height: 20),
-                    TextStyleInterForSplash(
-                      text: Strings.createAccount,
-                      color: blackTextColor,
-                      fontWeight: FontWeight.w500,
-                      size: 14.00,
-                    ),
-                    SizedBox(height: 20),
-                    TextInputWidget(
-                      controller: controller.firstNameController,
-                      label: Strings.firstname,
-                      type: TextInputType.text,
-                      height: 50,
-                    ),
-                    const SizedBox(height: 15),
-                    TextInputWidget(
-                      controller: controller.emailController,
-                      label: Strings.email,
-                      type: TextInputType.emailAddress,
-                      height: 50,
-                    ),
-                    const SizedBox(height: 15),
-                    CountryCodeAndPhoneNUmber(name: Strings.phoneNumber),
-                    const SizedBox(height: 15),
-                    DateOfBirthField(controller: controller.dobController),
-                    const SizedBox(height: 15),
-                    GenderDropdownField(
-                      name: Strings.gender,
-                      onChanged: (value) {
-                        controller.selectedGender = value;
-                        controller.update();
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    TextInputWidget(
-                      controller: controller.referralCodeController,
-                      label: Strings.refferal_code,
-                      type: TextInputType.text,
-                      height: 50,
-                    ),
-                    const SizedBox(height: 15),
-                    AgreeWithTermsWidget(
-                      onChanged: (value) {
-                        controller.isAgreedToTerms = value ?? false;
-                        controller.update();
-                      },
-                    ),
+                child: Form(
+                  key: controller.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      TextStyleInterForSplash(
+                        text: Strings.registration,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                        size: 22.00,
+                      ),
+                      SizedBox(height: 20),
+                      TextStyleInterForSplash(
+                        text: Strings.createAccount,
+                        color: blackTextColor,
+                        fontWeight: FontWeight.w500,
+                        size: 14.00,
+                      ),
+                      SizedBox(height: 20),
+                      TextInputWidget(
+                        controller: controller.firstNameController,
+                        label: Strings.firstname,
+                        type: TextInputType.text,
+                        height: 50,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please enter your first name";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      TextInputWidget(
+                        controller: controller.emailController,
+                        label: Strings.email,
+                        type: TextInputType.emailAddress,
+                        height: 50,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please enter your email";
+                          }
+                          if (!GetUtils.isEmail(value.trim())) {
+                            return "Please enter a valid email address";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      CountryCodeAndPhoneNUmber(
+                        name: Strings.phoneNumber,
+                        countryValidator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Select code";
+                          }
+                          return null;
+                        },
+                        phoneValidator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please enter your phone number";
+                          }
+                          if (value.length < 10) {
+                            return "Phone number must be 10 digits";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      DateOfBirthField(controller: controller.dobController),
+                      const SizedBox(height: 15),
+                      GenderDropdownField(
+                        name: Strings.gender,
+                        onChanged: (value) {
+                          controller.selectedGender = value;
+                          controller.update();
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      TextInputWidget(
+                        controller: controller.referralCodeController,
+                        label: Strings.refferal_code,
+                        type: TextInputType.text,
+                        height: 50,
+                      ),
+                      const SizedBox(height: 15),
+                      AgreeWithTermsWidget(
+                        onChanged: (value) {
+                          controller.isAgreedToTerms = value ?? false;
+                          controller.update();
+                        },
+                      ),
                     SizedBox(height: 50),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -142,8 +176,8 @@ class _RegisterState extends State<Register> {
                         text: Strings.verify,
                       ),
                     ),
-                    SizedBox(height: 15),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -8,7 +8,7 @@ import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/Widgets/DoctorDetailWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 
 class DoctorBookingDetails extends StatefulWidget {
    DoctorBookingDetails({super.key, required this.bookingType});

@@ -8,7 +8,7 @@ import 'package:waada_customerapp/View/NurseBookings/ShiftLogs.dart';
 import 'package:waada_customerapp/Widgets/NurseDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
-import '../../../Widgets/CustomAppBar.dart';
+import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/CheckboxWdget.dart';
 import '../Login/SubmitButtonWidget.dart';
 

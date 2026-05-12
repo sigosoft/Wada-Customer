@@ -123,18 +123,40 @@ class _EditProfileState extends State<EditProfile> {
                     ],
                   ),
                   SizedBox(height: 30),
-                  TextInputWidget(
-                    label: Strings.firstname,
-                    type: TextInputType.text,
-                    height: 50,
-                    controller: ctrl.nameController,
-                  ),
-                  SizedBox(height: 15),
-                  TextInputWidget(
-                    label: Strings.email,
-                    type: TextInputType.emailAddress,
-                    height: 50,
-                    controller: ctrl.emailController,
+                  Form(
+                    key: ctrl.formKey,
+                    child: Column(
+                      children: [
+                        TextInputWidget(
+                          label: Strings.firstname,
+                          type: TextInputType.text,
+                          height: 50,
+                          controller: ctrl.nameController,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return "Please enter your name";
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 15),
+                        TextInputWidget(
+                          label: Strings.email,
+                          type: TextInputType.emailAddress,
+                          height: 50,
+                          controller: ctrl.emailController,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return "Please enter your email";
+                            }
+                            if (!GetUtils.isEmail(value.trim())) {
+                              return "Please enter a valid email address";
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 15),
                   FadedPhonenumberField(
@@ -147,6 +169,15 @@ class _EditProfileState extends State<EditProfile> {
                     },
                     onTap: () {
                       ctrl.fetchCountryCodes();
+                    },
+                    phoneValidator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Please enter phone number";
+                      }
+                      if (value.length < 10) {
+                        return "Phone number must be 10 digits";
+                      }
+                      return null;
                     },
                   ),
                   SizedBox(height: 15),

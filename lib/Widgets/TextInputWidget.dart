@@ -19,9 +19,8 @@ class TextInputWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10,right: 10),
-        child:SizedBox(
-          height: height,
-          width: double.infinity,
+        child:ConstrainedBox(
+          constraints: BoxConstraints(minHeight: height),
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -40,49 +39,50 @@ class TextInputWidget extends StatelessWidget {
                   //   fontWeight: FontWeight.w400,
                   //   size: 9,
                   // ),
-                  Expanded(
-                    child: TextFormField(
-                      controller: controller,
-                      validator: validator,
-                      onTap: onTap,
-                      keyboardType: type,
-                      maxLines: 1,
-                      inputFormatters: [
+                  TextFormField(
+                    controller: controller,
+                    validator: validator,
+                    onTap: onTap,
+                    keyboardType: type,
+                    maxLines: height > 50 ? null : 1,
+                    inputFormatters: [
+                      if (height <= 50)
                         FilteringTextInputFormatter.singleLineFormatter,
-                        LengthLimitingTextInputFormatter(30),
-                      ],
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: label,
-                        labelStyle: GoogleFonts.inter(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                          color: blackTextColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                      fontStyle: FontStyle.normal,
+                      LengthLimitingTextInputFormatter(height > 50 ? 500 : 30),
+                    ],
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
                     ),
-                        filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: InputDecoration(
+                      labelText: label,
+                      labelStyle: GoogleFonts.inter(
+                        textStyle: Theme.of(context).textTheme.displayLarge,
+                        color: blackTextColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        fontStyle: FontStyle.normal,
                       ),
-                      onChanged: (value) {
-
-                      },
+                      filled: true,
+                      fillColor: const Color(0xFFF3F3F3),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
+                      errorStyle: const TextStyle(height: 0.8, fontSize: 11),
                     ),
+                    onChanged: (value) {},
                   ),
                 ],
               ),
             ),
           ),
-        )
+        ),
     );
   }
 }
