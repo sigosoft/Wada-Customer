@@ -12,9 +12,11 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Resource/Colors.dart';
 import '../Configs/ApiConfigs.dart';
+import '../View/SuccessPages/NurseBookingsSuccess/ShareLocationSucccess.dart';
 
 class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   Set<Marker> marker = {};
@@ -31,9 +33,14 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   String kplacesApiKey = "AIzaSyDFSyZhayfNWiFj0zdROZO7zi4Od5WiER0";
   List<dynamic> placeList = <String>[].obs;
   Dio dio = ApiConfigs.dio;
+  var isSharingLoading = false.obs;
+  var isLiveMode = true.obs;
   String route = "";
   TextEditingController searchController = TextEditingController();
   bool permissionDenied = false;
+  DateTime lastProgrammaticMoveTime = DateTime.now().subtract(
+    const Duration(seconds: 5),
+  );
 
   @override
   void dispose() {
@@ -251,6 +258,7 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
 
   //Fetching location
   Future<void> getCurrentPosition({double? lat, double? long}) async {
+    lastProgrammaticMoveTime = DateTime.now();
     if (Platform.isAndroid
         ? await _handleLocationPermissionAndroid()
         : await handleLocationPermissionIos()) {
@@ -262,12 +270,6 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
           );
           currentPosition = LatLng(position.latitude, position.longitude);
           marker.clear();
-          marker.add(
-            Marker(
-              markerId: const MarkerId('location'),
-              position: LatLng(position.latitude, position.longitude),
-            ),
-          );
           if (mapController != null) {
             // Get.back();
             mapController!.animateCamera(
@@ -282,12 +284,6 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
         } else {
           currentPosition = LatLng(lat!, long!);
           marker.clear();
-          marker.add(
-            Marker(
-              markerId: const MarkerId('location'),
-              position: LatLng(lat, long),
-            ),
-          );
           if (mapController != null) {
             mapController!.animateCamera(
               CameraUpdate.newCameraPosition(
@@ -427,5 +423,77 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
     // } else {
     //   getCurrentPosition(lat: latitude, long: longitude);
     // }
+  }
+
+  Future<void> shareLocation({required String bookingId}) async {
+    try {
+      isSharingLoading(true);
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.shareLocation}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final Map<String, dynamic> data = {
+        'booking_id': bookingId,
+        'latitude': currentPosition?.latitude,
+        'longitude': currentPosition?.longitude,
+        'location': location.value,
+      };
+
+      final response = await dio.post(
+        url,
+        data: FormData.fromMap(data),
+        options: Options(headers: headers),
+      );
+
+      final responseData = response.data;
+      bool isSuccess = false;
+
+      if (responseData is Map) {
+        isSuccess =
+            responseData['success'] == true ||
+            responseData['success'].toString() == "true" ||
+            responseData['status'] == true ||
+            responseData['status'].toString() == "true";
+      } else if (responseData is String) {
+        isSuccess =
+            responseData.contains('"success":true') ||
+            responseData.contains('"success":"true"') ||
+            responseData.contains('"status":true') ||
+            responseData.contains('"status":"true"');
+      }
+
+      if (response.statusCode == 200 && isSuccess) {
+        String message = "Customer location shared successfully.";
+        if (responseData is Map) {
+          message = responseData['message'] ?? message;
+        }
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(SnackBar(content: Text(message)));
+        Get.back(); // Go back to the previous screen (Home) after sharing
+      } else {
+        String message = "Failed to share location";
+        if (responseData is Map) {
+          message = responseData['message'] ?? message;
+        }
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (e) {
+      debugPrint("Share location error: $e");
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text("An error occurred while sharing location"),
+        ),
+      );
+    } finally {
+      isSharingLoading(false);
+    }
   }
 }

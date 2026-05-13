@@ -21,12 +21,20 @@ class RequestHomeVisit extends StatefulWidget {
 
 class _RequestHomeVisitState extends State<RequestHomeVisit> {
   bool isTimeFieldEnabled = false;
+  dynamic doctorData;
+
+  @override
+  void initState() {
+    super.initState();
+    doctorData = Get.arguments;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(label: Strings.requesthomevisit, showCloseIcon: false),
+      appBar:
+          CustomAppBar(label: Strings.requesthomevisit, showCloseIcon: false),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(5.0),
@@ -34,13 +42,10 @@ class _RequestHomeVisitState extends State<RequestHomeVisit> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.only(left: 10,top: 10),
-                  child: DoctorDetailWidget()),
-              CallAssistantButton(
-                onPressed: () {
-                  // Your onPressed logic here
-                },
+                margin: EdgeInsets.only(left: 10, top: 10),
+                child: DoctorDetailWidget(doctorData: doctorData),
               ),
+              CallAssistantButton(onPressed: () {}),
               Container(
                 margin: EdgeInsets.only(left: 10,top: 10),
                 child: Text(
@@ -176,7 +181,9 @@ class _RequestHomeVisitState extends State<RequestHomeVisit> {
                 child: SubmitButtonWidget(
                   onTap: () {
                     Get.to(BookingDetails(
-                      bookingType: "home"));
+                      bookingType: "home",
+                      doctorData: doctorData,
+                    ));
                   },
                   text: Strings.confirm,
                 ),

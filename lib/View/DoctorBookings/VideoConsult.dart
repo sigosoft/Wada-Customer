@@ -20,6 +20,13 @@ class VideoConsult extends StatefulWidget {
 
 class _VideoConsultState extends State<VideoConsult> {
   bool isTimeFieldEnabled = false;
+  dynamic doctorData;
+
+  @override
+  void initState() {
+    super.initState();
+    doctorData = Get.arguments;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +41,10 @@ class _VideoConsultState extends State<VideoConsult> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                    margin: EdgeInsets.only(left: 10,top: 10),
-                    child: DoctorDetailWidget()),
-                CallAssistantButton(
-                  onPressed: () {
-                    // Your onPressed logic here
-                  },
+                  margin: EdgeInsets.only(left: 10, top: 10),
+                  child: DoctorDetailWidget(doctorData: doctorData),
                 ),
+                CallAssistantButton(onPressed: () {}),
                 Container(
                   margin: EdgeInsets.only(left: 10,top: 10),
                   child: Text(
@@ -73,7 +77,9 @@ class _VideoConsultState extends State<VideoConsult> {
                   child: SubmitButtonWidget(
                     onTap: () {
                       Get.to(BookingDetails(
-                          bookingType: "video"));
+                        bookingType: "video",
+                        doctorData: doctorData,
+                      ));
                     },
                     text: Strings.confirm,
                   ),

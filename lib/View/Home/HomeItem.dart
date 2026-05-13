@@ -85,7 +85,9 @@ class _HomeItemState extends State<HomeItem> {
                                     child: InkWell(
                                       onTap: () {
                                         Get.to(
-                                          () => ShareLocationBookingDetails(),
+                                          () => ShareLocationBookingDetails(
+                                            bookingId: spec['id']?.toString(),
+                                          ),
                                         );
                                       },
                                       child: HomeNurseDetailsWidget(
@@ -101,7 +103,11 @@ class _HomeItemState extends State<HomeItem> {
                                                 ? "${ApiConfigs.IMAGE_URL}${spec['image']}"
                                                 : 'lib/Assets/Images/nurse.png',
                                         onTapButton: () {
-                                          Get.to(() => ChooseLocation());
+                                          Get.to(
+                                            () => ChooseLocation(
+                                              bookingId: spec['id']?.toString(),
+                                            ),
+                                          );
                                         },
                                         showButton: true,
                                         buttonText: Strings.shareYourLocation,

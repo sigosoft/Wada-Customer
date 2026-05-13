@@ -69,19 +69,18 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: imagePath.startsWith('http')
-                        ? Image.network(
-                            imagePath,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Image.asset(
-                              'lib/Assets/Images/nurse.png',
-                              fit: BoxFit.contain,
-                            ),
-                          )
-                        : Image.asset(
-                            imagePath,
-                            fit: BoxFit.contain,
-                          ),
+                    child:
+                        imagePath.startsWith('http')
+                            ? Image.network(
+                              imagePath,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Image.asset(
+                                    'lib/Assets/Images/nurse.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                            )
+                            : Image.asset(imagePath, fit: BoxFit.contain),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -144,7 +143,9 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          SvgPicture.asset("lib/Assets/Images/qualification.svg"),
+                          SvgPicture.asset(
+                            "lib/Assets/Images/qualification.svg",
+                          ),
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
@@ -209,15 +210,10 @@ class HomeNurseDetailsWidget extends StatelessWidget {
           ),
           SizedBox(height: showButton ? 15 : 5),
           showButton
-              ? InkWell(
-                  onTap: onTapButton,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: SubmitButtonWidget(
-                      text: buttonText,
-                      onTap: () {},
-                    ),
-                  ))
+              ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: SubmitButtonWidget(text: buttonText, onTap: onTapButton),
+              )
               : Container(),
           SizedBox(height: showButton ? 10 : 0),
         ],
@@ -225,5 +221,3 @@ class HomeNurseDetailsWidget extends StatelessWidget {
     );
   }
 }
-
-

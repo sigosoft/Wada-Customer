@@ -14,7 +14,8 @@ import 'package:get/get.dart';
 
 class ChooseLocation extends StatefulWidget {
   final bool isPicker;
-  const ChooseLocation({super.key, this.isPicker = false});
+  final String? bookingId;
+  const ChooseLocation({super.key, this.isPicker = false, this.bookingId});
 
   @override
   _ChooseLocationState createState() => _ChooseLocationState();
@@ -70,6 +71,15 @@ class _ChooseLocationState extends State<ChooseLocation> {
                   },
                   onCameraMove: (position) {
                     controller.currentPosition = position.target;
+                    // Only switch to manual mode if it's not a programmatic move (e.g. within 1 second of clicking Live Location)
+                    if (DateTime.now()
+                            .difference(controller.lastProgrammaticMoveTime)
+                            .inMilliseconds >
+                        2000) {
+                      if (controller.isLiveMode.value) {
+                        controller.isLiveMode(false);
+                      }
+                    }
                   },
                   onCameraIdle: () {
                     if (controller.currentPosition != null) {
@@ -166,8 +176,10 @@ class _ChooseLocationState extends State<ChooseLocation> {
                                   ),
                                 ),
                                 onTap: () {
-                                  final selectedPlace = controller.placeList[index];
-                                  controller.searchController.text = selectedPlace;
+                                  final selectedPlace =
+                                      controller.placeList[index];
+                                  controller.searchController.text =
+                                      selectedPlace;
                                   controller.resolvePlace(selectedPlace);
                                   controller.placeList.clear();
                                   controller.update();
@@ -195,7 +207,118 @@ class _ChooseLocationState extends State<ChooseLocation> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
+                        Obx(
+                          () => Row(
+                            children: [
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {
+                                    controller.isLiveMode(true);
+                                    controller.getCurrentPosition();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          controller.isLiveMode.value
+                                              ? colorPrimary.withOpacity(0.1)
+                                              : Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color:
+                                            controller.isLiveMode.value
+                                                ? colorPrimary
+                                                : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.my_location,
+                                          color:
+                                              controller.isLiveMode.value
+                                                  ? colorPrimary
+                                                  : Colors.grey,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          "Live Location",
+                                          style: GoogleFonts.inter(
+                                            color:
+                                                controller.isLiveMode.value
+                                                    ? colorPrimary
+                                                    : Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {
+                                    controller.isLiveMode(false);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          !controller.isLiveMode.value
+                                              ? colorPrimary.withOpacity(0.1)
+                                              : Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color:
+                                            !controller.isLiveMode.value
+                                                ? colorPrimary
+                                                : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.map,
+                                          color:
+                                              !controller.isLiveMode.value
+                                                  ? colorPrimary
+                                                  : Colors.grey,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          "Select Location",
+                                          style: GoogleFonts.inter(
+                                            color:
+                                                !controller.isLiveMode.value
+                                                    ? colorPrimary
+                                                    : Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 15),
                         Row(
                           children: [
                             SvgPicture.asset(
@@ -240,25 +363,37 @@ class _ChooseLocationState extends State<ChooseLocation> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        SubmitButtonWidget(
-                          onTap: () {
-                            if (widget.isPicker) {
-                              Get.back(
-                                result: {
-                                  "name": controller.location.value,
-                                  "lat":
-                                      controller.currentPosition?.latitude
-                                          .toString(),
-                                  "long":
-                                      controller.currentPosition?.longitude
-                                          .toString(),
-                                },
-                              );
-                            } else {
-                              Get.to(Home());
-                            }
-                          },
-                          text: Strings.verifylocation,
+                        Obx(
+                          () => SubmitButtonWidget(
+                            onTap: () {
+                              if (controller.isSharingLoading.value) return;
+                              if (widget.bookingId != null) {
+                                controller.shareLocation(
+                                  bookingId: widget.bookingId!,
+                                );
+                              } else if (widget.isPicker) {
+                                Get.back(
+                                  result: {
+                                    "name": controller.location.value,
+                                    "lat":
+                                        controller.currentPosition?.latitude
+                                            .toString(),
+                                    "long":
+                                        controller.currentPosition?.longitude
+                                            .toString(),
+                                  },
+                                );
+                              } else {
+                                Get.to(Home());
+                              }
+                            },
+                            text:
+                                controller.isSharingLoading.value
+                                    ? "Sending..."
+                                    : (widget.bookingId != null
+                                        ? "Send Location"
+                                        : Strings.verifylocation),
+                          ),
                         ),
                         const SizedBox(height: 10),
                       ],

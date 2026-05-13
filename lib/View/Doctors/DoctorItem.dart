@@ -12,6 +12,8 @@ import '../../Widgets/Plusfour.dart';
 import '../../Widgets/ShiftDetailsWidget.dart';
 
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+import 'package:waada_customerapp/Controller/DoctorListingController.dart';
+import 'package:get/get.dart';
 
 class DoctorItem extends StatelessWidget {
   final dynamic doctor;
@@ -245,7 +247,14 @@ class DoctorItem extends StatelessWidget {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    Get.to(RequestHomeVisit());
+                    final controller = Get.find<DoctorListingController>();
+                    final doctorId = int.tryParse(
+                          doctor?['id']?.toString() ??
+                              doctor?['doctor_id']?.toString() ??
+                              "0",
+                        ) ??
+                        0;
+                    controller.fetchDoctorDetails(doctorId, 1);
                   },
                   child: BookingTypeWidget(
                     text1: Strings.requesthomevisit,
@@ -257,7 +266,14 @@ class DoctorItem extends StatelessWidget {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    Get.to(VideoConsult());
+                    final controller = Get.find<DoctorListingController>();
+                    final doctorId = int.tryParse(
+                          doctor?['id']?.toString() ??
+                              doctor?['doctor_id']?.toString() ??
+                              "0",
+                        ) ??
+                        0;
+                    controller.fetchDoctorDetails(doctorId, 2);
                   },
                   child: BookingTypeWidget(
                     text1: Strings.videoconsult,

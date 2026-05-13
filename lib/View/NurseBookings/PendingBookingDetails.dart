@@ -105,7 +105,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.to(CancelBookingSuccess());
+                          controller.cancelBooking(widget.bookingId);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorPrimary,

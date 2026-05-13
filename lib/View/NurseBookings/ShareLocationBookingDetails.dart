@@ -11,9 +11,11 @@ import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/CheckboxWdget.dart';
+import '../Map/ChooseLocation.dart';
 
 class ShareLocationBookingDetails extends StatefulWidget {
-  const ShareLocationBookingDetails({super.key});
+  final String? bookingId;
+  const ShareLocationBookingDetails({super.key, this.bookingId});
 
   @override
   State<ShareLocationBookingDetails> createState() =>
@@ -317,9 +319,14 @@ class _ShareLocationBookingDetailsState
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SubmitButtonWidget(onTap: () {
-                    Get.to(ShareLocationSucccess ());
-                  }, text: Strings.sharelocation),
+                  child: SubmitButtonWidget(
+                    onTap: () {
+                      Get.to(
+                        () => ChooseLocation(bookingId: widget.bookingId),
+                      );
+                    },
+                    text: Strings.sharelocation,
+                  ),
                 ),
                 SizedBox(height: 30),
               ],

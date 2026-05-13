@@ -44,4 +44,7 @@ class ApiEndPoints {
   static String listBookings = "listBookings";
   static String bookingDetails = "bookingDetails";
   static String getHours = "getHours";
+  static String shareLocation = "shareLocation";
+  static String cancelBooking = "cancelBooking";
+  static String doctorDetails = "doctorDetails";
 }

@@ -12,15 +12,14 @@ import '../../Resource/Colors.dart';
 import '../SuccessPages/DoctorBookingsSuccess/DoctorRequestSentSuccess.dart';
 
 class BookingDetails extends StatefulWidget {
-  const BookingDetails({super.key, required this.bookingType});
- final  String bookingType;
+  const BookingDetails({super.key, required this.bookingType, this.doctorData});
+  final String bookingType;
+  final dynamic doctorData;
   @override
-  State<BookingDetails> createState() =>
-      _BookingDetailsState();
+  State<BookingDetails> createState() => _BookingDetailsState();
 }
 
-class _BookingDetailsState
-    extends State<BookingDetails> {
+class _BookingDetailsState extends State<BookingDetails> {
   int selectedPaymentIndex = -1;
 
   final List<Map<String, String>> paymentMethods = [
@@ -29,6 +28,12 @@ class _BookingDetailsState
   ];
   @override
   Widget build(BuildContext context) {
+    String fee = widget.bookingType == "home"
+        ? (widget.doctorData?['home_consultation_fee']?.toString() ?? "0")
+        : (widget.doctorData?['video_consultation_fee']?.toString() ?? "0");
+
+    double total = (double.tryParse(fee) ?? 0) + 12;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(label: Strings.bookingdetails, showCloseIcon: false),
@@ -41,8 +46,9 @@ class _BookingDetailsState
               children: [
                 SizedBox(height: 20),
                 Container(
-                  margin: EdgeInsets.only(left: 15,right: 15),
-                    child: DoctorDetailWidget()),
+                  margin: EdgeInsets.only(left: 15, right: 15),
+                  child: DoctorDetailWidget(doctorData: widget.doctorData),
+                ),
                 SizedBox(height: 10),
                 TextStyleInterForSplash(
                   text: Strings.appointmentdetails,
@@ -119,7 +125,7 @@ class _BookingDetailsState
                       child: Container(
                         alignment: Alignment.topRight,
                         child: TextStyleInterForSplash(
-                          text: "₹500",
+                          text: "₹$fee",
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
                           size: 14.00,
@@ -173,7 +179,7 @@ class _BookingDetailsState
                       child: Container(
                         alignment: Alignment.topRight,
                         child: TextStyleInterForSplash(
-                          text: "₹512",
+                          text: "₹${total.toStringAsFixed(0)}",
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
                           size: 14.00,

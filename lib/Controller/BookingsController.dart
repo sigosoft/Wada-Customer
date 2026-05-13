@@ -109,6 +109,51 @@ class BookingsController extends GetxController {
     return [];
   }
 
+  Future<void> cancelBooking(int bookingId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.cancelBooking}?booking_id=$bookingId";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      if (response.statusCode == 200 &&
+          (response.data['success'] == true ||
+              response.data['success'].toString() == "true")) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.data['message'] ?? "Booking cancelled successfully",
+            ),
+          ),
+        );
+        fetchNurseBookings();
+        Get.back(); // Close the bottom sheet
+        Get.back(); // Close the details page
+      } else {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.data['message'] ?? "Failed to cancel booking",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text("An error occurred while cancelling booking"),
+        ),
+      );
+    }
+  }
+
   @override
   void onClose() {
     print("BookingsController disposed");
