@@ -57,30 +57,56 @@ class DoctorsListingListing extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child:
-                        controller.isLoading
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 25,
-                                  height: 25,
-                                  child: CircularProgressIndicator(
-                                    color: colorPrimary,
-                                    strokeWidth: 3,
+                    Expanded(
+                      child: controller.isLoading
+                          ? const Center(
+                              child: SizedBox(
+                                width: 25,
+                                height: 25,
+                                child: CircularProgressIndicator(
+                                  color: colorPrimary,
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            )
+                          : controller.doctors.isEmpty
+                              ? const Center(child: Text("No doctors found"))
+                              : NotificationListener<ScrollNotification>(
+                                  onNotification: (ScrollNotification scrollInfo) {
+                                    if (scrollInfo.metrics.pixels ==
+                                            scrollInfo.metrics.maxScrollExtent &&
+                                        !controller.isLoadMore) {
+                                      controller.loadMoreDoctors();
+                                    }
+                                    return false;
+                                  },
+                                  child: ListView.builder(
+                                    itemCount: controller.doctors.length +
+                                        (controller.isLoadMore ? 1 : 0),
+                                    itemBuilder: (context, index) {
+                                      if (index < controller.doctors.length) {
+                                        return DoctorItem(
+                                          doctor: controller.doctors[index],
+                                        );
+                                      } else {
+                                        return const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Center(
+                                            child: SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                color: colorPrimary,
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ),
-                              )
-                            : controller.doctors.isEmpty
-                            ? const Center(child: Text("No doctors found"))
-                            : ListView.builder(
-                              itemCount: controller.doctors.length,
-                              itemBuilder: (context, index) {
-                                return DoctorItem(
-                                  doctor: controller.doctors[index],
-                                );
-                              },
-                            ),
-                  ),
+                    ),
                 ],
               ),
             ),

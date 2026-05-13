@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:waada_customerapp/View/Ambulance/Ambulance.dart';
 import 'package:waada_customerapp/View/BloodBank/BloodBankListing.dart';
 import 'package:waada_customerapp/View/Doctors/DoctorsListingListing.dart';
@@ -18,14 +20,76 @@ class HomeController extends GetxController {
   Map<String, dynamic>? homeData;
   bool isLoading = false;
 
+  String currentAddress = "Fetching location...";
+  String currentCity = "Raipur";
+
   @override
   void onInit() {
     super.onInit();
     print("HomeController initialized");
+    getCurrentLocation();
     fetchHomeData();
     fetchSpecializations();
     fetchOtherServices();
     fetchHours();
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        currentAddress = "Location services disabled";
+        update();
+        return;
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          currentAddress = "Location permission denied";
+          update();
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        currentAddress = "Location permissions permanently denied";
+        update();
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        currentCity = place.locality ?? "Raipur";
+        
+        // Build address string carefully
+        List<String> parts = [];
+        if (place.name != null && place.name!.isNotEmpty) parts.add(place.name!);
+        if (place.subLocality != null && place.subLocality!.isNotEmpty) parts.add(place.subLocality!);
+        if (place.locality != null && place.locality!.isNotEmpty) parts.add(place.locality!);
+        if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) parts.add(place.administrativeArea!);
+        
+        currentAddress = parts.join(", ");
+        update();
+      }
+    } catch (e) {
+      print("Error getting location: $e");
+      currentAddress = "Location not available";
+      update();
+    }
   }
 
   Future<void> onRefresh() async {

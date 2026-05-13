@@ -31,47 +31,79 @@ class BookingsTabBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10),
-          GetBuilder<BookingsController>(
-            builder: (controller) {
-              final bookings = controller.getBookingsForIndex(
-                indexValue as int,
-              );
-              if (controller.isNurseLoading) {
-                return const Center(
-                  child: SizedBox(
-                    width: 25,
-                    height: 25,
-                    child: CircularProgressIndicator(
-                      color: colorPrimary,
-                      strokeWidth: 3,
+    return GetBuilder<BookingsController>(
+      builder: (controller) {
+        final bookings = controller.getBookingsForIndex(indexValue as int);
+
+        if (controller.isNurseLoading && controller.currentPage == 1) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: SizedBox(
+                width: 25,
+                height: 25,
+                child: CircularProgressIndicator(
+                  color: colorPrimary,
+                  strokeWidth: 3,
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (swapValue && bookings.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height * 0.3,
+            ),
+            child: const Center(
+              child: Text(
+                "No bookings found",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          );
+        }
+
+        return NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (scrollInfo.metrics.pixels ==
+                    scrollInfo.metrics.maxScrollExtent &&
+                !controller.isLoadMore &&
+                swapValue) {
+              controller.loadMoreNurseBookings();
+            }
+            return false;
+          },
+          child: ListView.builder(
+            itemCount:
+                (swapValue ? bookings.length : 1) +
+                (controller.isLoadMore && swapValue ? 1 : 0),
+            padding: const EdgeInsets.only(bottom: 20),
+            itemBuilder: (context, index) {
+              if (swapValue && index == bookings.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: colorPrimary,
+                        strokeWidth: 2,
+                      ),
                     ),
                   ),
                 );
               }
-              if (swapValue && bookings.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.3,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "No bookings found",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                );
-              }
+
+              final booking = swapValue ? bookings[index] : null;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (indexValue == 0)
+                  if (index == 0 && indexValue == 0)
                     const Padding(
-                      padding: EdgeInsets.only(left: 15),
+                      padding: EdgeInsets.only(left: 15, top: 10, bottom: 5),
                       child: TextStyleInterForSplash(
                         textAlign: TextAlign.left,
                         text: Strings.pending,
@@ -80,76 +112,64 @@ class BookingsTabBarItem extends StatelessWidget {
                         size: 14.00,
                       ),
                     ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: swapValue ? bookings.length : 1,
-                    itemBuilder: (context, index) {
-                      final booking = swapValue ? bookings[index] : null;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child:
-                            swapValue
-                                ? InkWell(
-                                  onTap: () {
-                                    if (indexValue == 0)
-                                      Get.to(
-                                        PendingBookingDetails(
-                                          bookingId: booking!['booking_id'],
-                                        ),
-                                      );
-                                    else if (indexValue == 3)
-                                      Get.to(
-                                        OngoingBookingDetails(
-                                          type: "cancelled",
-                                        ),
-                                      );
-                                  },
-                                  child: HomeNurseDetailsWidget(
-                                    showButton: false,
-                                    buttonText: "",
-                                    name: booking?['name'] ?? "Nurse Name",
-                                    location:
-                                        booking?['location'] ?? "Location",
-                                    qualification:
-                                        booking?['qualification'] ??
-                                        "Qualification",
-                                    experience:
-                                        "${booking?['experience'] ?? 0} Years of Experience",
-                                    checkInDate: booking?['checkin_date'] ?? "",
-                                    checkInTime: booking?['checkin_time'] ?? "",
-                                    languages:
-                                        (booking?['languages'] as List?)?.join(
-                                          ", ",
-                                        ) ??
-                                        "Languages",
-                                  ),
-                                )
-                                : InkWell(
-                                  onTap: () {
-                                    if (indexValue == 3) {
-                                      Get.to(
-                                        DoctorsRequestCancelledScreen(
-                                          bookingType: 'home',
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: BookingsDoctorDetailsWidget(
-                                    showButton: false,
-                                    buttonText: Strings.makePayment,
-                                  ),
-                                ),
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child:
+                        swapValue
+                            ? InkWell(
+                              onTap: () {
+                                if (indexValue == 0)
+                                  Get.to(
+                                    PendingBookingDetails(
+                                      bookingId: booking!['booking_id'],
+                                    ),
+                                  );
+                                else if (indexValue == 3)
+                                  Get.to(
+                                    OngoingBookingDetails(type: "cancelled"),
+                                  );
+                              },
+                              child: HomeNurseDetailsWidget(
+                                showButton: false,
+                                buttonText: "",
+                                name: booking?['name'] ?? "Nurse Name",
+                                location: booking?['location'] ?? "Location",
+                                qualification:
+                                    booking?['qualification'] ??
+                                    "Qualification",
+                                experience:
+                                    "${booking?['experience'] ?? 0} Years of Experience",
+                                checkInDate: booking?['checkin_date'] ?? "",
+                                checkInTime: booking?['checkin_time'] ?? "",
+                                languages:
+                                    (booking?['languages'] as List?)?.join(
+                                      ", ",
+                                    ) ??
+                                    "Languages",
+                              ),
+                            )
+                            : InkWell(
+                              onTap: () {
+                                if (indexValue == 3) {
+                                  Get.to(
+                                    DoctorsRequestCancelledScreen(
+                                      bookingType: 'home',
+                                    ),
+                                  );
+                                }
+                              },
+                              child: BookingsDoctorDetailsWidget(
+                                showButton: false,
+                                buttonText: Strings.makePayment,
+                              ),
+                            ),
                   ),
                 ],
               );
             },
           ),
-          SizedBox(height: 10),
-        ],
-      ),
+        );
+      },
     );
   }
 }

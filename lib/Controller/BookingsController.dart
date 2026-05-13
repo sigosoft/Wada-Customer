@@ -14,6 +14,9 @@ class BookingsController extends GetxController {
   final Dio _dio = ApiConfigs.dio;
   List<dynamic> nurseBookings = [];
   bool isNurseLoading = false;
+  bool isLoadMore = false;
+  int currentPage = 1;
+  bool hasMore = true;
   Map<String, dynamic>? selectedBookingDetails;
   bool isDetailsLoading = false;
 
@@ -55,13 +58,15 @@ class BookingsController extends GetxController {
 
   Future<void> fetchNurseBookings() async {
     try {
+      currentPage = 1;
+      hasMore = true;
       isNurseLoading = true;
       update();
 
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
       String url =
-          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0";
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=$currentPage";
 
       final headers = {
         'Accept': 'application/json',
@@ -73,6 +78,9 @@ class BookingsController extends GetxController {
       if (response.statusCode == 200 &&
           response.data['success'].toString() == "true") {
         nurseBookings = response.data['data']['data'] ?? [];
+        if (nurseBookings.length < 10) {
+          hasMore = false;
+        }
       } else {
         nurseBookings = [];
       }
@@ -80,6 +88,47 @@ class BookingsController extends GetxController {
       nurseBookings = [];
     } finally {
       isNurseLoading = false;
+      update();
+    }
+  }
+
+  Future<void> loadMoreNurseBookings() async {
+    if (isLoadMore || !hasMore) return;
+
+    try {
+      isLoadMore = true;
+      update();
+
+      currentPage++;
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=$currentPage";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      if (response.statusCode == 200 &&
+          response.data['success'].toString() == "true") {
+        List newBookings = response.data['data']['data'] ?? [];
+        if (newBookings.isEmpty) {
+          hasMore = false;
+        } else {
+          nurseBookings.addAll(newBookings);
+          if (newBookings.length < 10) {
+            hasMore = false;
+          }
+        }
+      }
+    } catch (e) {
+      print("--- API Error (Load More Bookings) ---");
+      currentPage--;
+    } finally {
+      isLoadMore = false;
       update();
     }
   }

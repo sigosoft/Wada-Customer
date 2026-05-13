@@ -7,7 +7,12 @@ class ApiConfigs {
   static String IMAGE_URL = "https://thewada.com/wada-backend/public/storage/";
 
   static Dio get dio {
-    final dio = Dio();
+    final dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+      ),
+    );
     dio.interceptors.add(LoggingInterceptor());
     return dio;
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Controller/HomeController.dart';
 import 'package:waada_customerapp/Controller/BottomNavController.dart';
 import 'package:waada_customerapp/View/Bookings/Bookings.dart';
 import 'package:waada_customerapp/View/Home/HomeItem.dart';
@@ -17,6 +18,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final BottomNavController controller = Get.put(BottomNavController());
+  final HomeController homeController = Get.put(HomeController());
 
   final List<Widget> _pages = [
     const HomeItem(),

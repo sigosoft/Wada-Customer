@@ -108,28 +108,54 @@ class NursesListing extends StatelessWidget {
                   ),
                   SizedBox(height: 15),
                   Expanded(
-                    child:
-                        controller.isLoading
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 25,
-                                  height: 25,
-                                  child: CircularProgressIndicator(
-                                    color: colorPrimary,
-                                    strokeWidth: 3,
-                                  ),
-                                ),
-                              )
-                            : controller.nurses.isEmpty
-                            ? Center(child: Text("No nurses found"))
-                            : ListView.builder(
-                              itemCount: controller.nurses.length,
-                              itemBuilder: (context, index) {
-                                return NurseItem(
-                                  nurse: controller.nurses[index],
-                                );
-                              },
+                    child: controller.isLoading
+                        ? const Center(
+                            child: SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: CircularProgressIndicator(
+                                color: colorPrimary,
+                                strokeWidth: 3,
+                              ),
                             ),
+                          )
+                        : controller.nurses.isEmpty
+                            ? const Center(child: Text("No nurses found"))
+                            : NotificationListener<ScrollNotification>(
+                                onNotification: (ScrollNotification scrollInfo) {
+                                  if (scrollInfo.metrics.pixels ==
+                                          scrollInfo.metrics.maxScrollExtent &&
+                                      !controller.isLoadMore) {
+                                    controller.loadMoreNurses();
+                                  }
+                                  return false;
+                                },
+                                child: ListView.builder(
+                                  itemCount: controller.nurses.length +
+                                      (controller.isLoadMore ? 1 : 0),
+                                  itemBuilder: (context, index) {
+                                    if (index < controller.nurses.length) {
+                                      return NurseItem(
+                                        nurse: controller.nurses[index],
+                                      );
+                                    } else {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: colorPrimary,
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
                   ),
                 ],
               ),

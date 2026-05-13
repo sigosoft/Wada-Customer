@@ -79,13 +79,42 @@ class BloodBankListing extends StatelessWidget {
                           ),
                         )
                       : controller.donors.isEmpty
-                      ? const Center(child: Text("No donors found"))
-                      : ListView.builder(
-                        itemCount: controller.donors.length,
-                        itemBuilder: (context, index) {
-                          return BloodBankItem(donor: controller.donors[index]);
-                        },
-                      ),
+                          ? const Center(child: Text("No donors found"))
+                          : NotificationListener<ScrollNotification>(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                if (scrollInfo.metrics.pixels ==
+                                        scrollInfo.metrics.maxScrollExtent &&
+                                    !controller.isLoadMore) {
+                                  controller.loadMoreDonors();
+                                }
+                                return false;
+                              },
+                              child: ListView.builder(
+                                itemCount: controller.donors.length +
+                                    (controller.isLoadMore ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index < controller.donors.length) {
+                                    return BloodBankItem(
+                                      donor: controller.donors[index],
+                                    );
+                                  } else {
+                                    return const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: colorPrimary,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
             ),
       ),
     );

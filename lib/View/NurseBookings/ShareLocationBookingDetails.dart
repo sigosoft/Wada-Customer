@@ -309,7 +309,7 @@ class _ShareLocationBookingDetailsState
                     ),
                   ],
                 ),
-                SizedBox(height: 30,),
+                SizedBox(height: 30),
                 TextStyleInterForSplash(
                   text: Strings.sharelocationnotes,
                   color: Colors.grey,
@@ -321,9 +321,7 @@ class _ShareLocationBookingDetailsState
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: SubmitButtonWidget(
                     onTap: () {
-                      Get.to(
-                        () => ChooseLocation(bookingId: widget.bookingId),
-                      );
+                      Get.to(() => ChooseLocation(bookingId: widget.bookingId));
                     },
                     text: Strings.sharelocation,
                   ),
