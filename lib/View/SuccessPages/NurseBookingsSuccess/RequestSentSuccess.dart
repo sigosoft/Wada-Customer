@@ -12,7 +12,8 @@ import '../../../Configs/ApiConfigs.dart';
 import '../../../Controller/NurseBookingController.dart';
 
 class RequestSentSuccess extends StatelessWidget {
-  @override
+  final Map<String, dynamic>? data;
+  const RequestSentSuccess({super.key, this.data});
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -52,7 +53,10 @@ class RequestSentSuccess extends StatelessWidget {
                     GetBuilder<NurseBookingController>(
                       init: Get.find<NurseBookingController>(),
                       builder: (controller) {
-                        final nurse = controller.nurseData;
+                        final nurse = data ?? controller.nurseData;
+                        final String checkInDate = data?['checkin_date'] ?? controller.fromDate;
+                        final String checkInTime = data?['checkin_time'] ?? controller.checkinTimeController.text;
+
                         return HomeNurseDetailsWidget(
                           showButton: false,
                           buttonText: "",
@@ -62,7 +66,7 @@ class RequestSentSuccess extends StatelessWidget {
                           languages:
                               (nurse?['languages'] as List?)
                                   ?.take(2)
-                                  .map((l) => l['language'])
+                                  .map((l) => l['language'] ?? l)
                                   .join(", ") ??
                               "Languages",
                           plusLanguages:
@@ -70,7 +74,7 @@ class RequestSentSuccess extends StatelessWidget {
                                       (nurse?['languages'] as List).length > 2
                                   ? (nurse?['languages'] as List)
                                       .skip(2)
-                                      .map((l) => l['language'])
+                                      .map((l) => l['language'] ?? l)
                                       .join(", ")
                                   : "",
                           qualification:
@@ -81,10 +85,12 @@ class RequestSentSuccess extends StatelessWidget {
                           imagePath:
                               (nurse?['image'] != null &&
                                       nurse!['image'].toString().isNotEmpty)
-                                  ? "${ApiConfigs.IMAGE_URL}${nurse['image']}"
+                                  ? nurse!['image'].toString().startsWith('http') 
+                                      ? nurse['image'] 
+                                      : "${ApiConfigs.IMAGE_URL}${nurse['image']}"
                                   : 'lib/Assets/Images/nurse.png',
-                          checkInDate: controller.fromDate,
-                          checkInTime: controller.checkinTimeController.text,
+                          checkInDate: checkInDate,
+                          checkInTime: checkInTime,
                         );
                       },
                     ),

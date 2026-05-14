@@ -3,6 +3,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:pinput/pinput.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:waada_customerapp/Controller/RegisterController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 
 class PinPutWidget extends StatelessWidget {
@@ -15,7 +16,9 @@ class PinPutWidget extends StatelessWidget {
       child: Center(
         child: Pinput(
           length: 6,
-          controller: Get.find<LoginController>().otpController,
+          controller: Get.isRegistered<Registercontroller>()
+              ? Get.find<Registercontroller>().otpController
+              : Get.find<LoginController>().otpController,
           defaultPinTheme: PinTheme(
             width: 50,
             height: 50,

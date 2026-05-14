@@ -15,9 +15,14 @@ class DoctorRequestSentSuccess extends StatefulWidget {
     super.key,
     required this.bookingType,
     required this.msg,
+    this.doctorData,
+    this.bookingData,
   });
   final String bookingType;
   final String msg;
+  final Map<String, dynamic>? doctorData;
+  final Map<String, dynamic>? bookingData;
+
   @override
   State<DoctorRequestSentSuccess> createState() =>
       _DoctorRequestSentSuccessState();
@@ -64,6 +69,8 @@ class _DoctorRequestSentSuccessState extends State<DoctorRequestSentSuccess> {
                     BookingsDoctorDetailsWidget(
                       showButton: false,
                       buttonText: Strings.makePayment,
+                      doctorData: widget.doctorData,
+                      bookingData: widget.bookingData,
                     ),
                   ],
                 ),

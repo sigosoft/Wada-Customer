@@ -13,7 +13,12 @@ import 'package:waada_customerapp/Controller/DonateBloodController.dart';
 import 'package:waada_customerapp/Controller/FamilyMemberController.dart';
 
 class CountryCodeAndPhoneNUmber extends StatelessWidget {
-  const CountryCodeAndPhoneNUmber({super.key, required this.name, this.phoneValidator, this.countryValidator});
+  const CountryCodeAndPhoneNUmber({
+    super.key,
+    required this.name,
+    this.phoneValidator,
+    this.countryValidator,
+  });
   final String name;
   final String? Function(String?)? phoneValidator;
   final String? Function(String?)? countryValidator;
@@ -46,15 +51,12 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                         if (Get.isRegistered<FamilyMemberController>()) {
                           Get.find<FamilyMemberController>()
                               .fetchCountryCodes();
-                        } else if (Get.isRegistered<
-                          DonateBloodController
-                        >()) {
-                          Get.find<DonateBloodController>()
-                              .fetchCountryCodes();
-                        } else if (Get.isRegistered<Registercontroller>()) {
-                          Get.find<Registercontroller>().fetchCountryCodes();
+                        } else if (Get.isRegistered<DonateBloodController>()) {
+                          Get.find<DonateBloodController>().fetchCountryCodes();
                         } else if (Get.isRegistered<LoginController>()) {
                           Get.find<LoginController>().fetchCountryCodes();
+                        } else if (Get.isRegistered<Registercontroller>()) {
+                          Get.find<Registercontroller>().fetchCountryCodes();
                         }
                       },
                       value:
@@ -64,11 +66,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                               : Get.isRegistered<DonateBloodController>()
                               ? Get.find<DonateBloodController>()
                                   .selectedCountryCode
+                              : Get.isRegistered<LoginController>()
+                              ? Get.find<LoginController>().selectedCountryCode
                               : Get.isRegistered<Registercontroller>()
                               ? Get.find<Registercontroller>()
-                                  .selectedCountryCode
-                              : Get.isRegistered<LoginController>()
-                              ? Get.find<LoginController>()
                                   .selectedCountryCode
                               : null,
                       hint: Text(
@@ -109,11 +110,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                                   : Get.isRegistered<DonateBloodController>()
                                   ? Get.find<DonateBloodController>()
                                       .countryCodes
-                                  : Get.isRegistered<Registercontroller>()
-                                  ? Get.find<Registercontroller>()
-                                      .countryCodes
                                   : Get.isRegistered<LoginController>()
                                   ? Get.find<LoginController>().countryCodes
+                                  : Get.isRegistered<Registercontroller>()
+                                  ? Get.find<Registercontroller>().countryCodes
                                   : [])
                               .map((code) {
                                 return DropdownMenuItem<String>(
@@ -131,32 +131,17 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                               .toList(),
                       onChanged: (value) {
                         if (Get.isRegistered<FamilyMemberController>()) {
-                          var fmController =
-                              Get.find<FamilyMemberController>();
+                          var fmController = Get.find<FamilyMemberController>();
                           fmController.selectedCountryCode = value;
-                          int index = fmController.countryCodes.indexOf(
-                            value!,
-                          );
+                          int index = fmController.countryCodes.indexOf(value!);
                           if (index != -1) {
                             fmController.countryCodeId =
                                 fmController.countryIds[index].toString();
                           }
                           fmController.update();
-                        } else if (Get.isRegistered<
-                          DonateBloodController
-                        >()) {
+                        } else if (Get.isRegistered<DonateBloodController>()) {
                           DonateBloodController controller =
                               Get.find<DonateBloodController>();
-                          controller.selectedCountryCode = value;
-                          int index = controller.countryCodes.indexOf(value!);
-                          if (index != -1) {
-                            controller.selectedCountryId =
-                                controller.countryIds[index];
-                          }
-                          controller.update();
-                        } else if (Get.isRegistered<Registercontroller>()) {
-                          Registercontroller controller =
-                              Get.find<Registercontroller>();
                           controller.selectedCountryCode = value;
                           int index = controller.countryCodes.indexOf(value!);
                           if (index != -1) {
@@ -167,6 +152,16 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                         } else if (Get.isRegistered<LoginController>()) {
                           LoginController controller =
                               Get.find<LoginController>();
+                          controller.selectedCountryCode = value;
+                          int index = controller.countryCodes.indexOf(value!);
+                          if (index != -1) {
+                            controller.selectedCountryId =
+                                controller.countryIds[index];
+                          }
+                          controller.update();
+                        } else if (Get.isRegistered<Registercontroller>()) {
+                          Registercontroller controller =
+                              Get.find<Registercontroller>();
                           controller.selectedCountryCode = value;
                           int index = controller.countryCodes.indexOf(value!);
                           if (index != -1) {
@@ -201,11 +196,10 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                             Get.isRegistered<DonateBloodController>()
                                 ? Get.find<DonateBloodController>()
                                     .phoneController
-                                : Get.isRegistered<Registercontroller>()
-                                ? Get.find<Registercontroller>()
-                                    .phoneController
                                 : Get.isRegistered<LoginController>()
                                 ? Get.find<LoginController>().phoneController
+                                : Get.isRegistered<Registercontroller>()
+                                ? Get.find<Registercontroller>().phoneController
                                 : Get.isRegistered<FamilyMemberController>()
                                 ? Get.find<FamilyMemberController>()
                                     .mobileController
@@ -224,8 +218,7 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                         decoration: InputDecoration(
                           labelText: name,
                           labelStyle: GoogleFonts.inter(
-                            textStyle:
-                                Theme.of(context).textTheme.displayLarge,
+                            textStyle: Theme.of(context).textTheme.displayLarge,
                             color: blackTextColor,
                             fontWeight: FontWeight.w400,
                             fontSize: 12,

@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/View/Home/Home.dart';
 
 import '../../../Resource/Strings.dart';
 import '../../Bookings/BookingDoctorDetailsWidget.dart';
 import '../../Home/HomeNurseDetailsWidget.dart';
 import '../../Login/SubmitButtonWidget.dart';
 
-
 class DoctorPaymentSuccess extends StatelessWidget {
+  final Map<String, dynamic>? doctorData;
+  final Map<String, dynamic>? bookingData;
+
+  const DoctorPaymentSuccess({super.key, this.doctorData, this.bookingData});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +56,8 @@ class DoctorPaymentSuccess extends StatelessWidget {
                     BookingsDoctorDetailsWidget(
                       showButton: false,
                       buttonText: Strings.makePayment,
+                      doctorData: doctorData,
+                      bookingData: bookingData,
                     ),
                   ],
                 ),
@@ -58,13 +67,13 @@ class DoctorPaymentSuccess extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(5.0),
               child: SubmitButtonWidget(
-                onTap:(){
-        
+                onTap: () {
+                  Get.offAll(() => const Home());
                 },
-                text:Strings.home,
+                text: Strings.home,
               ),
             ),
-            SizedBox(height: 30,)
+            SizedBox(height: 30),
           ],
         ),
       ),

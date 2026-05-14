@@ -55,16 +55,14 @@ class HomeHorizontalScrollingWidget extends StatelessWidget {
                           height: 40,
                           fit: BoxFit.contain,
                           errorBuilder:
-                              (_, __, ___) => SvgPicture.asset(
-                                "lib/Assets/Images/HomeScreenRowIcon1.svg",
-                                width: 40,
-                                height: 40,
-                              ),
+                              (_, __, ___) => const Icon(Icons.image_outlined, size: 40, color: greyText),
                         )
-                        : SvgPicture.asset(
-                          homeRowWidgetItems[index]['icon'].toString(),
-                          fit: BoxFit.scaleDown,
-                        ),
+                        : (homeRowWidgetItems[index]['icon'].toString().isNotEmpty
+                            ? SvgPicture.asset(
+                              homeRowWidgetItems[index]['icon'].toString(),
+                              fit: BoxFit.scaleDown,
+                            )
+                            : const Icon(Icons.image_outlined, size: 40, color: greyText)),
                     SizedBox(height: 10),
                     TextStyleInterWithoutPadding(
                       text: homeRowWidgetItems[index]['name'].toString(),

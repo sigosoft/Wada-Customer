@@ -1,8 +1,11 @@
+import 'package:dio/dio.dart' as dio_instance;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/Controller/BookingsController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
@@ -474,8 +477,53 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                     ),
                     const SizedBox(height: 30),
                     SubmitButtonWidget(
-                      onTap: () {
-                        Get.to(PaymentSuccess());
+                      onTap: () async {
+                        print(
+                          "--- Make Payment button clicked for ID: ${widget.bookingId} ---",
+                        );
+                        // Call API to update payment status
+                        try {
+                          final prefs = await SharedPreferences.getInstance();
+                          final String? token = prefs.getString('auth_token');
+                          String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.updateNursePaymentStatus}";
+                          
+                          final Map<String, dynamic> data = {'booking_id': widget.bookingId.toString()};
+                          final dio_instance.FormData formData = dio_instance.FormData.fromMap(data);
+
+                          print("--- [PendingBookingDetails] Request: POST $url ---");
+                          
+                          final response = await ApiConfigs.dio.post(
+                            url,
+                            data: formData,
+                            options: dio_instance.Options(headers: {
+                              'Accept': 'application/json',
+                              if (token != null) 'Authorization': 'Bearer $token',
+                            }),
+                          );
+
+                          print("--- [PendingBookingDetails] Response: ${response.statusCode} ---");
+                          print("--- [PendingBookingDetails] Data: ${response.data} ---");
+                        } catch (e) {
+                          print("--- [PendingBookingDetails] API ERROR: $e ---");
+                        }
+
+                        Get.to(
+                          PaymentSuccess(
+                            data: {
+                              'name': details['name'],
+                              'location': details['location'],
+                              'qualification': details['qualification'],
+                              'experience': details['experience'],
+                              'image': details['image'],
+                              'checkin_date': details['checkin_date'],
+                              'checkin_time': details['checkin_time'],
+                              'languages':
+                                  (details['languages'] as List?)
+                                      ?.map((l) => l['language'] ?? l)
+                                      .toList(),
+                            },
+                          ),
+                        );
                       },
                       text: Strings.makePayment,
                     ),

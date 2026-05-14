@@ -50,18 +50,16 @@ class OtherServicesGrid extends StatelessWidget {
                             height: 30,
                             width: 30,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => SvgPicture.asset(
-                              "lib/Assets/Images/OtherServicesIcon1.svg",
-                              height: 30,
-                              width: 30,
-                            ),
+                            errorBuilder: (_, __, ___) => const Icon(Icons.image_outlined, size: 30, color: Colors.white),
                           )
-                        : SvgPicture.asset(
-                            otherServicesList[index]['icon'].toString(),
-                            height: 30,
-                            width: 30,
-                            fit: BoxFit.contain,
-                          ),
+                        : (otherServicesList[index]['icon'].toString().isNotEmpty
+                            ? SvgPicture.asset(
+                                otherServicesList[index]['icon'].toString(),
+                                height: 30,
+                                width: 30,
+                                fit: BoxFit.contain,
+                              )
+                            : const Icon(Icons.image_outlined, size: 30, color: Colors.white)),
                   ),
                SizedBox(height: 5,),
                Expanded(

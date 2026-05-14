@@ -279,7 +279,23 @@ class NurseBookingController extends GetxController {
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
-        Get.to(() => RequestSentSuccess());
+        Get.to(
+          () => RequestSentSuccess(
+            data: {
+              'name': nurseData?['name'],
+              'location': nurseData?['location'],
+              'qualification': nurseData?['qualification'],
+              'experience': nurseData?['experience'],
+              'image': nurseData?['image'],
+              'checkin_date': fromDate,
+              'checkin_time': checkinTimeController.text,
+              'languages':
+                  (nurseData?['languages'] as List?)
+                      ?.map((l) => l['language'] ?? l)
+                      .toList(),
+            },
+          ),
+        );
       } else {
         if (Get.context != null) {
           ScaffoldMessenger.of(Get.context!).showSnackBar(

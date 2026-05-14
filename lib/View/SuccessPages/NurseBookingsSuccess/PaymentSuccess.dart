@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:get/get.dart';
+import 'package:waada_customerapp/View/Home/Home.dart';
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import '../../../Resource/Strings.dart';
 import '../../Home/HomeNurseDetailsWidget.dart';
 import '../../Login/SubmitButtonWidget.dart';
 
-
 class PaymentSuccess extends StatelessWidget {
+  final Map<String, dynamic>? data;
+  const PaymentSuccess({super.key, this.data});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +48,25 @@ class PaymentSuccess extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  HomeNurseDetailsWidget(showButton: false,buttonText: "",)
+                  HomeNurseDetailsWidget(
+                    showButton: false,
+                    buttonText: "",
+                    name: data?['name']?.toString() ?? "Nurse Name",
+                    location: data?['location']?.toString() ?? "Location",
+                    qualification:
+                        data?['qualification']?.toString() ?? "Qualification",
+                    experience: "${data?['experience'] ?? 0} Years of Experience",
+                    checkInDate: data?['checkin_date'] ?? "",
+                    checkInTime: data?['checkin_time'] ?? "",
+                    languages:
+                        (data?['languages'] as List?)?.join(", ") ??
+                        "Languages",
+                    imagePath:
+                        (data?['image'] != null &&
+                                data!['image'].toString().isNotEmpty)
+                            ? "${ApiConfigs.IMAGE_URL}${data!['image']}"
+                            : 'lib/Assets/Images/nurse.png',
+                  ),
                 ],
               ),
             ),
@@ -63,26 +85,31 @@ class PaymentSuccess extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  flex:1,
-                  child:  SvgPicture.asset(
-                    "lib/Assets/Images/homebutton.svg",
-                    width: 40,
-                    height: 50,
+                  flex: 1,
+                  child: InkWell(
+                    onTap: () {
+                      Get.offAll(() => const Home());
+                    },
+                    child: SvgPicture.asset(
+                      "lib/Assets/Images/homebutton.svg",
+                      width: 40,
+                      height: 50,
+                    ),
                   ),
                 ),
                 Expanded(
-                  flex:4,
+                  flex: 4,
                   child: SubmitButtonWidget(
-                    onTap:(){
-
+                    onTap: () {
+                      Get.offAll(() => const Home());
                     },
-                    text:Strings.sharelocation,
+                    text: Strings.sharelocation,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 30,)
+          SizedBox(height: 30),
         ],
       ),
     );

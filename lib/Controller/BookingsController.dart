@@ -1,13 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:waada_customerapp/View/SuccessPages/DoctorBookingsSuccess/DoctorRequestSentSuccess.dart';
 import '../Configs/ApiConfigs.dart';
 import '../Resource/Colors.dart';
 import '../Resource/Strings.dart';
 import '../View/Login/SubmitButtonWidget.dart';
 import '../View/SuccessPages/DoctorBookingsSuccess/DoctorPaymentSuccess.dart';
+import '../View/SuccessPages/NurseBookingsSuccess/CancelBookingSuccess.dart';
 import '../Widgets/widgets.dart';
 
 class BookingsController extends GetxController {
@@ -25,6 +27,53 @@ class BookingsController extends GetxController {
     super.onInit();
     print("BookingsController initialized");
     fetchNurseBookings();
+  }
+
+  Future<void> updateNursePaymentStatus(int bookingId) async {
+    print(
+      "--- [BookingsController] updateNursePaymentStatus triggered for ID: $bookingId ---",
+    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.updateNursePaymentStatus}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final Map<String, dynamic> data = {'booking_id': bookingId.toString()};
+      print("--- [BookingsController] Request: POST $url ---");
+      print("--- [BookingsController] Headers: $headers ---");
+      print("--- [BookingsController] Body: $data ---");
+
+      final FormData formData = FormData.fromMap(data);
+
+      final response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      print(
+        "--- [BookingsController] Response Status: ${response.statusCode} ---",
+      );
+      print("--- [BookingsController] Response Data: ${response.data} ---");
+
+      if (response.statusCode == 200 &&
+          (response.data['success'] == true ||
+              response.data['success'].toString() == "true")) {
+        print("--- [BookingsController] Payment status update SUCCESS ---");
+      } else {
+        print(
+          "--- [BookingsController] Payment status update FAILED (check data) ---",
+        );
+      }
+    } catch (e) {
+      print("--- [BookingsController] API EXCEPTION: $e ---");
+    }
   }
 
   Future<void> fetchBookingDetails(int bookingId) async {
@@ -158,6 +207,103 @@ class BookingsController extends GetxController {
     return [];
   }
 
+  Future<void> bookHomeVisit({
+    required String doctorId,
+    required String? memberId,
+    required String date,
+    required String startTime,
+    required String endTime,
+    required String consultationFee,
+    required String total,
+    required Map<String, dynamic>? doctorData,
+    required Map<String, dynamic>? bookingData,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.bookHomeVisit}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      String formatTo24h(String time) {
+        try {
+          final parts = time.split(' ');
+          if (parts.length < 2) return time;
+          final timeParts = parts[0].split(':');
+          int hour = int.parse(timeParts[0]);
+          final minute = timeParts[1];
+          final ampm = parts[1].toUpperCase();
+
+          if (ampm == 'PM' && hour < 12) hour += 12;
+          if (ampm == 'AM' && hour == 12) hour = 0;
+
+          return "${hour.toString().padLeft(2, '0')}:$minute";
+        } catch (e) {
+          return time;
+        }
+      }
+
+      final Map<String, dynamic> data = {
+        'doctor_id': doctorId,
+        if (memberId != null) 'member_id': memberId,
+        'date': date,
+        'start_time': formatTo24h(startTime),
+        'end_time': formatTo24h(endTime),
+        'consultation_fee': consultationFee,
+        'total': total,
+        'service_fee': "",
+        'commision': "",
+      };
+
+      print("--- [BookingsController] bookHomeVisit Request ---");
+      print("URL: $url");
+      print("Body: $data");
+
+      final FormData formData = FormData.fromMap(data);
+
+      final response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      print("--- [BookingsController] bookHomeVisit Response ---");
+      print("Status: ${response.statusCode}");
+      print("Data: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          (response.data['status'] == true ||
+              response.data['status'].toString() == "true")) {
+        Get.to(
+          () => DoctorRequestSentSuccess(
+            bookingType: "home",
+            msg:
+                response.data['message'] ??
+                "Home visit request sent successfully.",
+            doctorData: doctorData,
+            bookingData: bookingData,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.data['message'] ?? "Failed to book home visit",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print("--- [BookingsController] bookHomeVisit EXCEPTION: $e ---");
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text("An error occurred during booking")),
+      );
+    }
+  }
+
   Future<void> cancelBooking(int bookingId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -183,8 +329,25 @@ class BookingsController extends GetxController {
           ),
         );
         fetchNurseBookings();
+        final details = selectedBookingDetails?['booking_details'];
         Get.back(); // Close the bottom sheet
-        Get.back(); // Close the details page
+        Get.off(
+          () => CancelBookingSuccess(
+            data: {
+              'name': details?['name'],
+              'location': details?['location'],
+              'qualification': details?['qualification'],
+              'experience': details?['experience'],
+              'image': details?['image'],
+              'checkin_date': details?['checkin_date'],
+              'checkin_time': details?['checkin_time'],
+              'languages':
+                  (details?['languages'] as List?)
+                      ?.map((l) => l['language'] ?? l)
+                      .toList(),
+            },
+          ),
+        );
       } else {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           SnackBar(
@@ -245,8 +408,10 @@ class BookingsController extends GetxController {
     BuildContext context,
     String selectedMethod,
     Function(String) onChanged,
-    VoidCallback onPay,
-  ) {
+    VoidCallback onPay, {
+    Map<String, dynamic>? doctorData,
+    Map<String, dynamic>? bookingData,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -342,7 +507,12 @@ class BookingsController extends GetxController {
                     SubmitButtonWidget(
                       text: Strings.payText,
                       onTap: () {
-                        Get.off(DoctorPaymentSuccess());
+                        Get.off(
+                          () => DoctorPaymentSuccess(
+                            doctorData: doctorData,
+                            bookingData: bookingData,
+                          ),
+                        );
                       },
                     ),
                   ],

@@ -43,15 +43,17 @@ class CarouselSliderWidget extends StatelessWidget {
                         ? Image.network(
                             url,
                             fit: BoxFit.fill,
-                            errorBuilder: (_, __, ___) => Image.asset(
-                              'lib/Assets/Images/carousalSliderDummy.png',
-                              fit: BoxFit.fill,
+                            errorBuilder: (_, __, ___) => const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: Colors.grey,
+                                size: 40,
+                              ),
                             ),
                           )
-                        : Image.asset(
-                            url,
-                            fit: BoxFit.fill,
-                          ),
+                        : (url.isNotEmpty
+                            ? Image.asset(url, fit: BoxFit.fill)
+                            : const SizedBox.shrink()),
                   );
                 },
               );

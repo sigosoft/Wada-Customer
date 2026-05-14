@@ -76,7 +76,7 @@ class _RegisterState extends State<Register> {
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: Form(
-                  key: controller.formKey,
+                  key: controller.registerFormKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

@@ -76,7 +76,7 @@ class _VideoConsultState extends State<VideoConsult> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: SubmitButtonWidget(
                     onTap: () {
-                      Get.to(BookingDetails(
+                      Get.to(() => BookingDetails(
                         bookingType: "video",
                         doctorData: doctorData,
                       ));

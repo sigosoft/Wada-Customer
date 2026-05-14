@@ -13,7 +13,7 @@ import 'package:waada_customerapp/View/Home/HomeHorizontalScrollingWidget.dart';
 import 'package:waada_customerapp/View/Home/HomeNurseDetailsWidget.dart';
 import 'package:waada_customerapp/View/Home/OtherServicesGridWidget.dart';
 import 'package:waada_customerapp/View/Map/ChooseLocation.dart';
-import 'package:waada_customerapp/View/NurseBookings/ShareLocationBookingDetails.dart';
+import 'package:waada_customerapp/View/NurseBookings/UpcomingBookingDetails.dart';
 import 'package:waada_customerapp/View/ServiceListing/ServiceListing.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
@@ -70,42 +70,48 @@ class _HomeItemState extends State<HomeItem> {
                                   });
                                 },
                               ),
-                              const SizedBox(height: 5),
-                              const TextStyleInterForSplash(
-                                text: Strings.approved,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                                size: 16.00,
-                              ),
-                              const SizedBox(height: 10),
-                              if (controller.specializationsList.isNotEmpty)
-                                ...controller.specializationsList.map((spec) {
+                              if (controller.approvedBookings.isNotEmpty) ...[
+                                const TextStyleInterForSplash(
+                                  text: Strings.approved,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                  size: 16.00,
+                                ),
+                                const SizedBox(height: 10),
+                                ...controller.approvedBookings.map((booking) {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: InkWell(
                                       onTap: () {
-                                        Get.to(
-                                          () => ShareLocationBookingDetails(
-                                            bookingId: spec['id']?.toString(),
-                                          ),
-                                        );
+                                        Get.to(() => UpcomingBookingDetails());
                                       },
                                       child: HomeNurseDetailsWidget(
-                                        name:
-                                            spec['specialist']?.toString() ??
-                                            "Specialist",
+                                        name: booking['name'] ?? "Nurse Name",
+                                        location:
+                                            booking['location'] ?? "Location",
                                         qualification:
-                                            spec['specialization']
-                                                ?.toString() ??
+                                            booking['qualification'] ??
                                             "Qualification",
+                                        experience:
+                                            "${booking['experience'] ?? 0} Years of Experience",
+                                        checkInDate:
+                                            booking['checkin_date'] ?? "",
+                                        checkInTime:
+                                            booking['checkin_time'] ?? "",
+                                        languages:
+                                            (booking['languages'] as List?)
+                                                ?.join(", ") ??
+                                            "Languages",
                                         imagePath:
-                                            spec['image'] != null
-                                                ? "${ApiConfigs.IMAGE_URL}${spec['image']}"
+                                            booking['image'] != null
+                                                ? "${ApiConfigs.IMAGE_URL}${booking['image']}"
                                                 : 'lib/Assets/Images/nurse.png',
                                         onTapButton: () {
                                           Get.to(
                                             () => ChooseLocation(
-                                              bookingId: spec['id']?.toString(),
+                                              bookingId:
+                                                  booking['booking_id']
+                                                      ?.toString(),
                                             ),
                                           );
                                         },
@@ -114,21 +120,9 @@ class _HomeItemState extends State<HomeItem> {
                                       ),
                                     ),
                                   );
-                                }).toList()
-                              else
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(() => ShareLocationBookingDetails());
-                                  },
-                                  child: HomeNurseDetailsWidget(
-                                    onTapButton: () {
-                                      Get.to(() => ChooseLocation());
-                                    },
-                                    showButton: true,
-                                    buttonText: Strings.shareYourLocation,
-                                  ),
-                                ),
-                              const SizedBox(height: 15),
+                                }).toList(),
+                                const SizedBox(height: 15),
+                              ],
                               HomeHorizontalScrollingWidget(
                                 screenList: controller.screenWidgets,
                                 homeRowWidgetItems:

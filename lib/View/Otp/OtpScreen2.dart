@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:waada_customerapp/Controller/RegisterController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Home/Home.dart';
@@ -49,8 +50,8 @@ class _OtpScreen2State extends State<OtpScreen2> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: GetBuilder(
-            init: LoginController(),
+          child: GetBuilder<LoginController>(
+            init: Get.isRegistered<LoginController>() ? null : LoginController(),
             builder:
                 (controller) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +78,11 @@ class _OtpScreen2State extends State<OtpScreen2> {
                       child: SubmitButtonWidget(
                         text: Strings.verify,
                         onTap: () {
-                          controller.login();
+                          if (Get.isRegistered<Registercontroller>()) {
+                            Get.find<Registercontroller>().register();
+                          } else {
+                            controller.login();
+                          }
                         },
                       ),
                     ),

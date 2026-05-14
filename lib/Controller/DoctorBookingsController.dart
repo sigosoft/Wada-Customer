@@ -21,7 +21,11 @@ class DoctorBookingsController extends GetxController {
   }
 
 
-  void showCancelShiftBottomSheet(BuildContext context) {
+  void showCancelShiftBottomSheet(
+    BuildContext context, {
+    Map<String, dynamic>? doctorData,
+    Map<String, dynamic>? bookingData,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -93,7 +97,12 @@ class DoctorBookingsController extends GetxController {
                         height: 45,
                         child: ElevatedButton(
                           onPressed: () {
-                             Get.to(DoctorCancelBookingSuccess());
+                            Get.to(
+                              DoctorCancelBookingSuccess(
+                                doctorData: doctorData,
+                                bookingData: bookingData,
+                              ),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colorPrimary,
@@ -112,8 +121,6 @@ class DoctorBookingsController extends GetxController {
                         ),
                       ),
                     ),
-            
-            
                   ],
                 ),
                 SizedBox(height: 20),

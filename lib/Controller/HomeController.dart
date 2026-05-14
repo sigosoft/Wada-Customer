@@ -29,7 +29,7 @@ class HomeController extends GetxController {
     print("HomeController initialized");
     getCurrentLocation();
     fetchHomeData();
-    fetchSpecializations();
+    fetchApprovedBookings();
     fetchOtherServices();
     fetchHours();
   }
@@ -74,14 +74,19 @@ class HomeController extends GetxController {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         currentCity = place.locality ?? "Raipur";
-        
+
         // Build address string carefully
         List<String> parts = [];
-        if (place.name != null && place.name!.isNotEmpty) parts.add(place.name!);
-        if (place.subLocality != null && place.subLocality!.isNotEmpty) parts.add(place.subLocality!);
-        if (place.locality != null && place.locality!.isNotEmpty) parts.add(place.locality!);
-        if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) parts.add(place.administrativeArea!);
-        
+        if (place.name != null && place.name!.isNotEmpty)
+          parts.add(place.name!);
+        if (place.subLocality != null && place.subLocality!.isNotEmpty)
+          parts.add(place.subLocality!);
+        if (place.locality != null && place.locality!.isNotEmpty)
+          parts.add(place.locality!);
+        if (place.administrativeArea != null &&
+            place.administrativeArea!.isNotEmpty)
+          parts.add(place.administrativeArea!);
+
         currentAddress = parts.join(", ");
         update();
       }
@@ -95,7 +100,7 @@ class HomeController extends GetxController {
   Future<void> onRefresh() async {
     await Future.wait([
       fetchHomeData(),
-      fetchSpecializations(),
+      fetchApprovedBookings(),
       fetchOtherServices(),
       fetchHours(),
     ]);
@@ -147,28 +152,12 @@ class HomeController extends GetxController {
           response.data['status'].toString() == "true") {
         final List otherServices = response.data['data'] ?? [];
         if (otherServices.isNotEmpty) {
-          final localIcons = [
-            "lib/Assets/Images/OtherServicesIcon1.svg",
-            "lib/Assets/Images/OtherServicesIcon2.svg",
-            "lib/Assets/Images/OtherServicesIcon3.svg",
-            "lib/Assets/Images/OtherServicesIcon4.svg",
-            "lib/Assets/Images/OtherServicesIcon5.svg",
-            "lib/Assets/Images/OtherServicesIcon6.svg",
-          ];
           otherServicesList =
-              otherServices.asMap().entries.map((entry) {
-                final i = entry.key;
-                final s = entry.value;
+              otherServices.map((s) {
                 final name = s['name']?.toString() ?? '';
                 final imageUrl = _fullImageUrl(s['image']?.toString());
-                final icon =
-                    imageUrl.isNotEmpty
-                        ? imageUrl
-                        : (i < localIcons.length
-                            ? localIcons[i]
-                            : localIcons.last);
                 return <String, dynamic>{
-                  'icon': icon,
+                  'icon': imageUrl,
                   'name': name,
                   'route': _routeFor(name),
                 };
@@ -182,13 +171,14 @@ class HomeController extends GetxController {
     }
   }
 
-  List<dynamic> specializationsList = [];
+  List<dynamic> approvedBookings = [];
 
-  Future<void> fetchSpecializations() async {
+  Future<void> fetchApprovedBookings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
-      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.specializations}";
+      String url =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=1";
 
       final headers = {
         'Accept': 'application/json',
@@ -197,18 +187,23 @@ class HomeController extends GetxController {
 
       final response = await _dio.get(url, options: Options(headers: headers));
 
-      if (response.statusCode == 200) {
-        // The API might return a list directly or wrapped in 'data'
-        if (response.data is List) {
-          specializationsList = response.data;
-        } else if (response.data['status'].toString() == "true") {
-          specializationsList = response.data['data'] ?? [];
-        }
+      if (response.statusCode == 200 &&
+          response.data['success'].toString() == "true") {
+        List allBookings = response.data['data']['data'] ?? [];
+        approvedBookings =
+            allBookings
+                .where((b) => b['booking_status'].toString() == "1")
+                .toList();
+        print("Approved Bookings Parsed: ${approvedBookings.length}");
+        update();
+      } else {
+        print("Approved Bookings API failed or returned false success");
+        approvedBookings = [];
         update();
       }
     } catch (e) {
-      print("--- API Error (Specializations) ---");
-      print("Error fetching specializations: $e");
+      print("--- API Error (Approved Bookings) ---");
+      print("Error fetching approved bookings: $e");
     }
   }
 
@@ -222,30 +217,10 @@ class HomeController extends GetxController {
   int currentIndex2 = 0;
 
   // Carousel image URLs - populated from API (main_sliders)
-  List<String> imageUrls = [
-    'lib/Assets/Images/carousalSliderDummy.png',
-    'lib/Assets/Images/carousalSliderDummy.png',
-    'lib/Assets/Images/carousalSliderDummy.png',
-  ];
+  List<String> imageUrls = [];
 
   // Main services - populated from API (mainServiceNames)
-  List<Map<String, String>> homeRowWidgetItems = [
-    {
-      'icon': "lib/Assets/Images/HomeScreenRowIcon1.svg",
-      'name': 'Doctor',
-      'description': 'Browse by specialty, availability, and location.',
-    },
-    {
-      'icon': 'lib/Assets/Images/HomeScreenRowIcon2.svg',
-      'name': 'Nurses',
-      'description': 'Home care services & appointment booking.',
-    },
-    {
-      'icon': 'lib/Assets/Images/HomeScreenRowIcon3.svg',
-      'name': 'Blood Bank',
-      'description': 'Home care services & appointment booking.',
-    },
-  ];
+  List<Map<String, String>> homeRowWidgetItems = [];
 
   List<Widget> screenWidgets = [
     DoctorsListingListing(),
@@ -254,45 +229,10 @@ class HomeController extends GetxController {
   ];
 
   // Other services - populated from API (otherServiceNames)
-  List<Map<String, dynamic>> otherServicesList = [
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon1.svg",
-      'name': 'Ambulance',
-      'route': () => Get.to(() => Ambulance()),
-    },
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon2.svg",
-      'name': 'Pathology Lab',
-      'route': () => Get.to(() => Laboratory()),
-    },
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon3.svg",
-      'name': 'Diagnostic Center',
-      'route': () => Get.to(() => Ambulance()),
-    },
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon4.svg",
-      'name': 'Medical Equipment',
-      'route': () => Get.to(() => Ambulance()),
-    },
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon5.svg",
-      'name': 'Medical Store',
-      'route': () => Get.to(() => MedicalStore()),
-    },
-    {
-      'icon': "lib/Assets/Images/OtherServicesIcon6.svg",
-      'name': 'Laboratories',
-      'route': () => Get.to(() => Laboratory()),
-    },
-  ];
+  List<Map<String, dynamic>> otherServicesList = [];
 
   // Bottom carousel image URLs - populated from API (bottom_sliders)
-  List<String> imageUrls2 = [
-    'lib/Assets/Images/homeSliderDummyImage.png',
-    'lib/Assets/Images/homeSliderDummyImage.png',
-    'lib/Assets/Images/homeSliderDummyImage.png',
-  ];
+  List<String> imageUrls2 = [];
 
   // Helper: build a widget for a given service name from API
   Widget _widgetFor(String name) {
@@ -365,34 +305,24 @@ class HomeController extends GetxController {
 
         // --- Parse main_sliders (first carousel) ---
         final mainSliders = homeData?['main_sliders'];
-        if (mainSliders != null &&
-            mainSliders is List &&
-            mainSliders.isNotEmpty) {
-          final parsedUrls =
+        if (mainSliders != null && mainSliders is List) {
+          imageUrls =
               mainSliders
                   .map((s) => _fullImageUrl(s['image']?.toString()))
                   .where((u) => u.isNotEmpty)
                   .toList();
-          if (parsedUrls.isNotEmpty) {
-            imageUrls = List<String>.from(parsedUrls);
-            print("main_sliders parsed: $imageUrls");
-          }
+          print("main_sliders parsed: $imageUrls");
         }
 
         // --- Parse bottom_sliders (second carousel) ---
         final bottomSliders = homeData?['bottom_sliders'];
-        if (bottomSliders != null &&
-            bottomSliders is List &&
-            bottomSliders.isNotEmpty) {
-          final parsedUrls =
+        if (bottomSliders != null && bottomSliders is List) {
+          imageUrls2 =
               bottomSliders
                   .map((s) => _fullImageUrl(s['image']?.toString()))
                   .where((u) => u.isNotEmpty)
                   .toList();
-          if (parsedUrls.isNotEmpty) {
-            imageUrls2 = List<String>.from(parsedUrls);
-            print("bottom_sliders parsed: $imageUrls2");
-          }
+          print("bottom_sliders parsed: $imageUrls2");
         }
 
         // --- Parse mainServiceNames (horizontal scroll) ---
@@ -400,25 +330,11 @@ class HomeController extends GetxController {
         if (mainServices != null &&
             mainServices is List &&
             mainServices.isNotEmpty) {
-          final localIcons = [
-            "lib/Assets/Images/HomeScreenRowIcon1.svg",
-            "lib/Assets/Images/HomeScreenRowIcon2.svg",
-            "lib/Assets/Images/HomeScreenRowIcon3.svg",
-          ];
           homeRowWidgetItems =
-              mainServices.asMap().entries.map((entry) {
-                final i = entry.key;
-                final s = entry.value;
+              mainServices.map((s) {
                 final imageUrl = _fullImageUrl(s['image']?.toString());
-                // Use network image if available, else fall back to local SVG icon
-                final icon =
-                    imageUrl.isNotEmpty
-                        ? imageUrl
-                        : (i < localIcons.length
-                            ? localIcons[i]
-                            : localIcons.last);
                 return {
-                  'icon': icon,
+                  'icon': imageUrl,
                   'name': s['name']?.toString() ?? '',
                   'description': s['description']?.toString() ?? '',
                 };
@@ -440,28 +356,12 @@ class HomeController extends GetxController {
         if (otherServices != null &&
             otherServices is List &&
             otherServices.isNotEmpty) {
-          final localIcons = [
-            "lib/Assets/Images/OtherServicesIcon1.svg",
-            "lib/Assets/Images/OtherServicesIcon2.svg",
-            "lib/Assets/Images/OtherServicesIcon3.svg",
-            "lib/Assets/Images/OtherServicesIcon4.svg",
-            "lib/Assets/Images/OtherServicesIcon5.svg",
-            "lib/Assets/Images/OtherServicesIcon6.svg",
-          ];
           otherServicesList =
-              otherServices.asMap().entries.map((entry) {
-                final i = entry.key;
-                final s = entry.value;
+              otherServices.map((s) {
                 final name = s['name']?.toString() ?? '';
                 final imageUrl = _fullImageUrl(s['image']?.toString());
-                final icon =
-                    imageUrl.isNotEmpty
-                        ? imageUrl
-                        : (i < localIcons.length
-                            ? localIcons[i]
-                            : localIcons.last);
                 return <String, dynamic>{
-                  'icon': icon,
+                  'icon': imageUrl,
                   'name': name,
                   'route': _routeFor(name),
                 };

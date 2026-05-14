@@ -17,18 +17,12 @@ class MemberDropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<dynamic> displayMembers =
-        members ??
-        [
-          {'id': 'Merlin Joy', 'name': 'Merlin Joy'},
-          {'id': 'Joy', 'name': 'Joy'},
-          {'id': 'Cristina', 'name': 'Cristina'},
-        ];
+    final List<dynamic> displayMembers = members ?? [];
 
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: DropdownButtonFormField<dynamic>(
-        value: selectedMemberId ?? (members == null ? 'Merlin Joy' : null),
+        value: selectedMemberId,
         items:
             displayMembers.map((member) {
               return DropdownMenuItem<dynamic>(

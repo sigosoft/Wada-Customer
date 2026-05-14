@@ -57,47 +57,53 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: SvgPicture.asset(
-                  "lib/Assets/Images/WaadaSymbol.svg",
-                  fit: BoxFit.scaleDown,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20), // Added top spacing
+                Center(
+                  child: SvgPicture.asset(
+                    "lib/Assets/Images/WaadaSymbol.svg",
+                    fit: BoxFit.scaleDown,
+                    height: 100, // Added size
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              SvgPicture.asset(
-                "lib/Assets/Images/splashImage.svg",
-                fit: BoxFit.scaleDown,
-              ),
-              SizedBox(height: 50),
-              TextStyleInterForSplash(
-                text: "Lorem ipsum",
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                size: 20.00,
-              ),
-              SizedBox(height: 20),
-              TextStyleInterForSplash(
-                text:
-                    "Quis autem vel eum iure reprehenderit qui in eareda voluptate velit.",
-                color: Colors.white,
-                fontWeight: FontWeight.w400,
-                size: 16.00,
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 40),
-              ButtonWidget(
-                onTap: () {
-                  Get.to(OnboardingScreen());
-                },
-                text: "Get Started",
-              ),
-            ],
+                SizedBox(height: 35), // Increased spacing
+                SvgPicture.asset(
+                  "lib/Assets/Images/splashImage.svg",
+                  fit: BoxFit.scaleDown,
+                  width: 300, // Added size
+                ),
+                SizedBox(height: 25),
+                TextStyleInterForSplash(
+                  text: "Lorem ipsum",
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  size: 20.00,
+                ),
+                SizedBox(height: 20),
+                TextStyleInterForSplash(
+                  text:
+                      "Quis autem vel eum iure reprehenderit qui in eareda voluptate velit.",
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  size: 16.00,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+                ButtonWidget(
+                  onTap: () {
+                    Get.to(() => OnboardingScreen());
+                  },
+                  text: "Get Started",
+                ),
+                SizedBox(height: 30), // Added bottom spacing
+              ],
+            ),
           ),
         ),
       ),

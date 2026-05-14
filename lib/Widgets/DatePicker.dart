@@ -4,21 +4,28 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import '../Resource/Strings.dart';
 
 class DatePicker extends StatefulWidget {
-  const DatePicker({super.key});
+  final TextEditingController? controller;
+  const DatePicker({super.key, this.controller});
 
   @override
   State<DatePicker> createState() => _DatePickerState();
 }
 
 class _DatePickerState extends State<DatePicker> {
-  final TextEditingController _dateController = TextEditingController();
+  late TextEditingController _dateController;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateController = widget.controller ?? TextEditingController();
+  }
 
   Future<void> _openDatePicker(BuildContext context) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -84,10 +91,7 @@ class _DatePickerState extends State<DatePicker> {
                     ),
                     suffixIcon: Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: Icon(
-                        Icons.calendar_today,
-                        color: Colors.black,
-                      ),
+                      child: Icon(Icons.calendar_today, color: Colors.black),
                     ),
                     filled: true,
                     fillColor: const Color(0xFFF3F3F3),

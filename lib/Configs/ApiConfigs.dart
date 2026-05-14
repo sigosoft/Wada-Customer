@@ -24,6 +24,7 @@ class ApiEndPoints {
   static String sendLoginOtp = "send_login_otp";
   static String logout = "logout";
   static String sendRegOtp = "send_reg_otp";
+  static String register = "register";
   static String home = "home";
   static String specializations = "specializations";
   static String otherServiceNames = "otherServiceNames";
@@ -52,4 +53,6 @@ class ApiEndPoints {
   static String shareLocation = "shareLocation";
   static String cancelBooking = "cancelBooking";
   static String doctorDetails = "doctorDetails";
+  static String updateNursePaymentStatus = "updateNursePaymentStatus";
+  static String bookHomeVisit = "bookHomeVisit";
 }
