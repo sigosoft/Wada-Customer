@@ -50,16 +50,13 @@ class BookingsTabBarItem2 extends StatelessWidget {
           );
         }
 
-        if (swapValue && bookings.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.3,
-            ),
-            child: const Center(
-              child: Text(
-                "No bookings found",
-                style: TextStyle(color: Colors.grey),
-              ),
+        if ((swapValue && bookings.isEmpty) || !swapValue) {
+          return Center(
+            child: Image.asset(
+              'lib/Assets/Images/No bookings.png',
+              height: MediaQuery.of(context).size.height * 0.25,
+              width: MediaQuery.of(context).size.width * 0.5,
+              fit: BoxFit.contain,
             ),
           );
         }
@@ -119,19 +116,20 @@ class BookingsTabBarItem2 extends StatelessWidget {
                               "Languages",
                         ),
                       )
-                    : InkWell(
-                        onTap: () {
-                          Get.to(
-                            DoctorUpcomingBookingDetails(
-                              bookingType: "home",
-                            ),
-                          );
-                        },
-                        child: BookingsDoctorDetailsWidget(
-                          showButton: true,
-                          buttonText: "Join",
-                        ),
-                      ),
+                    : const SizedBox.shrink(),
+                    // InkWell(
+                    //     onTap: () {
+                    //       Get.to(
+                    //         DoctorUpcomingBookingDetails(
+                    //           bookingType: "home",
+                    //         ),
+                    //       );
+                    //     },
+                    //     child: BookingsDoctorDetailsWidget(
+                    //       showButton: true,
+                    //       buttonText: "Join",
+                    //     ),
+                    //   ),
               );
             },
           ),

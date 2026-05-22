@@ -141,7 +141,6 @@ class _HomeItemState extends State<HomeItem> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      // Handle view all action
                                       Get.to(() => ServiceListing());
                                     },
                                     child: const TextStyleInterForSplash(

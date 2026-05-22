@@ -26,11 +26,18 @@ class HomeHorizontalScrollingWidget extends StatelessWidget {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                if (screenList != null && screenList.isNotEmpty) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => screenList[index]),
-                  );
+                final String name = homeRowWidgetItems[index]['name']?.toString().toLowerCase() ?? '';
+                final bool isNurse = name.contains('nurse') || name.contains('nursing');
+                final bool isBlood = name.contains('blood') || name.contains('donate');
+                if (!isNurse && !isBlood) {
+                  showComingSoonDialog(context);
+                } else {
+                  if (screenList != null && screenList.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => screenList[index]),
+                    );
+                  }
                 }
               },
               child: Container(

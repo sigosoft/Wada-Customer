@@ -5,6 +5,7 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/HealthCardMedicalRecords/CompleteHealthCards.dart';
 import 'package:waada_customerapp/View/HealthCardMedicalRecords/HealthcardMedicalRecords.dart';
+import 'package:waada_customerapp/Widgets/widgets.dart';
 
 // import 'package:waada_customerapp/View/FamilyMember/FamilyMemberScreen.dart';
 import 'package:waada_customerapp/View/Membership/MemberShipScreen.dart';
@@ -65,7 +66,7 @@ class _ProfileState extends State<Profile> {
                     SizedBox(height: 15),
                     InkWell(
                       onTap: () {
-                        Get.to(CompleteHealthCards());
+                        showComingSoonDialog(context);
                       },
                       child: HealthCardWidget(),
                     ),

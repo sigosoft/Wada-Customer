@@ -22,9 +22,18 @@ class OtherServicesGrid extends StatelessWidget {
         itemCount: otherServicesList.length,
         itemBuilder: (context, index) {
           return InkWell(
-            onTap: otherServicesList[index]['route'] != null
-                ? () => otherServicesList[index]['route']()
-                : onTap,
+            onTap: () {
+              final String name = otherServicesList[index]['name']?.toString().toLowerCase() ?? '';
+              if (name.contains('blood')) {
+                if (otherServicesList[index]['route'] != null) {
+                  otherServicesList[index]['route']();
+                } else if (onTap != null) {
+                  onTap();
+                }
+              } else {
+                showComingSoonDialog(context);
+              }
+            },
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -44,25 +53,39 @@ class OtherServicesGrid extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.all(10.0),
-                    child: otherServicesList[index]['icon'].toString().startsWith('http')
-                        ? Image.network(
-                            otherServicesList[index]['icon'].toString(),
-                            height: 30,
-                            width: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.image_outlined, size: 30, color: Colors.white),
-                          )
-                        : (otherServicesList[index]['icon'].toString().isNotEmpty
-                            ? SvgPicture.asset(
-                                otherServicesList[index]['icon'].toString(),
-                                height: 30,
-                                width: 30,
-                                fit: BoxFit.contain,
-                              )
-                            : const Icon(Icons.image_outlined, size: 30, color: Colors.white)),
+                    child:
+                        otherServicesList[index]['icon'].toString().startsWith(
+                              'http',
+                            )
+                            ? Image.network(
+                              otherServicesList[index]['icon'].toString(),
+                              height: 30,
+                              width: 30,
+                              fit: BoxFit.contain,
+                              errorBuilder:
+                                  (_, __, ___) => const Icon(
+                                    Icons.image_outlined,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                            )
+                            : (otherServicesList[index]['icon']
+                                    .toString()
+                                    .isNotEmpty
+                                ? SvgPicture.asset(
+                                  otherServicesList[index]['icon'].toString(),
+                                  height: 30,
+                                  width: 30,
+                                  fit: BoxFit.contain,
+                                )
+                                : const Icon(
+                                  Icons.image_outlined,
+                                  size: 30,
+                                  color: Colors.white,
+                                )),
                   ),
-               SizedBox(height: 5,),
-               Expanded(
+                  SizedBox(height: 5),
+                  Expanded(
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: TextStyleInterWithoutPadding(
