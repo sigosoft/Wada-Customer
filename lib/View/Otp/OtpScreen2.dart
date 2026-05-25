@@ -24,6 +24,10 @@ class OtpScreen2 extends StatefulWidget {
 class _OtpScreen2State extends State<OtpScreen2> {
   @override
   Widget build(BuildContext context) {
+    print("OtpScreen2 build, LoginController isRegistered: ${Get.isRegistered<LoginController>()}");
+    if (Get.isRegistered<LoginController>()) {
+      print("LoginController phoneController text: ${Get.find<LoginController>().phoneController.text}");
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -51,7 +55,9 @@ class _OtpScreen2State extends State<OtpScreen2> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: GetBuilder<LoginController>(
-            init: Get.isRegistered<LoginController>() ? null : LoginController(),
+            init: Get.isRegistered<LoginController>()
+                ? Get.find<LoginController>()
+                : Get.put(LoginController(), permanent: true),
             builder:
                 (controller) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

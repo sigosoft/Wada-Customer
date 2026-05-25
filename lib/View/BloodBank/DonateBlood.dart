@@ -245,8 +245,9 @@ class _DonateBloodState extends State<DonateBlood> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          const CountryCodeAndPhoneNUmber(
+                          CountryCodeAndPhoneNUmber(
                             name: Strings.phonenumberwithstar,
+                            controller: controller,
                             phoneValidator: null, // Uses default if needed
                           ),
                           const SizedBox(height: 15),

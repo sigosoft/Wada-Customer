@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+import 'package:waada_customerapp/Utils/HelperFunctions.dart';
 import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 import 'package:waada_customerapp/View/Home/Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +17,9 @@ class LoginController extends GetxController {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
 
-  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>(debugLabel: 'LoginFormKey');
+  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>(
+    debugLabel: 'LoginFormKey',
+  );
 
   @override
   void onInit() {
@@ -38,11 +41,11 @@ class LoginController extends GetxController {
         countryIds = codes.map((e) => int.parse(e['id'].toString())).toList();
         update();
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> sendLoginOtp() async {
+    print("sendLoginOtp called, phoneController text: ${phoneController.text}");
     if (selectedCountryId == null) {
       _showError("Please select country code");
       return;
@@ -51,8 +54,9 @@ class LoginController extends GetxController {
       _showError("Please enter phone number");
       return;
     }
-    if (phoneController.text.trim().length < 10) {
-      _showError("Please enter a valid 10-digit phone number");
+    final expectedLength = getPhoneNumberLength(selectedCountryCode);
+    if (phoneController.text.trim().length < expectedLength) {
+      _showError("Please enter a valid $expectedLength-digit phone number");
       return;
     }
 
@@ -96,6 +100,7 @@ class LoginController extends GetxController {
   }
 
   Future<void> login() async {
+    print("login called, phoneController text: ${phoneController.text}");
     if (otpController.text.length < 6) {
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
@@ -147,6 +152,13 @@ class LoginController extends GetxController {
     }
   }
 
+  void clear() {
+    phoneController.clear();
+    otpController.clear();
+    selectedCountryCode = null;
+    selectedCountryId = null;
+  }
+
   void _showError(String message) {
     if (Get.context != null) {
       ScaffoldMessenger.of(
@@ -157,8 +169,6 @@ class LoginController extends GetxController {
 
   @override
   void onClose() {
-    phoneController.dispose();
-    otpController.dispose();
     print("LoginController disposed");
     super.onClose();
   }

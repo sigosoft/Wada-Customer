@@ -37,11 +37,6 @@ class Registercontroller extends GetxController {
 
   @override
   void onClose() {
-    firstNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    dobController.dispose();
-    referralCodeController.dispose();
     print("Registercontroller disposed");
     super.onClose();
   }
@@ -127,8 +122,16 @@ class Registercontroller extends GetxController {
       } else {
         _showError(response.data['message'] ?? "Failed to send OTP");
       }
+    } on DioException catch (e) {
+      print("--- API Error (Register OTP DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        print("Error Data: ${e.response?.data}");
+        _handleApiError(e.response?.data);
+      } else {
+        _showError("Something went wrong. Please try again.");
+      }
     } catch (e) {
-      print("--- API Error (Register OTP) ---");
+      print("--- API Error (Register OTP General Exception) ---");
       print("Error sending register OTP: $e");
       _showError("Something went wrong. Please try again.");
     }
@@ -175,11 +178,10 @@ class Registercontroller extends GetxController {
             const SnackBar(content: Text("Registration Successful!")),
           );
         }
-        if (Get.isRegistered<LoginController>()) {
-          Get.delete<LoginController>(force: true);
-        }
-        Get.delete<Registercontroller>(force: true);
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (Get.isRegistered<LoginController>()) {
+            Get.find<LoginController>().clear();
+          }
           Get.offAll(() => LoginScreen());
         });
       } else {
@@ -198,6 +200,19 @@ class Registercontroller extends GetxController {
       print("Error: $e");
       _showError("Something went wrong. Please try again.");
     }
+  }
+
+  void clear() {
+    firstNameController.clear();
+    emailController.clear();
+    phoneController.clear();
+    dobController.clear();
+    referralCodeController.clear();
+    otpController.clear();
+    selectedGender = null;
+    isAgreedToTerms = false;
+    selectedCountryCode = null;
+    selectedCountryId = null;
   }
 
   void _handleApiError(dynamic data) {

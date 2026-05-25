@@ -16,7 +16,8 @@ import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 import 'package:waada_customerapp/Widgets/DateOfBirthField.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
-import '../../Controller/RegisterController.dart';
+import 'package:waada_customerapp/Controller/RegisterController.dart';
+import 'package:waada_customerapp/Utils/HelperFunctions.dart';
 import '../../Widgets/AgreeWithTermsWidget.dart';
 import '../../Widgets/CustomAppBar.dart';
 import '../../Widgets/GenderDropdownField.dart';
@@ -30,6 +31,10 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>(
+    debugLabel: 'RegisterFormKey',
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,15 +73,18 @@ class _RegisterState extends State<Register> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: GetBuilder(
-        init: Registercontroller(),
+      body: GetBuilder<Registercontroller>(
+        init: Get.isRegistered<Registercontroller>()
+            ? Get.find<Registercontroller>()
+            : Get.put(Registercontroller()),
+        autoRemove: false,
         builder:
             (controller) => SingleChildScrollView(
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: Form(
-                  key: controller.registerFormKey,
+                  key: _registerFormKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -126,6 +134,7 @@ class _RegisterState extends State<Register> {
                       const SizedBox(height: 15),
                       CountryCodeAndPhoneNUmber(
                         name: Strings.phoneNumber,
+                        controller: controller,
                         countryValidator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Select code";
@@ -133,13 +142,10 @@ class _RegisterState extends State<Register> {
                           return null;
                         },
                         phoneValidator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return "Please enter your phone number";
-                          }
-                          if (value.length < 10) {
-                            return "Phone number must be 10 digits";
-                          }
-                          return null;
+                          return validatePhoneNumber(
+                            value,
+                            controller.selectedCountryCode,
+                          );
                         },
                       ),
                       const SizedBox(height: 15),
@@ -166,16 +172,16 @@ class _RegisterState extends State<Register> {
                           controller.update();
                         },
                       ),
-                    SizedBox(height: 50),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: SubmitButtonWidget(
-                        onTap: () {
-                          controller.sendRegOtp();
-                        },
-                        text: Strings.verify,
+                      SizedBox(height: 50),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: SubmitButtonWidget(
+                          onTap: () {
+                            controller.sendRegOtp();
+                          },
+                          text: Strings.verify,
+                        ),
                       ),
-                    ),
                     ],
                   ),
                 ),

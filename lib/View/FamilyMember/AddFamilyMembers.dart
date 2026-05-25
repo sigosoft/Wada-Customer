@@ -7,6 +7,7 @@ import 'package:waada_customerapp/Controller/FamilyMemberController.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
+import 'package:waada_customerapp/Utils/HelperFunctions.dart';
 import 'package:waada_customerapp/View/Login/PasswordWidget.dart';
 import 'package:waada_customerapp/View/Login/PhoneNumberWidget.dart';
 import 'package:waada_customerapp/View/Login/RichTextWidget.dart';
@@ -95,14 +96,9 @@ class _AddFamilyMembersState extends State<AddFamilyMembers> {
                     SizedBox(height: 15),
                     CountryCodeAndPhoneNUmber(
                       name: Strings.phonenumberwithstar,
+                      controller: controller,
                       phoneValidator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return "Please enter phone number";
-                        }
-                        if (value.length < 10) {
-                          return "Phone number must be 10 digits";
-                        }
-                        return null;
+                        return validatePhoneNumber(value, controller.selectedCountryCode);
                       },
                     ),
                     SizedBox(height: 15),

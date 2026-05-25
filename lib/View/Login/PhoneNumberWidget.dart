@@ -11,6 +11,7 @@ import 'package:waada_customerapp/Controller/RegisterController.dart';
 
 import 'package:waada_customerapp/Controller/DonateBloodController.dart';
 import 'package:waada_customerapp/Controller/FamilyMemberController.dart';
+import 'package:waada_customerapp/Utils/HelperFunctions.dart';
 
 class CountryCodeAndPhoneNUmber extends StatelessWidget {
   const CountryCodeAndPhoneNUmber({
@@ -18,13 +19,29 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
     required this.name,
     this.phoneValidator,
     this.countryValidator,
+    this.controller,
   });
   final String name;
   final String? Function(String?)? phoneValidator;
   final String? Function(String?)? countryValidator;
+  final dynamic controller;
 
   @override
   Widget build(BuildContext context) {
+    final String? selectedCountryCode =
+        controller != null
+            ? controller.selectedCountryCode
+            : (Get.isRegistered<FamilyMemberController>()
+                ? Get.find<FamilyMemberController>().selectedCountryCode
+                : Get.isRegistered<DonateBloodController>()
+                ? Get.find<DonateBloodController>().selectedCountryCode
+                : Get.isRegistered<Registercontroller>()
+                ? Get.find<Registercontroller>().selectedCountryCode
+                : Get.isRegistered<LoginController>()
+                ? Get.find<LoginController>().selectedCountryCode
+                : null);
+    final int phoneLength = getPhoneNumberLength(selectedCountryCode);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ConstrainedBox(
@@ -48,30 +65,40 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                     DropdownButtonFormField<String>(
                       validator: countryValidator,
                       onTap: () {
-                        if (Get.isRegistered<FamilyMemberController>()) {
-                          Get.find<FamilyMemberController>()
-                              .fetchCountryCodes();
-                        } else if (Get.isRegistered<DonateBloodController>()) {
-                          Get.find<DonateBloodController>().fetchCountryCodes();
-                        } else if (Get.isRegistered<LoginController>()) {
-                          Get.find<LoginController>().fetchCountryCodes();
-                        } else if (Get.isRegistered<Registercontroller>()) {
-                          Get.find<Registercontroller>().fetchCountryCodes();
+                        if (controller != null) {
+                          controller.fetchCountryCodes();
+                        } else {
+                          if (Get.isRegistered<FamilyMemberController>()) {
+                            Get.find<FamilyMemberController>()
+                                .fetchCountryCodes();
+                          } else if (Get.isRegistered<
+                            DonateBloodController
+                          >()) {
+                            Get.find<DonateBloodController>()
+                                .fetchCountryCodes();
+                          } else if (Get.isRegistered<Registercontroller>()) {
+                            Get.find<Registercontroller>().fetchCountryCodes();
+                          } else if (Get.isRegistered<LoginController>()) {
+                            Get.find<LoginController>().fetchCountryCodes();
+                          }
                         }
                       },
                       value:
-                          Get.isRegistered<FamilyMemberController>()
-                              ? Get.find<FamilyMemberController>()
-                                  .selectedCountryCode
-                              : Get.isRegistered<DonateBloodController>()
-                              ? Get.find<DonateBloodController>()
-                                  .selectedCountryCode
-                              : Get.isRegistered<LoginController>()
-                              ? Get.find<LoginController>().selectedCountryCode
-                              : Get.isRegistered<Registercontroller>()
-                              ? Get.find<Registercontroller>()
-                                  .selectedCountryCode
-                              : null,
+                          controller != null
+                              ? controller.selectedCountryCode
+                              : (Get.isRegistered<FamilyMemberController>()
+                                  ? Get.find<FamilyMemberController>()
+                                      .selectedCountryCode
+                                  : Get.isRegistered<DonateBloodController>()
+                                  ? Get.find<DonateBloodController>()
+                                      .selectedCountryCode
+                                  : Get.isRegistered<Registercontroller>()
+                                  ? Get.find<Registercontroller>()
+                                      .selectedCountryCode
+                                  : Get.isRegistered<LoginController>()
+                                  ? Get.find<LoginController>()
+                                      .selectedCountryCode
+                                  : null),
                       hint: Text(
                         Strings.countryCode,
                         style: GoogleFonts.inter(
@@ -104,18 +131,23 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                         ),
                       ),
                       items:
-                          (Get.isRegistered<FamilyMemberController>()
-                                  ? Get.find<FamilyMemberController>()
-                                      .countryCodes
-                                  : Get.isRegistered<DonateBloodController>()
-                                  ? Get.find<DonateBloodController>()
-                                      .countryCodes
-                                  : Get.isRegistered<LoginController>()
-                                  ? Get.find<LoginController>().countryCodes
-                                  : Get.isRegistered<Registercontroller>()
-                                  ? Get.find<Registercontroller>().countryCodes
-                                  : [])
-                              .map((code) {
+                          (controller != null
+                                  ? controller.countryCodes
+                                  : (Get.isRegistered<FamilyMemberController>()
+                                      ? Get.find<FamilyMemberController>()
+                                          .countryCodes
+                                      : Get.isRegistered<
+                                        DonateBloodController
+                                      >()
+                                      ? Get.find<DonateBloodController>()
+                                          .countryCodes
+                                      : Get.isRegistered<Registercontroller>()
+                                      ? Get.find<Registercontroller>()
+                                          .countryCodes
+                                      : Get.isRegistered<LoginController>()
+                                      ? Get.find<LoginController>().countryCodes
+                                      : []))
+                              .map<DropdownMenuItem<String>>((code) {
                                 return DropdownMenuItem<String>(
                                   value: code,
                                   child: Text(
@@ -130,45 +162,65 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                               })
                               .toList(),
                       onChanged: (value) {
-                        if (Get.isRegistered<FamilyMemberController>()) {
-                          var fmController = Get.find<FamilyMemberController>();
-                          fmController.selectedCountryCode = value;
-                          int index = fmController.countryCodes.indexOf(value!);
-                          if (index != -1) {
-                            fmController.countryCodeId =
-                                fmController.countryIds[index].toString();
-                          }
-                          fmController.update();
-                        } else if (Get.isRegistered<DonateBloodController>()) {
-                          DonateBloodController controller =
-                              Get.find<DonateBloodController>();
+                        if (controller != null) {
                           controller.selectedCountryCode = value;
                           int index = controller.countryCodes.indexOf(value!);
                           if (index != -1) {
-                            controller.selectedCountryId =
-                                controller.countryIds[index];
+                            if (controller is FamilyMemberController) {
+                              controller.countryCodeId =
+                                  controller.countryIds[index].toString();
+                            } else {
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
+                            }
                           }
                           controller.update();
-                        } else if (Get.isRegistered<LoginController>()) {
-                          LoginController controller =
-                              Get.find<LoginController>();
-                          controller.selectedCountryCode = value;
-                          int index = controller.countryCodes.indexOf(value!);
-                          if (index != -1) {
-                            controller.selectedCountryId =
-                                controller.countryIds[index];
+                        } else {
+                          if (Get.isRegistered<FamilyMemberController>()) {
+                            var fmController =
+                                Get.find<FamilyMemberController>();
+                            fmController.selectedCountryCode = value;
+                            int index = fmController.countryCodes.indexOf(
+                              value!,
+                            );
+                            if (index != -1) {
+                              fmController.countryCodeId =
+                                  fmController.countryIds[index].toString();
+                            }
+                            fmController.update();
+                          } else if (Get.isRegistered<
+                            DonateBloodController
+                          >()) {
+                            DonateBloodController controller =
+                                Get.find<DonateBloodController>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
+                            }
+                            controller.update();
+                          } else if (Get.isRegistered<Registercontroller>()) {
+                            Registercontroller controller =
+                                Get.find<Registercontroller>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
+                            }
+                            controller.update();
+                          } else if (Get.isRegistered<LoginController>()) {
+                            LoginController controller =
+                                Get.find<LoginController>();
+                            controller.selectedCountryCode = value;
+                            int index = controller.countryCodes.indexOf(value!);
+                            if (index != -1) {
+                              controller.selectedCountryId =
+                                  controller.countryIds[index];
+                            }
+                            controller.update();
                           }
-                          controller.update();
-                        } else if (Get.isRegistered<Registercontroller>()) {
-                          Registercontroller controller =
-                              Get.find<Registercontroller>();
-                          controller.selectedCountryCode = value;
-                          int index = controller.countryCodes.indexOf(value!);
-                          if (index != -1) {
-                            controller.selectedCountryId =
-                                controller.countryIds[index];
-                          }
-                          controller.update();
                         }
                       },
                     ),
@@ -193,22 +245,28 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                       TextFormField(
                         validator: phoneValidator,
                         controller:
-                            Get.isRegistered<DonateBloodController>()
-                                ? Get.find<DonateBloodController>()
-                                    .phoneController
-                                : Get.isRegistered<LoginController>()
-                                ? Get.find<LoginController>().phoneController
-                                : Get.isRegistered<Registercontroller>()
-                                ? Get.find<Registercontroller>().phoneController
-                                : Get.isRegistered<FamilyMemberController>()
-                                ? Get.find<FamilyMemberController>()
-                                    .mobileController
-                                : null,
+                            controller != null
+                                ? (controller is FamilyMemberController
+                                    ? controller.mobileController
+                                    : controller.phoneController)
+                                : (Get.isRegistered<DonateBloodController>()
+                                    ? Get.find<DonateBloodController>()
+                                        .phoneController
+                                    : Get.isRegistered<Registercontroller>()
+                                    ? Get.find<Registercontroller>()
+                                        .phoneController
+                                    : Get.isRegistered<LoginController>()
+                                    ? Get.find<LoginController>()
+                                        .phoneController
+                                    : Get.isRegistered<FamilyMemberController>()
+                                    ? Get.find<FamilyMemberController>()
+                                        .mobileController
+                                    : null),
                         keyboardType: TextInputType.phone,
                         maxLines: 1,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
+                          LengthLimitingTextInputFormatter(phoneLength),
                         ],
                         style: GoogleFonts.inter(
                           fontSize: 13,
@@ -245,8 +303,8 @@ class CountryCodeAndPhoneNUmber extends StatelessWidget {
                           ),
                         ),
                         onChanged: (value) {
-                          if (value.length > 10) {
-                            value = value.substring(0, 10);
+                          if (value.length > phoneLength) {
+                            value = value.substring(0, phoneLength);
                           }
                         },
                       ),

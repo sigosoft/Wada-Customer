@@ -13,6 +13,8 @@ import 'package:dio/dio.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/View/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -440,6 +442,9 @@ class ProfileController extends GetxController {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('auth_token');
 
+        if (Get.isRegistered<LoginController>()) {
+          Get.find<LoginController>().clear();
+        }
         Get.offAll(const LoginScreen());
       } else {
         if (Get.context != null) {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:waada_customerapp/Controller/LoginController.dart';
+import 'package:waada_customerapp/Utils/HelperFunctions.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/PhoneNumberWidget.dart';
@@ -15,6 +16,7 @@ import 'package:waada_customerapp/Widgets/CustomAppBar.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
 
 import '../Register/Register.dart';
+import 'package:waada_customerapp/Controller/RegisterController.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,8 +26,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>(
+    debugLabel: 'LoginFormKey',
+  );
+
   @override
   Widget build(BuildContext context) {
+    print(
+      "LoginScreen build, LoginController isRegistered: ${Get.isRegistered<LoginController>()}",
+    );
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -53,15 +62,18 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: GetBuilder(
-        init: LoginController(),
+      body: GetBuilder<LoginController>(
+        init: Get.isRegistered<LoginController>()
+            ? Get.find<LoginController>()
+            : Get.put(LoginController(), permanent: true),
+        autoRemove: false,
         builder:
             (controller) => SingleChildScrollView(
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: Form(
-                  key: controller.loginFormKey,
+                  key: _loginFormKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -82,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 20),
                       CountryCodeAndPhoneNUmber(
                         name: Strings.phoneNumber,
+                        controller: controller,
                         countryValidator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Select code";
@@ -89,13 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         },
                         phoneValidator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return "Please enter your phone number";
-                          }
-                          if (value.length < 10) {
-                            return "Phone number must be 10 digits";
-                          }
-                          return null;
+                          return validatePhoneNumber(
+                            value,
+                            controller.selectedCountryCode,
+                          );
                         },
                       ),
                       SizedBox(height: 20),
@@ -113,6 +123,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         text1: Strings.donHaveAnAccount,
                         text2: Strings.register,
                         onTap: () {
+                          if (Get.isRegistered<Registercontroller>()) {
+                            Get.find<Registercontroller>().clear();
+                          }
                           Get.to(Register());
                         },
                       ),

@@ -27,8 +27,10 @@ class _OtpScreen1State extends State<OtpScreen1> {
     child: SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      child: GetBuilder(
-        init: LoginController(),
+      child: GetBuilder<LoginController>(
+        init: Get.isRegistered<LoginController>()
+            ? Get.find<LoginController>()
+            : Get.put(LoginController(), permanent: true),
           builder:(controller) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
