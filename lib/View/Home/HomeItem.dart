@@ -27,6 +27,8 @@ class HomeItem extends StatefulWidget {
 class _HomeItemState extends State<HomeItem> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: HomeAppBar(),
@@ -40,7 +42,7 @@ class _HomeItemState extends State<HomeItem> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
+                  width: width,
                   child:
                       controller.isLoading
                           ? const SizedBox(

@@ -15,10 +15,13 @@ class HomeHorizontalScrollingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.only(left: 10.0, right: 10),
       child: SizedBox(
-        height: 150,
+        height: height * 0.18,
+        width: width * 1.00,
         child: ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
@@ -26,23 +29,31 @@ class HomeHorizontalScrollingWidget extends StatelessWidget {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                final String name = homeRowWidgetItems[index]['name']?.toString().toLowerCase() ?? '';
-                final bool isNurse = name.contains('nurse') || name.contains('nursing');
-                final bool isBlood = name.contains('blood') || name.contains('donate');
+                final String name =
+                    homeRowWidgetItems[index]['name']
+                        ?.toString()
+                        .toLowerCase() ??
+                    '';
+                final bool isNurse =
+                    name.contains('nurse') || name.contains('nursing');
+                final bool isBlood =
+                    name.contains('blood') || name.contains('donate');
                 if (!isNurse && !isBlood) {
                   showComingSoonDialog(context);
                 } else {
                   if (screenList != null && screenList.isNotEmpty) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => screenList[index]),
+                      MaterialPageRoute(
+                        builder: (context) => screenList[index],
+                      ),
                     );
                   }
                 }
               },
               child: Container(
                 padding: EdgeInsets.all(8),
-                width: 130,
+                width: width * 0.35,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEAF3FA),
@@ -62,14 +73,24 @@ class HomeHorizontalScrollingWidget extends StatelessWidget {
                           height: 40,
                           fit: BoxFit.contain,
                           errorBuilder:
-                              (_, __, ___) => const Icon(Icons.image_outlined, size: 40, color: greyText),
+                              (_, __, ___) => const Icon(
+                                Icons.image_outlined,
+                                size: 40,
+                                color: greyText,
+                              ),
                         )
-                        : (homeRowWidgetItems[index]['icon'].toString().isNotEmpty
+                        : (homeRowWidgetItems[index]['icon']
+                                .toString()
+                                .isNotEmpty
                             ? SvgPicture.asset(
                               homeRowWidgetItems[index]['icon'].toString(),
                               fit: BoxFit.scaleDown,
                             )
-                            : const Icon(Icons.image_outlined, size: 40, color: greyText)),
+                            : const Icon(
+                              Icons.image_outlined,
+                              size: 40,
+                              color: greyText,
+                            )),
                     SizedBox(height: 10),
                     TextStyleInterWithoutPadding(
                       text: homeRowWidgetItems[index]['name'].toString(),

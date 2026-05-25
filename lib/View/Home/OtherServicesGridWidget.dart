@@ -23,7 +23,9 @@ class OtherServicesGrid extends StatelessWidget {
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () {
-              final String name = otherServicesList[index]['name']?.toString().toLowerCase() ?? '';
+              final String name =
+                  otherServicesList[index]['name']?.toString().toLowerCase() ??
+                  '';
               if (name.contains('blood')) {
                 if (otherServicesList[index]['route'] != null) {
                   otherServicesList[index]['route']();
@@ -84,7 +86,7 @@ class OtherServicesGrid extends StatelessWidget {
                                   color: Colors.white,
                                 )),
                   ),
-                  SizedBox(height: 5),
+                  //  SizedBox(height: 3),
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerLeft,
