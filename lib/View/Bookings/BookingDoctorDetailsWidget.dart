@@ -159,7 +159,7 @@ class BookingsDoctorDetailsWidget extends StatelessWidget {
                                       true
                                   ? (doctorData!['languages'] as List)
                                       .take(2)
-                                      .map((l) => l['language'] ?? l)
+                                      .map((l) => (l is Map) ? l['language'] : l)
                                       .join(", ")
                                   : "Languages",
                               style: GoogleFonts.inter(
@@ -174,7 +174,7 @@ class BookingsDoctorDetailsWidget extends StatelessWidget {
                               Plusfour(
                                 data: (doctorData!['languages'] as List)
                                     .skip(2)
-                                    .map((l) => l['language'] ?? l)
+                                    .map((l) => (l is Map) ? l['language'] : l)
                                     .join(", "),
                                 length:
                                     (doctorData!['languages'] as List).length -

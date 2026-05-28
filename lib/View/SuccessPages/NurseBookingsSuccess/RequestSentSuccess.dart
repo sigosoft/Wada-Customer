@@ -66,7 +66,7 @@ class RequestSentSuccess extends StatelessWidget {
                           languages:
                               (nurse?['languages'] as List?)
                                   ?.take(2)
-                                  .map((l) => l['language'] ?? l)
+                                  .map((l) => (l is Map) ? l['language'] : l)
                                   .join(", ") ??
                               "Languages",
                           plusLanguages:
@@ -74,7 +74,7 @@ class RequestSentSuccess extends StatelessWidget {
                                       (nurse?['languages'] as List).length > 2
                                   ? (nurse?['languages'] as List)
                                       .skip(2)
-                                      .map((l) => l['language'] ?? l)
+                                      .map((l) => (l is Map) ? l['language'] : l)
                                       .join(", ")
                                   : "",
                           qualification:

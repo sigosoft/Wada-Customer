@@ -133,7 +133,7 @@ class NurseItem extends StatelessWidget {
                         const SizedBox(width: 5),
                         Text(
                           (nurse['nurse_languages'] as List?)
-                                  ?.map((l) => l['language'])
+                                  ?.map((l) => (l is Map) ? l['language'] : l)
                                   .join(", ") ??
                               "Languages",
                           style: GoogleFonts.inter(
@@ -148,7 +148,7 @@ class NurseItem extends StatelessWidget {
                           Plusfour(
                             data: (nurse['nurse_languages'] as List)
                                 .skip(2)
-                                .map((l) => l['language'])
+                                .map((l) => (l is Map) ? l['language'] : l)
                                 .join(", "),
                             length: (nurse['nurse_languages'] as List).length,
                           ),
@@ -305,12 +305,13 @@ class NurseItem extends StatelessWidget {
                   'location': Get.arguments?['location'],
                   'latitude': Get.arguments?['latitude'],
                   'longitude': Get.arguments?['longitude'],
-                  'amount': (nurse['nurse_charges'] as List?)?.firstWhere(
-                    (c) =>
-                        c['hour_id'].toString() ==
-                        Get.arguments?['hour_id'].toString(),
-                    orElse: () => {'price': '0'},
-                  )['price'],
+                  'amount':
+                      (nurse['nurse_charges'] as List?)?.firstWhere(
+                        (c) =>
+                            c['hour_id'].toString() ==
+                            Get.arguments?['hour_id'].toString(),
+                        orElse: () => {'price': '0'},
+                      )['price'],
                 },
               );
             },

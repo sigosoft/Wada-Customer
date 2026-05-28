@@ -343,7 +343,7 @@ class BookingsController extends GetxController {
               'checkin_time': details?['checkin_time'],
               'languages':
                   (details?['languages'] as List?)
-                      ?.map((l) => l['language'] ?? l)
+                      ?.map((l) => (l is Map) ? l['language'] : l)
                       .toList(),
             },
           ),

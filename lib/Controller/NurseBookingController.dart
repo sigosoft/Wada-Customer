@@ -291,7 +291,7 @@ class NurseBookingController extends GetxController {
               'checkin_time': checkinTimeController.text,
               'languages':
                   (nurseData?['languages'] as List?)
-                      ?.map((l) => l['language'] ?? l)
+                      ?.map((l) => (l is Map) ? l['language'] : l)
                       .toList(),
             },
           ),

@@ -17,18 +17,43 @@ class NurseDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String name = nurseData?['name'] ?? "Nurse Name";
-    String location = nurseData?['location'] ?? "Location";
-    String qualification = nurseData?['qualification'] ?? "Qualification";
+    String name =
+        nurseData?['name']?.toString() ??
+        nurseData?['user']?['name']?.toString() ??
+        "Nurse Name";
+    String location =
+        nurseData?['location']?.toString() ??
+        nurseData?['user']?['location']?.toString() ??
+        "Location";
+    String qualification =
+        nurseData?['qualification']?.toString() ??
+        nurseData?['user']?['qualification']?.toString() ??
+        "Qualification";
     String experience =
-        "${nurseData?['experience'] ?? '0'} Years of Experience";
+        "${nurseData?['experience'] ?? nurseData?['user']?['experience'] ?? '0'} Years of Experience";
+
+    String? rawImage =
+        nurseData?['image']?.toString() ??
+        nurseData?['user']?['image']?.toString() ??
+        nurseData?['profile_pic']?.toString() ??
+        nurseData?['user']?['profile_pic']?.toString() ??
+        nurseData?['profile_image']?.toString() ??
+        nurseData?['user']?['profile_image']?.toString();
+
     String image =
-        nurseData?['image'] != null
-            ? "${ApiConfigs.IMAGE_URL}${nurseData!['image']}"
+        (rawImage != null && rawImage.isNotEmpty)
+            ? rawImage.startsWith('http')
+                ? rawImage
+                : "${ApiConfigs.IMAGE_URL}$rawImage"
             : "";
 
     // Languages logic
-    List<dynamic> languagesList = nurseData?['languages'] ?? nurseData?['nurse_languages'] ?? [];
+    List<dynamic> languagesList =
+        nurseData?['languages'] ??
+        nurseData?['user']?['languages'] ??
+        nurseData?['nurse_languages'] ??
+        nurseData?['user']?['nurse_languages'] ??
+        [];
     String languageString =
         languagesList.isNotEmpty
             ? languagesList.take(2).map((e) => e['language']).join(", ")

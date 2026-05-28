@@ -64,7 +64,9 @@ class ShareLocationSucccess extends StatelessWidget {
                     imagePath:
                         (data?['image'] != null &&
                                 data!['image'].toString().isNotEmpty)
-                            ? "${ApiConfigs.IMAGE_URL}${data!['image']}"
+                            ? data!['image'].toString().startsWith('http')
+                                ? data!['image'].toString()
+                                : "${ApiConfigs.IMAGE_URL}${data!['image']}"
                             : 'lib/Assets/Images/nurse.png',
                   ),
                 ],
