@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:waada_customerapp/Controller/BottomNavController.dart';
-import 'package:waada_customerapp/Controller/ServiceListingController.dart';
+import 'package:waada_customerapp/Controller/HomeController.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Home/OtherServicesGridWidget.dart';
 
@@ -55,11 +55,13 @@ class _ServiceListingState extends State<ServiceListing> {
         height: MediaQuery.of(context).size.height,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-          child: GetBuilder(
-            init: ServiceListingController(),
+          child: GetBuilder<HomeController>(
+            init: HomeController(),
             builder:
-                (controller) => OtherServicesGrid(
-                  otherServicesList: controller.otherServicesList,
+                (controller) => SingleChildScrollView(
+                  child: OtherServicesGrid(
+                    otherServicesList: controller.otherServicesList,
+                  ),
                 ),
           ),
         ),

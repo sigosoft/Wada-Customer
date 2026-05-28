@@ -30,7 +30,6 @@ class HomeController extends GetxController {
     getCurrentLocation();
     fetchHomeData();
     fetchApprovedBookings();
-    fetchOtherServices();
     fetchHours();
   }
 
@@ -98,12 +97,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> onRefresh() async {
-    await Future.wait([
-      fetchHomeData(),
-      fetchApprovedBookings(),
-      fetchOtherServices(),
-      fetchHours(),
-    ]);
+    await Future.wait([fetchHomeData(), fetchApprovedBookings(), fetchHours()]);
   }
 
   List<dynamic> shiftHours = [];
@@ -132,42 +126,6 @@ class HomeController extends GetxController {
     } catch (e) {
       print("--- API Error (Get Hours) ---");
       print("Error fetching hours: $e");
-    }
-  }
-
-  Future<void> fetchOtherServices() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('auth_token');
-      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.otherServiceNames}";
-
-      final headers = {
-        'Accept': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
-
-      final response = await _dio.get(url, options: Options(headers: headers));
-
-      if (response.statusCode == 200 &&
-          response.data['status'].toString() == "true") {
-        final List otherServices = response.data['data'] ?? [];
-        if (otherServices.isNotEmpty) {
-          otherServicesList =
-              otherServices.map((s) {
-                final name = s['name']?.toString() ?? '';
-                final imageUrl = _fullImageUrl(s['image']?.toString());
-                return <String, dynamic>{
-                  'icon': imageUrl,
-                  'name': name,
-                  'route': _routeFor(name),
-                };
-              }).toList();
-          update();
-        }
-      }
-    } catch (e) {
-      print("--- API Error (Other Services) ---");
-      print("Error fetching other services: $e");
     }
   }
 
@@ -281,8 +239,10 @@ class HomeController extends GetxController {
 
   Future<void> fetchHomeData() async {
     try {
-      isLoading = true;
-      update();
+      if (homeData == null) {
+        isLoading = true;
+        update();
+      }
 
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
