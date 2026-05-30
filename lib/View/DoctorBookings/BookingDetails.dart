@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/Controller/BookingsController.dart';
+import 'package:waada_customerapp/Controller/ProfileController.dart';
+import 'package:waada_customerapp/Services/RazorpayService.dart';
 import 'package:waada_customerapp/Widgets/DoctorDetailWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
@@ -294,14 +294,73 @@ class _BookingDetailsState extends State<BookingDetails> {
                 bookingData: bookingData,
               );
             } else {
-              Get.to(
-                () => DoctorRequestSentSuccess(
-                  bookingType: "video",
-                  msg: "You've Successfully Booked Doctor Appointments.",
-                  doctorData: widget.doctorData,
-                  bookingData: bookingData,
-                ),
-              );
+              if (selectedPaymentIndex == 0) {
+                // Online Transaction - Razorpay
+                String email = '';
+                String contact = '';
+                try {
+                  if (Get.isRegistered<ProfileController>()) {
+                    final profileController = Get.find<ProfileController>();
+                    email = profileController.patientData?['email']?.toString() ?? '';
+                    contact = profileController.patientData?['mobile']?.toString() ?? '';
+                  } else {
+                    final profileController = Get.put(ProfileController());
+                    email = profileController.patientData?['email']?.toString() ?? '';
+                    contact = profileController.patientData?['mobile']?.toString() ?? '';
+                  }
+                } catch (e) {
+                  print("Error getting profile: $e");
+                }
+
+                RazorpayService().startPayment(
+                  amount: total,
+                  bookingType: "2",
+                  bookingId: widget.bookingData?['id']?.toString() ?? widget.bookingData?['booking_id']?.toString() ?? "0",
+                  description: "Doctor Video Consult Payment",
+                  contact: contact,
+                  email: email,
+                  key: "rzp_test_T8uZQ7cP2kcNGN",
+                  onSuccess: (successResponse) {
+                    print("--- Doctor Payment Success: ${successResponse.paymentId} ---");
+                    Get.to(
+                      () => DoctorRequestSentSuccess(
+                        bookingType: "video",
+                        msg: "You've Successfully Booked Doctor Appointments.",
+                        doctorData: widget.doctorData,
+                        bookingData: bookingData,
+                      ),
+                    );
+                  },
+                  onFailure: (errorResponse) {
+                    print("--- Doctor Payment Failed: ${errorResponse.message} ---");
+                    Get.snackbar(
+                      "Payment Failed",
+                      errorResponse.message ?? "The payment could not be processed.",
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.redAccent,
+                      colorText: Colors.white,
+                    );
+                  },
+                );
+              } else if (selectedPaymentIndex == 1) {
+                // Wada Pay
+                Get.to(
+                  () => DoctorRequestSentSuccess(
+                    bookingType: "video",
+                    msg: "You've Successfully Booked Doctor Appointments.",
+                    doctorData: widget.doctorData,
+                    bookingData: bookingData,
+                  ),
+                );
+              } else {
+                Get.snackbar(
+                  "Select Payment Method",
+                  "Please select a payment method to proceed.",
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.orangeAccent,
+                  colorText: Colors.white,
+                );
+              }
             }
           },
         ),

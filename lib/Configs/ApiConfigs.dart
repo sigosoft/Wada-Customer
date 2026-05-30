@@ -55,4 +55,6 @@ class ApiEndPoints {
   static String doctorDetails = "doctorDetails";
   static String updateNursePaymentStatus = "updateNursePaymentStatus";
   static String bookHomeVisit = "bookHomeVisit";
+  static String createOrder = "create-order";
+  static String verifyPayment = "verify-payment";
 }

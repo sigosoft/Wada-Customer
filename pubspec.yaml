@@ -50,6 +50,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^29.2.7
   shared_preferences: ^2.5.5
   image_picker: ^1.1.2
+  razorpay_flutter: ^1.4.0
 
 dev_dependencies:
   flutter_test:

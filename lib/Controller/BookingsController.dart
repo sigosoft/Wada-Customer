@@ -11,6 +11,8 @@ import '../View/Login/SubmitButtonWidget.dart';
 import '../View/SuccessPages/DoctorBookingsSuccess/DoctorPaymentSuccess.dart';
 import '../View/SuccessPages/NurseBookingsSuccess/CancelBookingSuccess.dart';
 import '../Widgets/widgets.dart';
+import '../Controller/ProfileController.dart';
+import '../Services/RazorpayService.dart';
 
 class BookingsController extends GetxController {
   final Dio _dio = ApiConfigs.dio;
@@ -411,6 +413,7 @@ class BookingsController extends GetxController {
     VoidCallback onPay, {
     Map<String, dynamic>? doctorData,
     Map<String, dynamic>? bookingData,
+    double amount = 0.0,
   }) {
     showModalBottomSheet(
       context: context,
@@ -507,12 +510,92 @@ class BookingsController extends GetxController {
                     SubmitButtonWidget(
                       text: Strings.payText,
                       onTap: () {
-                        Get.off(
-                          () => DoctorPaymentSuccess(
-                            doctorData: doctorData,
-                            bookingData: bookingData,
-                          ),
-                        );
+                        if (method == 'Online Transaction') {
+                          String email = '';
+                          String contact = '';
+                          try {
+                            if (Get.isRegistered<ProfileController>()) {
+                              final profileController =
+                                  Get.find<ProfileController>();
+                              email =
+                                  profileController.patientData?['email']
+                                      ?.toString() ??
+                                  '';
+                              contact =
+                                  profileController.patientData?['mobile']
+                                      ?.toString() ??
+                                  '';
+                            } else {
+                              final profileController = Get.put(
+                                ProfileController(),
+                              );
+                              email =
+                                  profileController.patientData?['email']
+                                      ?.toString() ??
+                                  '';
+                              contact =
+                                  profileController.patientData?['mobile']
+                                      ?.toString() ??
+                                  '';
+                            }
+                          } catch (e) {
+                            print("Error getting profile: $e");
+                          }
+
+                          double finalAmount =
+                              amount > 0
+                                  ? amount
+                                  : (double.tryParse(
+                                        doctorData?['home_consultation_fee']
+                                                ?.toString() ??
+                                            '512',
+                                      ) ??
+                                      512.0);
+
+                          RazorpayService().startPayment(
+                            amount: finalAmount,
+                            bookingType: "2",
+                            bookingId:
+                                bookingData?['id']?.toString() ??
+                                bookingData?['booking_id']?.toString() ??
+                                "0",
+                            description: "Doctor Home Visit Payment",
+                            contact: contact,
+                            email: email,
+                            key: "rzp_test_T8uZQ7cP2kcNGN",
+                            onSuccess: (successResponse) {
+                              print(
+                                "--- Doctor Payment Success: ${successResponse.paymentId} ---",
+                              );
+                              Get.off(
+                                () => DoctorPaymentSuccess(
+                                  doctorData: doctorData,
+                                  bookingData: bookingData,
+                                ),
+                              );
+                            },
+                            onFailure: (errorResponse) {
+                              print(
+                                "--- Doctor Payment Failed: ${errorResponse.message} ---",
+                              );
+                              Get.snackbar(
+                                "Payment Failed",
+                                errorResponse.message ??
+                                    "The payment could not be processed.",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.redAccent,
+                                colorText: Colors.white,
+                              );
+                            },
+                          );
+                        } else {
+                          Get.off(
+                            () => DoctorPaymentSuccess(
+                              doctorData: doctorData,
+                              bookingData: bookingData,
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],
