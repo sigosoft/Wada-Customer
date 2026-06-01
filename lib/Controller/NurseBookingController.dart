@@ -176,6 +176,14 @@ class NurseBookingController extends GetxController {
         fromDate = response.data['data']['from_date'] ?? "";
         toDate = response.data['data']['to_date'] ?? "";
         hourId = response.data['data']['hour_id'] ?? "";
+        
+        final apiAmount = response.data['data']['amount'] ??
+            response.data['data']['price'] ??
+            response.data['data']['total_amount'] ??
+            response.data['data']['total'];
+        if (apiAmount != null) {
+          amount = apiAmount.toString();
+        }
       } else {
         nurseData = null;
       }

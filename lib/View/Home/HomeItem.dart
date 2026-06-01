@@ -85,7 +85,19 @@ class _HomeItemState extends State<HomeItem> {
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: InkWell(
                                       onTap: () {
-                                        Get.to(() => UpcomingBookingDetails());
+                                        Get.to(
+                                          () => UpcomingBookingDetails(
+                                            bookingId:
+                                                int.tryParse(
+                                                  booking['booking_id']
+                                                          ?.toString() ??
+                                                      booking['id']
+                                                          ?.toString() ??
+                                                      '',
+                                                ) ??
+                                                0,
+                                          ),
+                                        );
                                       },
                                       child: HomeNurseDetailsWidget(
                                         name: booking['name'] ?? "Nurse Name",

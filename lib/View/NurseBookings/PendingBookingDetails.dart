@@ -9,6 +9,7 @@ import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/Controller/BookingsController.dart';
 import 'package:waada_customerapp/Controller/ProfileController.dart';
 import 'package:waada_customerapp/Services/RazorpayService.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
@@ -227,6 +228,68 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
             if (details == null) {
               return const Center(child: Text("No details found"));
             }
+            int totalDays = 1;
+            if (details['checkin_date'] != null &&
+                details['checkout_date'] != null) {
+              try {
+                final start = DateTime.parse(
+                  details['checkin_date'].toString(),
+                );
+                final end = DateTime.parse(details['checkout_date'].toString());
+                totalDays = end.difference(start).inDays + 1;
+              } catch (e) {
+                print("Error parsing dates in PendingBookingDetails: $e");
+              }
+            }
+
+            final baseAmount =
+                details['amount'] ??
+                details['price'] ??
+                controller.selectedBookingDetails?['price'] ??
+                '0';
+
+            final double dailyRate =
+                double.tryParse(
+                  baseAmount
+                      .toString()
+                      .replaceAll('₹', '')
+                      .replaceAll(',', '')
+                      .trim(),
+                ) ??
+                0.0;
+
+            final apiTotalVal =
+                details['total_amount'] ??
+                details['total'] ??
+                details['grand_total'] ??
+                controller.selectedBookingDetails?['amount'] ??
+                controller.selectedBookingDetails?['total_amount'] ??
+                controller.selectedBookingDetails?['total'] ??
+                controller.selectedBookingDetails?['grand_total'];
+
+            double apiTotal = 0.0;
+            if (apiTotalVal != null) {
+              apiTotal =
+                  double.tryParse(
+                    apiTotalVal
+                        .toString()
+                        .replaceAll('₹', '')
+                        .replaceAll(',', '')
+                        .trim(),
+                  ) ??
+                  0.0;
+            }
+
+            double parsedAmount = apiTotal;
+            if (parsedAmount <= 0 ||
+                (parsedAmount == dailyRate && totalDays > 1)) {
+              parsedAmount = dailyRate * totalDays;
+            }
+
+            final formattedAmount =
+                parsedAmount == parsedAmount.toInt()
+                    ? parsedAmount.toInt().toString()
+                    : parsedAmount.toStringAsFixed(2);
             return SingleChildScrollView(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
@@ -431,7 +494,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                                     ? '8'
                                     : details['shift_type'].toString() == '3'
                                     ? '12'
-                                    : '24'} hours shift",
+                                    : '24'} hours shift${totalDays > 1 ? ' for $totalDays Days' : ''}",
                             color: Colors.grey,
                             fontWeight: FontWeight.w500,
                             size: 14.00,
@@ -442,7 +505,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text: "₹${details['amount'] ?? '0'}",
+                              text: "₹$formattedAmount",
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
                               size: 14.00,
@@ -468,7 +531,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text: "₹${details['amount'] ?? '0'}",
+                              text: "₹$formattedAmount",
                               color: Colors.black,
                               fontWeight: FontWeight.w800,
                               size: 14.00,
@@ -484,19 +547,34 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                           "--- Make Payment button clicked for ID: ${widget.bookingId} ---",
                         );
 
-                        double amount = double.tryParse(details['amount'].toString()) ?? 0.0;
+                        double amount = parsedAmount;
                         String email = '';
                         String contact = '';
 
                         try {
                           if (Get.isRegistered<ProfileController>()) {
-                            final profileController = Get.find<ProfileController>();
-                            email = profileController.patientData?['email']?.toString() ?? '';
-                            contact = profileController.patientData?['mobile']?.toString() ?? '';
+                            final profileController =
+                                Get.find<ProfileController>();
+                            email =
+                                profileController.patientData?['email']
+                                    ?.toString() ??
+                                '';
+                            contact =
+                                profileController.patientData?['mobile']
+                                    ?.toString() ??
+                                '';
                           } else {
-                            final profileController = Get.put(ProfileController());
-                            email = profileController.patientData?['email']?.toString() ?? '';
-                            contact = profileController.patientData?['mobile']?.toString() ?? '';
+                            final profileController = Get.put(
+                              ProfileController(),
+                            );
+                            email =
+                                profileController.patientData?['email']
+                                    ?.toString() ??
+                                '';
+                            contact =
+                                profileController.patientData?['mobile']
+                                    ?.toString() ??
+                                '';
                           }
                         } catch (e) {
                           print("Error getting profile: $e");
@@ -506,36 +584,57 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                           amount: amount,
                           bookingType: "1",
                           bookingId: widget.bookingId.toString(),
-                          description: "Nurse Booking Payment for ID ${widget.bookingId}",
+                          description:
+                              "Nurse Booking Payment for ID ${widget.bookingId}",
                           contact: contact,
                           email: email,
                           key: "rzp_test_T8uZQ7cP2kcNGN",
                           onSuccess: (successResponse) async {
-                            print("--- Payment Success: ${successResponse.paymentId} ---");
+                            print(
+                              "--- Payment Success: ${successResponse.paymentId} ---",
+                            );
                             // Call API to update payment status
                             try {
-                              final prefs = await SharedPreferences.getInstance();
-                              final String? token = prefs.getString('auth_token');
-                              String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.updateNursePaymentStatus}";
-                              
-                              final Map<String, dynamic> data = {'booking_id': widget.bookingId.toString()};
-                              final dio_instance.FormData formData = dio_instance.FormData.fromMap(data);
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final String? token = prefs.getString(
+                                'auth_token',
+                              );
+                              String url =
+                                  "${ApiConfigs.BASE_URL}${ApiEndPoints.updateNursePaymentStatus}";
 
-                              print("--- [PendingBookingDetails] Request: POST $url ---");
-                              
+                              final Map<String, dynamic> data = {
+                                'booking_id': widget.bookingId.toString(),
+                              };
+                              final dio_instance.FormData formData =
+                                  dio_instance.FormData.fromMap(data);
+
+                              print(
+                                "--- [PendingBookingDetails] Request: POST $url ---",
+                              );
+
                               final response = await ApiConfigs.dio.post(
                                 url,
                                 data: formData,
-                                options: dio_instance.Options(headers: {
-                                  'Accept': 'application/json',
-                                  if (token != null) 'Authorization': 'Bearer $token',
-                                }),
+                                options: dio_instance.Options(
+                                  headers: {
+                                    'Accept': 'application/json',
+                                    if (token != null)
+                                      'Authorization': 'Bearer $token',
+                                  },
+                                ),
                               );
 
-                              print("--- [PendingBookingDetails] Response: ${response.statusCode} ---");
-                              print("--- [PendingBookingDetails] Data: ${response.data} ---");
+                              print(
+                                "--- [PendingBookingDetails] Response: ${response.statusCode} ---",
+                              );
+                              print(
+                                "--- [PendingBookingDetails] Data: ${response.data} ---",
+                              );
                             } catch (e) {
-                              print("--- [PendingBookingDetails] API ERROR: $e ---");
+                              print(
+                                "--- [PendingBookingDetails] API ERROR: $e ---",
+                              );
                             }
 
                             Get.to(
@@ -550,21 +649,45 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                                   'checkin_time': details['checkin_time'],
                                   'languages':
                                       (details['languages'] as List?)
-                                          ?.map((l) => (l is Map) ? l['language'] : l)
+                                          ?.map(
+                                            (l) =>
+                                                (l is Map) ? l['language'] : l,
+                                          )
                                           .toList(),
                                 },
                               ),
                             );
                           },
                           onFailure: (errorResponse) {
-                            print("--- Payment Failed: ${errorResponse.message} ---");
-                            Get.snackbar(
-                              "Payment Failed",
-                              errorResponse.message ?? "The payment could not be processed.",
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
+                            print(
+                              "--- Payment Failed: ${errorResponse.message} ---",
                             );
+                            if (mounted) {
+                              final isCancelled =
+                                  errorResponse.code ==
+                                      Razorpay.PAYMENT_CANCELLED ||
+                                  errorResponse.code == 2;
+                              final displayMessage =
+                                  isCancelled
+                                      ? "Payment cancelled."
+                                      : (errorResponse.message == null ||
+                                              errorResponse.message ==
+                                                  "undefined" ||
+                                              errorResponse.message!
+                                                  .trim()
+                                                  .isEmpty
+                                          ? "The payment could not be processed."
+                                          : errorResponse.message!);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(displayMessage),
+                                  backgroundColor:
+                                      isCancelled
+                                          ? Colors.orangeAccent
+                                          : Colors.redAccent,
+                                ),
+                              );
+                            }
                           },
                         );
                       },

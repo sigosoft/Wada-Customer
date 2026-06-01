@@ -13,6 +13,7 @@ import '../View/SuccessPages/NurseBookingsSuccess/CancelBookingSuccess.dart';
 import '../Widgets/widgets.dart';
 import '../Controller/ProfileController.dart';
 import '../Services/RazorpayService.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class BookingsController extends GetxController {
   final Dio _dio = ApiConfigs.dio;
@@ -97,6 +98,7 @@ class BookingsController extends GetxController {
 
       if (response.statusCode == 200 && response.data['data'] != null) {
         selectedBookingDetails = response.data['data'];
+        print("--- [BookingsController] selectedBookingDetails: $selectedBookingDetails ---");
       }
     } catch (e) {
       print("--- API Error (Booking Details) ---");
@@ -110,31 +112,67 @@ class BookingsController extends GetxController {
   Future<void> fetchNurseBookings() async {
     try {
       currentPage = 1;
-      hasMore = true;
+      hasMore = false;
       isNurseLoading = true;
       update();
 
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
-      String url =
-          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=$currentPage";
 
       final headers = {
         'Accept': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
       };
 
-      final response = await _dio.get(url, options: Options(headers: headers));
+      // Types: 0.Requested, 1.Pending, 2.Completed, 3.Cancel, 4.Ongoing, 5.Rejected, 6.Upcoming
+      List<int> types = [0, 1, 2, 3, 4, 5, 6];
+      List<dynamic> allBookings = [];
 
-      if (response.statusCode == 200 &&
-          response.data['success'].toString() == "true") {
-        nurseBookings = response.data['data']['data'] ?? [];
-        if (nurseBookings.length < 10) {
-          hasMore = false;
-        }
-      } else {
-        nurseBookings = [];
+      final futures =
+          types.map((t) async {
+            String url =
+                "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=20&type=$t&page=1";
+            try {
+              final response = await _dio.get(
+                url,
+                options: Options(headers: headers),
+              );
+              if (response.statusCode == 200 &&
+                  response.data['success'].toString() == "true") {
+                return response.data['data']['data'] ?? [];
+              }
+            } catch (e) {
+              print("Error fetching type $t: $e");
+            }
+            return [];
+          }).toList();
+
+      final results = await Future.wait(futures);
+      
+      // Store results by type in a map
+      final Map<int, List<dynamic>> bookingsByType = {};
+      for (int i = 0; i < types.length; i++) {
+        bookingsByType[types[i]] = results[i];
       }
+
+      // Order of priority: 3.Cancel, 2.Completed, 4.Ongoing, 6.Upcoming, 1.Pending, 0.Requested, 5.Rejected
+      final List<int> priorityOrder = [3, 2, 4, 6, 1, 0, 5];
+      for (var t in priorityOrder) {
+        final list = bookingsByType[t] ?? [];
+        for (var booking in list) {
+          final b = Map<String, dynamic>.from(booking);
+          b['booking_status'] = t.toString();
+          allBookings.add(b);
+        }
+      }
+
+      // De-duplicate bookings
+      final seenIds = <dynamic>{};
+      nurseBookings =
+          allBookings.where((b) {
+            final id = b['id'] ?? b['booking_id'];
+            return seenIds.add(id);
+          }).toList();
     } catch (e) {
       nurseBookings = [];
     } finally {
@@ -144,68 +182,42 @@ class BookingsController extends GetxController {
   }
 
   Future<void> loadMoreNurseBookings() async {
-    if (isLoadMore || !hasMore) return;
-
-    try {
-      isLoadMore = true;
-      update();
-
-      currentPage++;
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('auth_token');
-      String url =
-          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=$currentPage";
-
-      final headers = {
-        'Accept': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
-
-      final response = await _dio.get(url, options: Options(headers: headers));
-
-      if (response.statusCode == 200 &&
-          response.data['success'].toString() == "true") {
-        List newBookings = response.data['data']['data'] ?? [];
-        if (newBookings.isEmpty) {
-          hasMore = false;
-        } else {
-          nurseBookings.addAll(newBookings);
-          if (newBookings.length < 10) {
-            hasMore = false;
-          }
-        }
-      }
-    } catch (e) {
-      print("--- API Error (Load More Bookings) ---");
-      currentPage--;
-    } finally {
-      isLoadMore = false;
-      update();
-    }
+    // Consolidated multiple type fetching is set to load all pages at once, pagination is handled on page 1.
+    return;
   }
 
   List<dynamic> get requestBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "0")
+          .where(
+            (b) =>
+                b['booking_status'].toString() == "0" || // Requested
+                b['booking_status'].toString() == "4" || // Ongoing
+                b['booking_status'].toString() == "5",
+          ) // Rejected
+          .toList();
+  List<dynamic> get pendingBookings =>
+      nurseBookings
+          .where((b) => b['booking_status'].toString() == "1") // Pending
           .toList();
   List<dynamic> get upcomingBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "1")
+          .where((b) => b['booking_status'].toString() == "6") // Upcoming
           .toList();
   List<dynamic> get completedBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "2")
+          .where((b) => b['booking_status'].toString() == "2") // Completed
           .toList();
   List<dynamic> get cancelledBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "3")
+          .where((b) => b['booking_status'].toString() == "3") // Cancelled
           .toList();
 
   List<dynamic> getBookingsForIndex(int index) {
     if (index == 0) return requestBookings;
-    if (index == 1) return upcomingBookings;
-    if (index == 2) return completedBookings;
-    if (index == 3) return cancelledBookings;
+    if (index == 1) return pendingBookings;
+    if (index == 2) return upcomingBookings;
+    if (index == 3) return completedBookings;
+    if (index == 4) return cancelledBookings;
     return [];
   }
 
@@ -578,14 +590,20 @@ class BookingsController extends GetxController {
                               print(
                                 "--- Doctor Payment Failed: ${errorResponse.message} ---",
                               );
-                              Get.snackbar(
-                                "Payment Failed",
-                                errorResponse.message ??
-                                    "The payment could not be processed.",
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.redAccent,
-                                colorText: Colors.white,
-                              );
+                              if (Get.context != null) {
+                                final isCancelled = errorResponse.code == Razorpay.PAYMENT_CANCELLED || errorResponse.code == 2;
+                                final displayMessage = isCancelled
+                                    ? "Payment cancelled."
+                                    : (errorResponse.message == null || errorResponse.message == "undefined" || errorResponse.message!.trim().isEmpty
+                                        ? "The payment could not be processed."
+                                        : errorResponse.message!);
+                                ScaffoldMessenger.of(Get.context!).showSnackBar(
+                                  SnackBar(
+                                    content: Text(displayMessage),
+                                    backgroundColor: isCancelled ? Colors.orangeAccent : Colors.redAccent,
+                                  ),
+                                );
+                              }
                             },
                           );
                         } else {

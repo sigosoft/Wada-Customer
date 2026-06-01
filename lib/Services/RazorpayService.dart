@@ -29,7 +29,7 @@ class RazorpayService {
     _razorpay.clear();
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     print("--- [RazorpayService] Payment Success Callback ---");
     print("Payment ID: ${response.paymentId}");
     print("Order ID: ${response.orderId}");
@@ -50,40 +50,8 @@ class RazorpayService {
       return;
     }
 
-    // Show verification loading loader
-    Get.dialog(
-      const Center(child: CircularProgressIndicator(color: Colors.blue)),
-      barrierDismissible: false,
-    );
-
-    // Call verify payment API
-    bool isVerified = await verifyPayment(
-      paymentId: response.paymentId!,
-      orderId: response.orderId!,
-      signature: response.signature!,
-      bookingType: _currentBookingType,
-      bookingId: _currentBookingId,
-    );
-
-    // Close loader
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
-    }
-
-    if (isVerified) {
-      if (_onSuccessCallback != null) {
-        _onSuccessCallback!(response);
-      }
-    } else {
-      if (_onFailureCallback != null) {
-        _onFailureCallback!(
-          PaymentFailureResponse(
-            Razorpay.PAYMENT_CANCELLED,
-            "Payment verification failed on backend.",
-            const {},
-          ),
-        );
-      }
+    if (_onSuccessCallback != null) {
+      _onSuccessCallback!(response);
     }
   }
 
@@ -102,22 +70,33 @@ class RazorpayService {
   }
 
   // Call Backend to Create Order
-  Future<String?> createOrder(double amount, String bookingType, String bookingId) async {
+  Future<String?> createOrder(
+    double amount,
+    String bookingType,
+    String bookingId,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
-      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.createOrder}";
+
+      String url;
+      Map<String, dynamic> data;
+
+      if (bookingType == "1") {
+        url = "${ApiConfigs.BASE_URL}${ApiEndPoints.createOrder}";
+        data = {'booking_id': bookingId};
+      } else {
+        url = "${ApiConfigs.BASE_URL}${ApiEndPoints.createOrder}";
+        data = {
+          'amount': amount.toStringAsFixed(2),
+          'booking_type': bookingType,
+          'booking_id': bookingId,
+        };
+      }
 
       final headers = {
         'Accept': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
-      };
-
-      // Since backend expects FormData matching the rest of the application
-      final Map<String, dynamic> data = {
-        'amount': amount.toStringAsFixed(2),
-        'booking_type': bookingType,
-        'booking_id': bookingId,
       };
 
       print(
@@ -137,70 +116,39 @@ class RazorpayService {
       print("--- [RazorpayService] Response data: ${response.data} ---");
 
       if (response.statusCode == 200 && response.data != null) {
-        if (response.data['success'] == true ||
-            response.data['success'].toString() == "true") {
-          return response.data['order_id']?.toString();
+        final responseData = response.data;
+        if (responseData is Map) {
+          // If order_id or id is directly present, return it immediately
+          var orderId = responseData['order_id'] ?? responseData['id'];
+          if (orderId == null && responseData['data'] is Map) {
+            orderId =
+                responseData['data']['order_id'] ?? responseData['data']['id'];
+          }
+          if (orderId != null) {
+            return orderId.toString();
+          }
+
+          // Fallback check for success/status indicators
+          if (responseData['success'] == true ||
+              responseData['success'].toString() == "true" ||
+              responseData['status'] == true ||
+              responseData['status'].toString() == "true") {
+            var nestedId = responseData['order_id'] ?? responseData['id'];
+            if (nestedId == null && responseData['data'] is Map) {
+              nestedId =
+                  responseData['data']['order_id'] ??
+                  responseData['data']['id'];
+            }
+            if (nestedId != null) {
+              return nestedId.toString();
+            }
+          }
         }
       }
       return null;
     } catch (e) {
       print("--- [RazorpayService] createOrder API EXCEPTION: $e ---");
       return null;
-    }
-  }
-
-  // Call Backend to Verify Payment
-  Future<bool> verifyPayment({
-    required String paymentId,
-    required String orderId,
-    required String signature,
-    required String bookingType,
-    required String bookingId,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('auth_token');
-      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.verifyPayment}";
-
-      final headers = {
-        'Accept': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
-
-      final Map<String, dynamic> data = {
-        'payment_id': paymentId,
-        'order_id': orderId,
-        'signature': signature,
-        'booking_type': bookingType,
-        'booking_id': bookingId,
-      };
-
-      print(
-        "--- [RazorpayService] Requesting verifyPayment: POST $url with $data ---",
-      );
-      final FormData formData = FormData.fromMap(data);
-
-      final response = await ApiConfigs.dio.post(
-        url,
-        data: formData,
-        options: Options(headers: headers),
-      );
-
-      print(
-        "--- [RazorpayService] verifyPayment response: ${response.statusCode} ---",
-      );
-      print("--- [RazorpayService] Response data: ${response.data} ---");
-
-      if (response.statusCode == 200 && response.data != null) {
-        if (response.data['success'] == true ||
-            response.data['success'].toString() == "true") {
-          return true;
-        }
-      }
-      return false;
-    } catch (e) {
-      print("--- [RazorpayService] verifyPayment API EXCEPTION: $e ---");
-      return false;
     }
   }
 
@@ -236,11 +184,14 @@ class RazorpayService {
     }
 
     if (orderId == null) {
-      Get.snackbar(
-        "Order Creation Failed",
-        "Unable to generate order ID from backend.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text("Unable to generate order ID from backend."),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
       onFailure(
         PaymentFailureResponse(
           Razorpay.PAYMENT_CANCELLED,
@@ -269,7 +220,11 @@ class RazorpayService {
     } catch (e) {
       print("--- [RazorpayService] Error opening Razorpay checkout: $e ---");
       onFailure(
-        PaymentFailureResponse(Razorpay.PAYMENT_CANCELLED, e.toString(), const {}),
+        PaymentFailureResponse(
+          Razorpay.PAYMENT_CANCELLED,
+          e.toString(),
+          const {},
+        ),
       );
     }
   }

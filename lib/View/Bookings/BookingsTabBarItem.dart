@@ -29,6 +29,18 @@ class BookingsTabBarItem extends StatelessWidget {
     required this.indexValue,
   }) : super(key: key);
 
+  String _formatLanguages(dynamic languages) {
+    if (languages == null) return "Languages";
+    if (languages is String) return languages;
+    if (languages is List) {
+      return languages.map((l) {
+        if (l is Map) return l['language'] ?? '';
+        return l.toString();
+      }).where((s) => s.isNotEmpty).join(", ");
+    }
+    return "Languages";
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BookingsController>(
@@ -115,15 +127,18 @@ class BookingsTabBarItem extends StatelessWidget {
                         swapValue
                             ? InkWell(
                               onTap: () {
-                                if (indexValue == 0)
+                                if (indexValue == 0 || indexValue == 1)
                                   Get.to(
                                     PendingBookingDetails(
                                       bookingId: booking!['booking_id'],
                                     ),
                                   );
-                                else if (indexValue == 3)
+                                else if (indexValue == 4)
                                   Get.to(
-                                    OngoingBookingDetails(type: "cancelled"),
+                                    OngoingBookingDetails(
+                                      type: "cancelled",
+                                      bookingId: booking!['booking_id'] ?? booking['id'],
+                                    ),
                                   );
                               },
                               child: HomeNurseDetailsWidget(
@@ -138,29 +153,25 @@ class BookingsTabBarItem extends StatelessWidget {
                                     "${booking?['experience'] ?? 0} Years of Experience",
                                 checkInDate: booking?['checkin_date'] ?? "",
                                 checkInTime: booking?['checkin_time'] ?? "",
-                                languages:
-                                    (booking?['languages'] as List?)?.join(
-                                      ", ",
-                                    ) ??
-                                    "Languages",
+                                languages: _formatLanguages(booking?['languages']),
                               ),
                             )
                             : const SizedBox.shrink(),
-                            // InkWell(
-                            //   onTap: () {
-                            //     if (indexValue == 3) {
-                            //       Get.to(
-                            //         DoctorsRequestCancelledScreen(
-                            //           bookingType: 'home',
-                            //         ),
-                            //       );
-                            //     }
-                            //   },
-                            //   child: BookingsDoctorDetailsWidget(
-                            //     showButton: false,
-                            //     buttonText: Strings.makePayment,
-                            //   ),
-                            // ),
+                    // InkWell(
+                    //   onTap: () {
+                    //     if (indexValue == 3) {
+                    //       Get.to(
+                    //         DoctorsRequestCancelledScreen(
+                    //           bookingType: 'home',
+                    //         ),
+                    //       );
+                    //     }
+                    //   },
+                    //   child: BookingsDoctorDetailsWidget(
+                    //     showButton: false,
+                    //     buttonText: Strings.makePayment,
+                    //   ),
+                    // ),
                   ),
                 ],
               );

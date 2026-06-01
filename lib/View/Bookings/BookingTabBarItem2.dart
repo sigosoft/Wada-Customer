@@ -28,6 +28,18 @@ class BookingsTabBarItem2 extends StatelessWidget {
     required this.indexValue,
   }) : super(key: key);
 
+  String _formatLanguages(dynamic languages) {
+    if (languages == null) return "Languages";
+    if (languages is String) return languages;
+    if (languages is List) {
+      return languages.map((l) {
+        if (l is Map) return l['language'] ?? '';
+        return l.toString();
+      }).where((s) => s.isNotEmpty).join(", ");
+    }
+    return "Languages";
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BookingsController>(
@@ -98,7 +110,11 @@ class BookingsTabBarItem2 extends StatelessWidget {
                 child: swapValue
                     ? InkWell(
                         onTap: () {
-                          Get.to(UpcomingBookingDetails());
+                          Get.to(
+                            UpcomingBookingDetails(
+                              bookingId: booking!['booking_id'] ?? booking['id'],
+                            ),
+                          );
                         },
                         child: HomeNurseDetailsWidget(
                           showButton: false,
@@ -111,9 +127,7 @@ class BookingsTabBarItem2 extends StatelessWidget {
                               "${booking?['experience'] ?? 0} Years of Experience",
                           checkInDate: booking?['checkin_date'] ?? "",
                           checkInTime: booking?['checkin_time'] ?? "",
-                          languages: (booking?['languages'] as List?)
-                                  ?.join(", ") ??
-                              "Languages",
+                          languages: _formatLanguages(booking?['languages']),
                         ),
                       )
                     : const SizedBox.shrink(),

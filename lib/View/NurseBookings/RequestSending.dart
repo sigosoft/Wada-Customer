@@ -243,8 +243,7 @@ class _RequestSendingState extends State<RequestSending> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text:
-                                  "₹${controller.nurseData?['nurse_charges']?[0]?['price'] ?? '0'}",
+                              text: "₹${controller.amount}",
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
                               size: 14.00,
@@ -270,8 +269,7 @@ class _RequestSendingState extends State<RequestSending> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text:
-                                  "₹${controller.nurseData?['nurse_charges']?[0]?['price'] ?? '0'}",
+                              text: "₹${controller.amount}",
                               color: Colors.black,
                               fontWeight: FontWeight.w800,
                               size: 14.00,

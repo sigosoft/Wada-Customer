@@ -28,7 +28,11 @@ class _BookingsState extends State<Bookings>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(label: Strings.bookings, showCloseIcon: false,elevation: 0.0,),
+      appBar: CustomAppBar(
+        label: Strings.bookings,
+        showCloseIcon: false,
+        elevation: 0.0,
+      ),
       body: SafeArea(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
@@ -54,7 +58,7 @@ class _BookingsState extends State<Bookings>
                               },
                             ),
                           ),
-                          SizedBox(width: 10,),
+                          SizedBox(width: 10),
                           Expanded(
                             child: HealthCardRowWidget(
                               text: Strings.doctorBookings,
@@ -72,15 +76,32 @@ class _BookingsState extends State<Bookings>
                       child: CustomTabBarWidget(
                         tabs: const [
                           Tab(text: Strings.requests),
+                          Tab(text: Strings.pending),
                           Tab(text: Strings.upcoming),
                           Tab(text: Strings.completed),
                           Tab(text: Strings.cancelled),
                         ],
-                        tabViews:  [
-                          BookingsTabBarItem(swapValue: controller.switchValue,indexValue:0),
-                          BookingsTabBarItem2(swapValue: controller.switchValue,indexValue:1),
-                          BookingsTabBarItem3(swapValue: controller.switchValue,indexValue:2),
-                          BookingsTabBarItem(swapValue: controller.switchValue,indexValue:3),
+                        tabViews: [
+                          BookingsTabBarItem(
+                            swapValue: controller.switchValue,
+                            indexValue: 0,
+                          ),
+                          BookingsTabBarItem(
+                            swapValue: controller.switchValue,
+                            indexValue: 1,
+                          ),
+                          BookingsTabBarItem2(
+                            swapValue: controller.switchValue,
+                            indexValue: 2,
+                          ),
+                          BookingsTabBarItem3(
+                            swapValue: controller.switchValue,
+                            indexValue: 3,
+                          ),
+                          BookingsTabBarItem(
+                            swapValue: controller.switchValue,
+                            indexValue: 4,
+                          ),
                         ],
                       ),
                     ),
@@ -92,4 +113,3 @@ class _BookingsState extends State<Bookings>
     );
   }
 }
-

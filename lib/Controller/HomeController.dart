@@ -136,7 +136,7 @@ class HomeController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
       String url =
-          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=0&page=1";
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.listBookings}?limit=10&type=1&page=1";
 
       final headers = {
         'Accept': 'application/json',
