@@ -124,7 +124,8 @@ class _HomeItemState extends State<HomeItem> {
                                           Get.to(
                                             () => ChooseLocation(
                                               bookingId:
-                                                  booking['booking_id']
+                                                  (booking['booking_id'] ??
+                                                          booking['id'])
                                                       ?.toString(),
                                             ),
                                           );
