@@ -328,6 +328,8 @@ class _BookingDetailsState extends State<BookingDetails> {
                       widget.bookingData?['id']?.toString() ??
                       widget.bookingData?['booking_id']?.toString() ??
                       "0",
+                  id: widget.doctorData?['id']?.toString() ?? '',
+                  paymentType: paymentMethods[selectedPaymentIndex]['title'],
                   description: "Doctor Video Consult Payment",
                   contact: contact,
                   email: email,

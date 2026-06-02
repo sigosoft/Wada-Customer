@@ -586,6 +586,10 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                           amount: amount,
                           bookingType: "1",
                           bookingId: widget.bookingId.toString(),
+                          id:
+                              (details['nurse_id'] ?? details['id'] ?? '')
+                                  .toString(),
+                          paymentType: "Online Transaction",
                           description:
                               "Nurse Booking Payment for ID ${widget.bookingId}",
                           contact: contact,

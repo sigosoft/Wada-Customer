@@ -573,6 +573,8 @@ class BookingsController extends GetxController {
                                 bookingData?['id']?.toString() ??
                                 bookingData?['booking_id']?.toString() ??
                                 "0",
+                            id: doctorData?['id']?.toString() ?? '',
+                            paymentType: method,
                             description: "Doctor Home Visit Payment",
                             contact: contact,
                             email: email,

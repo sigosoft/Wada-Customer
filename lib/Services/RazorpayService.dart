@@ -163,6 +163,8 @@ class RazorpayService {
     required String key, // Test Key: rzp_test_T8uZQ7cP2kcNGN
     required Function(PaymentSuccessResponse) onSuccess,
     required Function(PaymentFailureResponse) onFailure,
+    String? id, // nurse_id or doctor_id
+    String? paymentType,
   }) async {
     _onSuccessCallback = onSuccess;
     _onFailureCallback = onFailure;
@@ -214,6 +216,21 @@ class RazorpayService {
       'prefill': {
         'contact': contact.isNotEmpty ? contact : '9876543210',
         'email': email.isNotEmpty ? email : 'test@test.com',
+      },
+      'notes': {
+        'payment_type': paymentType ?? 'Online',
+        'total_amount': amount.toString(),
+        'type': bookingType,
+        'id': id ?? '',
+      },
+      'config': {
+        'display': {
+          'hide': [
+            {'method': 'emi'},
+            {'method': 'paylater'},
+          ],
+          'preferences': {'show_default_blocks': true},
+        },
       },
     };
 
