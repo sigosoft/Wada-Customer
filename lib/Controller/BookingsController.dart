@@ -98,7 +98,9 @@ class BookingsController extends GetxController {
 
       if (response.statusCode == 200 && response.data['data'] != null) {
         selectedBookingDetails = response.data['data'];
-        print("--- [BookingsController] selectedBookingDetails: $selectedBookingDetails ---");
+        print(
+          "--- [BookingsController] selectedBookingDetails: $selectedBookingDetails ---",
+        );
       }
     } catch (e) {
       print("--- API Error (Booking Details) ---");
@@ -148,7 +150,7 @@ class BookingsController extends GetxController {
           }).toList();
 
       final results = await Future.wait(futures);
-      
+
       // Store results by type in a map
       final Map<int, List<dynamic>> bookingsByType = {};
       for (int i = 0; i < types.length; i++) {
@@ -591,16 +593,28 @@ class BookingsController extends GetxController {
                                 "--- Doctor Payment Failed: ${errorResponse.message} ---",
                               );
                               if (Get.context != null) {
-                                final isCancelled = errorResponse.code == Razorpay.PAYMENT_CANCELLED || errorResponse.code == 2;
-                                final displayMessage = isCancelled
-                                    ? "Payment cancelled."
-                                    : (errorResponse.message == null || errorResponse.message == "undefined" || errorResponse.message!.trim().isEmpty
-                                        ? "The payment could not be processed."
-                                        : errorResponse.message!);
+                                final isCancelled =
+                                    errorResponse.code ==
+                                        Razorpay.PAYMENT_CANCELLED ||
+                                    errorResponse.code == 2;
+                                final displayMessage =
+                                    isCancelled
+                                        ? "Payment cancelled."
+                                        : (errorResponse.message == null ||
+                                                errorResponse.message ==
+                                                    "undefined" ||
+                                                errorResponse.message!
+                                                    .trim()
+                                                    .isEmpty
+                                            ? "The payment could not be processed."
+                                            : errorResponse.message!);
                                 ScaffoldMessenger.of(Get.context!).showSnackBar(
                                   SnackBar(
                                     content: Text(displayMessage),
-                                    backgroundColor: isCancelled ? Colors.orangeAccent : Colors.redAccent,
+                                    backgroundColor:
+                                        isCancelled
+                                            ? Colors.orangeAccent
+                                            : Colors.redAccent,
                                   ),
                                 );
                               }

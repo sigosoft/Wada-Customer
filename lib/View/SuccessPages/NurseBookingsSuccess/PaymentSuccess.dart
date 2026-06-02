@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:waada_customerapp/View/Home/Home.dart';
+import 'package:waada_customerapp/View/Map/ChooseLocation.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import '../../../Resource/Strings.dart';
 import '../../Home/HomeNurseDetailsWidget.dart';
@@ -103,7 +104,11 @@ class PaymentSuccess extends StatelessWidget {
                   flex: 4,
                   child: SubmitButtonWidget(
                     onTap: () {
-                      Get.offAll(() => const Home());
+                      Get.to(
+                        () => ChooseLocation(
+                          bookingId: data?['booking_id']?.toString(),
+                        ),
+                      );
                     },
                     text: Strings.sharelocation,
                   ),

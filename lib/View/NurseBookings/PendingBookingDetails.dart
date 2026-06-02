@@ -14,6 +14,8 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/CancelBookingSuccess.dart';
+import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/PaymentCancelledScreen.dart';
+import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/PaymentFailedScreen.dart';
 import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/PaymentSuccess.dart';
 import 'package:waada_customerapp/Widgets/NurseDetailsWidget.dart';
 import 'package:waada_customerapp/Widgets/ShiftDetailsWidget.dart';
@@ -593,49 +595,6 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                             print(
                               "--- Payment Success: ${successResponse.paymentId} ---",
                             );
-                            // Call API to update payment status
-                            try {
-                              final prefs =
-                                  await SharedPreferences.getInstance();
-                              final String? token = prefs.getString(
-                                'auth_token',
-                              );
-                              String url =
-                                  "${ApiConfigs.BASE_URL}${ApiEndPoints.updateNursePaymentStatus}";
-
-                              final Map<String, dynamic> data = {
-                                'booking_id': widget.bookingId.toString(),
-                              };
-                              final dio_instance.FormData formData =
-                                  dio_instance.FormData.fromMap(data);
-
-                              print(
-                                "--- [PendingBookingDetails] Request: POST $url ---",
-                              );
-
-                              final response = await ApiConfigs.dio.post(
-                                url,
-                                data: formData,
-                                options: dio_instance.Options(
-                                  headers: {
-                                    'Accept': 'application/json',
-                                    if (token != null)
-                                      'Authorization': 'Bearer $token',
-                                  },
-                                ),
-                              );
-
-                              print(
-                                "--- [PendingBookingDetails] Response: ${response.statusCode} ---",
-                              );
-                              print(
-                                "--- [PendingBookingDetails] Data: ${response.data} ---",
-                              );
-                            } catch (e) {
-                              print(
-                                "--- [PendingBookingDetails] API ERROR: $e ---",
-                              );
-                            }
 
                             Get.to(
                               PaymentSuccess(
@@ -647,6 +606,7 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                                   'image': details['image'],
                                   'checkin_date': details['checkin_date'],
                                   'checkin_time': details['checkin_time'],
+                                  'booking_id': widget.bookingId.toString(),
                                   'languages':
                                       (details['languages'] as List?)
                                           ?.map(
@@ -678,15 +638,15 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                                                   .isEmpty
                                           ? "The payment could not be processed."
                                           : errorResponse.message!);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(displayMessage),
-                                  backgroundColor:
-                                      isCancelled
-                                          ? Colors.orangeAccent
-                                          : Colors.redAccent,
-                                ),
-                              );
+                              if (isCancelled) {
+                                Get.to(() => const PaymentCancelledScreen());
+                              } else {
+                                Get.to(
+                                  () => PaymentFailedScreen(
+                                    errorMessage: displayMessage,
+                                  ),
+                                );
+                              }
                             }
                           },
                         );

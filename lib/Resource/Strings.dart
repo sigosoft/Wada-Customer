@@ -281,4 +281,10 @@ class Strings {
   static const String becomeserviceProvider = "Become a Service Provider";
   static const String useCurrentLocation = "Use Current Location";
   static const String selectPlaces = "Select places";
+  static const String paymentCancelled = "Payment Cancelled";
+  static const String paymentCancelledMessage =
+      "You cancelled the payment. No amount has been deducted.";
+  static const String paymentFailed = "Payment Failed";
+  static const String paymentFailedMessage =
+      "The payment could not be processed. Please try again.";
 }

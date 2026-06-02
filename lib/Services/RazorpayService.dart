@@ -209,6 +209,8 @@ class RazorpayService {
       'name': 'Wada App',
       'description': description,
       'order_id': orderId,
+      'payment_capture':
+          1, // Auto capture payment immediately after authorization
       'prefill': {
         'contact': contact.isNotEmpty ? contact : '9876543210',
         'email': email.isNotEmpty ? email : 'test@test.com',
