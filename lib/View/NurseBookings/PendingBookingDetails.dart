@@ -25,7 +25,12 @@ import '../../Widgets/CheckboxWdget.dart';
 
 class PendingBookingDetails extends StatefulWidget {
   final int bookingId;
-  const PendingBookingDetails({super.key, required this.bookingId});
+  final bool hidePayment;
+  const PendingBookingDetails({
+    super.key,
+    required this.bookingId,
+    this.hidePayment = false,
+  });
 
   @override
   State<PendingBookingDetails> createState() => _PendingBookingDetailsState();
@@ -542,121 +547,125 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30),
-                    SubmitButtonWidget(
-                      onTap: () async {
-                        print(
-                          "--- Make Payment button clicked for ID: ${widget.bookingId} ---",
-                        );
+                    if (!widget.hidePayment) ...[
+                      const SizedBox(height: 30),
+                      SubmitButtonWidget(
+                        onTap: () async {
+                          print(
+                            "--- Make Payment button clicked for ID: ${widget.bookingId} ---",
+                          );
 
-                        double amount = parsedAmount;
-                        String email = '';
-                        String contact = '';
+                          double amount = parsedAmount;
+                          String email = '';
+                          String contact = '';
 
-                        try {
-                          if (Get.isRegistered<ProfileController>()) {
-                            final profileController =
-                                Get.find<ProfileController>();
-                            email =
-                                profileController.patientData?['email']
-                                    ?.toString() ??
-                                '';
-                            contact =
-                                profileController.patientData?['mobile']
-                                    ?.toString() ??
-                                '';
-                          } else {
-                            final profileController = Get.put(
-                              ProfileController(),
-                            );
-                            email =
-                                profileController.patientData?['email']
-                                    ?.toString() ??
-                                '';
-                            contact =
-                                profileController.patientData?['mobile']
-                                    ?.toString() ??
-                                '';
-                          }
-                        } catch (e) {
-                          print("Error getting profile: $e");
-                        }
-
-                        await RazorpayService().startPayment(
-                          amount: amount,
-                          bookingType: "1",
-                          bookingId: widget.bookingId.toString(),
-                          id:
-                              (details['nurse_id'] ?? details['id'] ?? '')
-                                  .toString(),
-                          paymentType: "Online Transaction",
-                          description:
-                              "Nurse Booking Payment for ID ${widget.bookingId}",
-                          contact: contact,
-                          email: email,
-                          key: "rzp_test_T8uZQ7cP2kcNGN",
-                          onSuccess: (successResponse) async {
-                            print(
-                              "--- Payment Success: ${successResponse.paymentId} ---",
-                            );
-
-                            Get.to(
-                              PaymentSuccess(
-                                data: {
-                                  'name': details['name'],
-                                  'location': details['location'],
-                                  'qualification': details['qualification'],
-                                  'experience': details['experience'],
-                                  'image': details['image'],
-                                  'checkin_date': details['checkin_date'],
-                                  'checkin_time': details['checkin_time'],
-                                  'booking_id': widget.bookingId.toString(),
-                                  'languages':
-                                      (details['languages'] as List?)
-                                          ?.map(
-                                            (l) =>
-                                                (l is Map) ? l['language'] : l,
-                                          )
-                                          .toList(),
-                                },
-                              ),
-                            );
-                          },
-                          onFailure: (errorResponse) {
-                            print(
-                              "--- Payment Failed: ${errorResponse.message} ---",
-                            );
-                            if (mounted) {
-                              final isCancelled =
-                                  errorResponse.code ==
-                                      Razorpay.PAYMENT_CANCELLED ||
-                                  errorResponse.code == 2;
-                              final displayMessage =
-                                  isCancelled
-                                      ? "Payment cancelled."
-                                      : (errorResponse.message == null ||
-                                              errorResponse.message ==
-                                                  "undefined" ||
-                                              errorResponse.message!
-                                                  .trim()
-                                                  .isEmpty
-                                          ? "The payment could not be processed."
-                                          : errorResponse.message!);
-                              if (isCancelled) {
-                                Get.to(() => const PaymentCancelledScreen());
-                              } else {
-                                Get.to(
-                                  () => PaymentFailedScreen(
-                                    errorMessage: displayMessage,
-                                  ),
-                                );
-                              }
+                          try {
+                            if (Get.isRegistered<ProfileController>()) {
+                              final profileController =
+                                  Get.find<ProfileController>();
+                              email =
+                                  profileController.patientData?['email']
+                                      ?.toString() ??
+                                  '';
+                              contact =
+                                  profileController.patientData?['mobile']
+                                      ?.toString() ??
+                                  '';
+                            } else {
+                              final profileController = Get.put(
+                                ProfileController(),
+                              );
+                              email =
+                                  profileController.patientData?['email']
+                                      ?.toString() ??
+                                  '';
+                              contact =
+                                  profileController.patientData?['mobile']
+                                      ?.toString() ??
+                                  '';
                             }
-                          },
-                        );
-                      },
-                      text: Strings.makePayment,
-                    ),
+                          } catch (e) {
+                            print("Error getting profile: $e");
+                          }
+
+                          await RazorpayService().startPayment(
+                            amount: amount,
+                            bookingType: "1",
+                            bookingId: widget.bookingId.toString(),
+                            id:
+                                (details['nurse_id'] ?? details['id'] ?? '')
+                                    .toString(),
+                            paymentType: "Online Transaction",
+                            description:
+                                "Nurse Booking Payment for ID ${widget.bookingId}",
+                            contact: contact,
+                            email: email,
+                            key: "rzp_test_T8uZQ7cP2kcNGN",
+                            onSuccess: (successResponse) async {
+                              print(
+                                "--- Payment Success: ${successResponse.paymentId} ---",
+                              );
+
+                              Get.to(
+                                PaymentSuccess(
+                                  data: {
+                                    'name': details['name'],
+                                    'location': details['location'],
+                                    'qualification': details['qualification'],
+                                    'experience': details['experience'],
+                                    'image': details['image'],
+                                    'checkin_date': details['checkin_date'],
+                                    'checkin_time': details['checkin_time'],
+                                    'booking_id': widget.bookingId.toString(),
+                                    'languages':
+                                        (details['languages'] as List?)
+                                            ?.map(
+                                              (l) =>
+                                                  (l is Map)
+                                                      ? l['language']
+                                                      : l,
+                                            )
+                                            .toList(),
+                                  },
+                                ),
+                              );
+                            },
+                            onFailure: (errorResponse) {
+                              print(
+                                "--- Payment Failed: ${errorResponse.message} ---",
+                              );
+                              if (mounted) {
+                                final isCancelled =
+                                    errorResponse.code ==
+                                        Razorpay.PAYMENT_CANCELLED ||
+                                    errorResponse.code == 2;
+                                final displayMessage =
+                                    isCancelled
+                                        ? "Payment cancelled."
+                                        : (errorResponse.message == null ||
+                                                errorResponse.message ==
+                                                    "undefined" ||
+                                                errorResponse.message!
+                                                    .trim()
+                                                    .isEmpty
+                                            ? "The payment could not be processed."
+                                            : errorResponse.message!);
+                                if (isCancelled) {
+                                  Get.to(() => const PaymentCancelledScreen());
+                                } else {
+                                  Get.to(
+                                    () => PaymentFailedScreen(
+                                      errorMessage: displayMessage,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        },
+                        text: Strings.makePayment,
+                      ),
+                    ],
                     const SizedBox(height: 30),
                   ],
                 ),

@@ -75,21 +75,41 @@ class RazorpayService {
     String bookingType,
     String bookingId,
   ) async {
+    print(
+      "--- [RazorpayService] createOrder called: amount=$amount, bookingType='$bookingType', bookingId='$bookingId' ---",
+    );
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('auth_token');
 
+      // Normalize booking type
+      String normalizedBookingType = bookingType;
+      if (bookingType == "1") {
+        normalizedBookingType = "nurse_booking";
+      } else if (bookingType == "2") {
+        normalizedBookingType = "doctor_booking";
+      } else if (bookingType == "3") {
+        normalizedBookingType = "other_service_booking";
+      }
+      print(
+        "--- [RazorpayService] createOrder normalized bookingType to: '$normalizedBookingType' ---",
+      );
+
       String url;
       Map<String, dynamic> data;
 
-      if (bookingType == "1") {
+      if (normalizedBookingType == "nurse_booking") {
         url = "${ApiConfigs.BASE_URL}${ApiEndPoints.createOrder}";
-        data = {'booking_id': bookingId};
+        data = {
+          'booking_id': bookingId,
+          'type': normalizedBookingType,
+          'amount': amount.toStringAsFixed(2),
+        };
       } else {
         url = "${ApiConfigs.BASE_URL}${ApiEndPoints.createOrder}";
         data = {
           'amount': amount.toStringAsFixed(2),
-          'booking_type': bookingType,
+          'type': normalizedBookingType,
           'booking_id': bookingId,
         };
       }
@@ -100,7 +120,7 @@ class RazorpayService {
       };
 
       print(
-        "--- [RazorpayService] Requesting createOrder: POST $url with $data ---",
+        "--- [RazorpayService] Requesting createOrder: POST $url with payload Map: $data ---",
       );
       final FormData formData = FormData.fromMap(data);
 
@@ -166,9 +186,26 @@ class RazorpayService {
     String? id, // nurse_id or doctor_id
     String? paymentType,
   }) async {
+    print(
+      "--- [RazorpayService] startPayment called: amount=$amount, bookingType='$bookingType', bookingId='$bookingId' ---",
+    );
     _onSuccessCallback = onSuccess;
     _onFailureCallback = onFailure;
-    _currentBookingType = bookingType;
+
+    // Map the booking type to string representation
+    String mappedBookingType = bookingType;
+    if (bookingType == "1") {
+      mappedBookingType = "nurse_booking";
+    } else if (bookingType == "2") {
+      mappedBookingType = "doctor_booking";
+    } else if (bookingType == "3") {
+      mappedBookingType = "other_service_booking";
+    }
+    print(
+      "--- [RazorpayService] startPayment mappedBookingType to: '$mappedBookingType' ---",
+    );
+
+    _currentBookingType = mappedBookingType;
     _currentBookingId = bookingId;
 
     // Show loading dialog
@@ -178,7 +215,7 @@ class RazorpayService {
     );
 
     // Call backend to create order
-    final orderId = await createOrder(amount, bookingType, bookingId);
+    final orderId = await createOrder(amount, mappedBookingType, bookingId);
 
     // Close loading dialog
     if (Get.isDialogOpen ?? false) {
@@ -220,8 +257,8 @@ class RazorpayService {
       'notes': {
         'payment_type': paymentType ?? 'Online',
         'total_amount': amount.toString(),
-        'type': bookingType,
-        'id': id ?? '',
+        'type': mappedBookingType,
+        'id': bookingId,
       },
       'config': {
         'display': {
@@ -235,6 +272,9 @@ class RazorpayService {
     };
 
     try {
+      print(
+        "--- [RazorpayService] opening Razorpay checkout with options Map: $options ---",
+      );
       _razorpay.open(options);
     } catch (e) {
       print("--- [RazorpayService] Error opening Razorpay checkout: $e ---");

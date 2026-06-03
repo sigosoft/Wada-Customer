@@ -155,6 +155,11 @@ class BookingsController extends GetxController {
       final Map<int, List<dynamic>> bookingsByType = {};
       for (int i = 0; i < types.length; i++) {
         bookingsByType[types[i]] = results[i];
+        if (results[i].isNotEmpty) {
+          print(
+            "--- [BookingsController] type ${types[i]} first element: ${results[i].first} ---",
+          );
+        }
       }
 
       // Order of priority: 3.Cancel, 2.Completed, 4.Ongoing, 6.Upcoming, 1.Pending, 0.Requested, 5.Rejected
@@ -163,6 +168,7 @@ class BookingsController extends GetxController {
         final list = bookingsByType[t] ?? [];
         for (var booking in list) {
           final b = Map<String, dynamic>.from(booking);
+          // Set booking_status to reflect the query type t
           b['booking_status'] = t.toString();
           allBookings.add(b);
         }
@@ -175,6 +181,9 @@ class BookingsController extends GetxController {
             final id = b['id'] ?? b['booking_id'];
             return seenIds.add(id);
           }).toList();
+      print(
+        "--- [BookingsController] Total de-duplicated nurseBookings: ${nurseBookings.length} ---",
+      );
     } catch (e) {
       nurseBookings = [];
     } finally {
@@ -192,23 +201,37 @@ class BookingsController extends GetxController {
       nurseBookings
           .where(
             (b) =>
-                b['booking_status'].toString() == "0" || // Requested
-                b['booking_status'].toString() == "4" || // Ongoing
-                b['booking_status'].toString() == "5",
-          ) // Rejected
+                (b['booking_status'].toString() == "0" &&
+                    b['payment_status'].toString() != "1") ||
+                b['booking_status'].toString() == "5", // Rejected
+          )
           .toList();
+
   List<dynamic> get pendingBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "1") // Pending
+          .where(
+            (b) =>
+                b['booking_status'].toString() == "0" &&
+                b['payment_status'].toString() == "1",
+          )
           .toList();
+
   List<dynamic> get upcomingBookings =>
       nurseBookings
-          .where((b) => b['booking_status'].toString() == "6") // Upcoming
+          .where(
+            (b) =>
+                (b['booking_status'].toString() == "1" &&
+                    b['payment_status'].toString() == "2") ||
+                b['booking_status'].toString() == "6" || // Upcoming
+                b['booking_status'].toString() == "4", // Ongoing
+          )
           .toList();
+
   List<dynamic> get completedBookings =>
       nurseBookings
           .where((b) => b['booking_status'].toString() == "2") // Completed
           .toList();
+
   List<dynamic> get cancelledBookings =>
       nurseBookings
           .where((b) => b['booking_status'].toString() == "3") // Cancelled

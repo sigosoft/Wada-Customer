@@ -33,10 +33,13 @@ class BookingsTabBarItem extends StatelessWidget {
     if (languages == null) return "Languages";
     if (languages is String) return languages;
     if (languages is List) {
-      return languages.map((l) {
-        if (l is Map) return l['language'] ?? '';
-        return l.toString();
-      }).where((s) => s.isNotEmpty).join(", ");
+      return languages
+          .map((l) {
+            if (l is Map) return l['language'] ?? '';
+            return l.toString();
+          })
+          .where((s) => s.isNotEmpty)
+          .join(", ");
     }
     return "Languages";
   }
@@ -131,13 +134,16 @@ class BookingsTabBarItem extends StatelessWidget {
                                   Get.to(
                                     PendingBookingDetails(
                                       bookingId: booking!['booking_id'],
+                                      hidePayment: indexValue == 0,
                                     ),
                                   );
                                 else if (indexValue == 4)
                                   Get.to(
                                     OngoingBookingDetails(
                                       type: "cancelled",
-                                      bookingId: booking!['booking_id'] ?? booking['id'],
+                                      bookingId:
+                                          booking!['booking_id'] ??
+                                          booking['id'],
                                     ),
                                   );
                               },
@@ -153,7 +159,9 @@ class BookingsTabBarItem extends StatelessWidget {
                                     "${booking?['experience'] ?? 0} Years of Experience",
                                 checkInDate: booking?['checkin_date'] ?? "",
                                 checkInTime: booking?['checkin_time'] ?? "",
-                                languages: _formatLanguages(booking?['languages']),
+                                languages: _formatLanguages(
+                                  booking?['languages'],
+                                ),
                               ),
                             )
                             : const SizedBox.shrink(),
