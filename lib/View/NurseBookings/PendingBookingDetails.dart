@@ -37,7 +37,9 @@ class PendingBookingDetails extends StatefulWidget {
 }
 
 class _PendingBookingDetailsState extends State<PendingBookingDetails> {
-  final BookingsController controller = Get.find<BookingsController>();
+  final BookingsController controller = Get.isRegistered<BookingsController>()
+      ? Get.find<BookingsController>()
+      : Get.put(BookingsController());
 
   @override
   void initState() {

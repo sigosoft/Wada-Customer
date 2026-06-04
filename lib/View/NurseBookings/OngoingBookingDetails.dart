@@ -23,12 +23,14 @@ class OngoingBookingDetails extends StatefulWidget {
   });
 
   @override
-  State<OngoingBookingDetails> createState() =>
-      _OngoingBookingDetailsState();
+  State<OngoingBookingDetails> createState() => _OngoingBookingDetailsState();
 }
 
 class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
-  final BookingsController controller = Get.find<BookingsController>();
+  final BookingsController controller =
+      Get.isRegistered<BookingsController>()
+          ? Get.find<BookingsController>()
+          : Get.put(BookingsController());
 
   @override
   void initState() {
@@ -43,11 +45,12 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        label: widget.type == "cancelled"
-            ? Strings.cancelled
-            : widget.type == "completed"
-            ? Strings.completed
-            : Strings.ongoing,
+        label:
+            widget.type == "cancelled"
+                ? Strings.cancelled
+                : widget.type == "completed"
+                ? Strings.completed
+                : Strings.ongoing,
         showCloseIcon: false,
       ),
       body: SafeArea(
@@ -160,19 +163,20 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                     widget.type == "cancelled"
                         ? Container()
                         : Container(
-                            margin: const EdgeInsets.only(left: 5, right: 5),
-                            child: SubmitButtonWidget(
-                              onTap: () {
-                                Get.to(const ShiftLogs());
-                              },
-                              text: Strings.shiftlogs,
-                            ),
+                          margin: const EdgeInsets.only(left: 5, right: 5),
+                          child: SubmitButtonWidget(
+                            onTap: () {
+                              Get.to(const ShiftLogs());
+                            },
+                            text: Strings.shiftlogs,
                           ),
+                        ),
                     const SizedBox(height: 10),
                     TextStyleInterForSplash(
-                      text: widget.type == "cancelled"
-                          ? Strings.shiftdetails
-                          : Strings.bookingdetails,
+                      text:
+                          widget.type == "cancelled"
+                              ? Strings.shiftdetails
+                              : Strings.bookingdetails,
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                       size: 15.00,
@@ -224,18 +228,23 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15, top: 10),
+                      margin: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 10,
+                      ),
                       child: Row(
                         children: [
                           Expanded(
                             child: ShiftDetailsWidget(
-                              text1: details['shift_type'].toString() == '1'
-                                  ? "4 Hours"
-                                  : details['shift_type'].toString() == '2'
-                                  ? "8 Hours"
-                                  : details['shift_type'].toString() == '3'
-                                  ? "12 Hours"
-                                  : "24 Hours",
+                              text1:
+                                  details['shift_type'].toString() == '1'
+                                      ? "4 Hours"
+                                      : details['shift_type'].toString() == '2'
+                                      ? "8 Hours"
+                                      : details['shift_type'].toString() == '3'
+                                      ? "12 Hours"
+                                      : "24 Hours",
                               text2: Strings.shifttype,
                               showInfoButton: true,
                             ),
@@ -272,7 +281,8 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                           ),
                           children: [
                             TextSpan(
-                              text: ' ${patient?['dob'] != null ? (DateTime.now().year - DateTime.parse(patient!['dob']).year) : ""} (${patient?['gender'] == 1 ? "M" : "F"})',
+                              text:
+                                  ' ${patient?['dob'] != null ? (DateTime.now().year - DateTime.parse(patient!['dob']).year) : ""} (${patient?['gender'] == 1 ? "M" : "F"})',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 color: Colors.grey,
@@ -285,7 +295,11 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                      margin: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 5,
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,9 +323,11 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                               fontStyle: FontStyle.normal,
                             ),
                           ),
-                          if (details['landmark'] != null || details['city'] != null)
+                          if (details['landmark'] != null ||
+                              details['city'] != null)
                             Text(
-                              "${details['landmark'] ?? ''} ${details['city'] ?? ''}".trim(),
+                              "${details['landmark'] ?? ''} ${details['city'] ?? ''}"
+                                  .trim(),
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 color: Colors.grey,
@@ -365,7 +381,11 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                         Expanded(
                           flex: 1,
                           child: TextStyleInterForSplash(
-                            text: details['invoice_number'] ?? details['booking_id']?.toString() ?? details['id']?.toString() ?? "",
+                            text:
+                                details['invoice_number'] ??
+                                details['booking_id']?.toString() ??
+                                details['id']?.toString() ??
+                                "",
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
                             size: 13.00,
@@ -414,7 +434,9 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text: details['payment_method'] ?? "Online Transaction",
+                              text:
+                                  details['payment_method'] ??
+                                  "Online Transaction",
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
                               size: 14.00,
@@ -429,7 +451,14 @@ class _OngoingBookingDetailsState extends State<OngoingBookingDetails> {
                         Expanded(
                           flex: 2,
                           child: TextStyleInterForSplash(
-                            text: "${details['shift_type'].toString() == '1' ? '4' : details['shift_type'].toString() == '2' ? '8' : details['shift_type'].toString() == '3' ? '12' : '24'} hours shift${totalDays > 1 ? ' for $totalDays Days' : ''}",
+                            text:
+                                "${details['shift_type'].toString() == '1'
+                                    ? '4'
+                                    : details['shift_type'].toString() == '2'
+                                    ? '8'
+                                    : details['shift_type'].toString() == '3'
+                                    ? '12'
+                                    : '24'} hours shift${totalDays > 1 ? ' for $totalDays Days' : ''}",
                             color: Colors.grey,
                             fontWeight: FontWeight.w500,
                             size: 14.00,

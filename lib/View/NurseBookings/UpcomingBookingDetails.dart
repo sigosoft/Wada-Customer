@@ -21,7 +21,9 @@ class UpcomingBookingDetails extends StatefulWidget {
 }
 
 class _UpcomingBookingDetailsState extends State<UpcomingBookingDetails> {
-  final BookingsController controller = Get.find<BookingsController>();
+  final BookingsController controller = Get.isRegistered<BookingsController>()
+      ? Get.find<BookingsController>()
+      : Get.put(BookingsController());
 
   @override
   void initState() {
