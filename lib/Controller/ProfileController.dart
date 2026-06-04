@@ -101,10 +101,20 @@ class ProfileController extends GetxController {
           populateFields();
         }
         update();
+      } else {
+        _handleApiError(response.data, "Failed to fetch country codes");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Country Codes DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        _handleApiError(e.response?.data, "Failed to fetch country codes");
+      } else {
+        _showError("Failed to fetch country codes. Please check your connection.");
       }
     } catch (e) {
-      print("--- API Error (Country Codes) ---");
+      print("--- API Error (Country Codes General Exception) ---");
       print("Error fetching country codes: $e");
+      _showError("Something went wrong.");
     }
   }
 
@@ -147,10 +157,20 @@ class ProfileController extends GetxController {
         patientData = response.data['data']['patient'];
         print("Profile Data: $patientData");
         populateFields();
+      } else {
+        _handleApiError(response.data, "Failed to fetch profile");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Profile DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        _handleApiError(e.response?.data, "Failed to fetch profile");
+      } else {
+        _showError("Failed to fetch profile. Please check your connection.");
       }
     } catch (e) {
-      print("--- API Error (Profile) ---");
+      print("--- API Error (Profile General Exception) ---");
       print("Error fetching profile: $e");
+      _showError("Something went wrong while fetching profile.");
     } finally {
       isLoading = false;
       update();
@@ -178,10 +198,20 @@ class ProfileController extends GetxController {
           response.data['status'].toString() == "true") {
         referralCode = response.data['data']['referral_code'] ?? "";
         print("Referral Code: $referralCode");
+      } else {
+        _handleApiError(response.data, "Failed to fetch referral code");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Referral Code DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        _handleApiError(e.response?.data, "Failed to fetch referral code");
+      } else {
+        _showError("Failed to fetch referral code.");
       }
     } catch (e) {
-      print("--- API Error (Referral Code) ---");
+      print("--- API Error (Referral Code General Exception) ---");
       print("Error fetching referral code: $e");
+      _showError("Something went wrong.");
     } finally {
       isLoading = false;
       update();
@@ -551,29 +581,52 @@ class ProfileController extends GetxController {
         fetchProfile(); // Refresh profile data
         Get.back(); // Go back after successful update
       } else {
-        if (Get.context != null) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.data['message'] ?? "Failed to update profile",
-              ),
-            ),
-          );
-        }
+        _handleApiError(response.data, "Failed to update profile");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Update Profile DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        print("Error Data: ${e.response?.data}");
+        _handleApiError(e.response?.data, "Failed to update profile");
+      } else {
+        _showError("Failed to update profile. Please check your connection.");
       }
     } catch (e) {
-      print("--- API Error (Update Profile) ---");
+      print("--- API Error (Update Profile General Exception) ---");
       print("Error updating profile: $e");
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Something went wrong. Please try again."),
-          ),
-        );
-      }
+      _showError("Something went wrong. Please try again.");
     } finally {
       isLoading = false;
       update();
+    }
+  }
+
+  void _handleApiError(dynamic data, String fallbackMessage) {
+    if (data is Map && data['message'] != null) {
+      var message = data['message'];
+      if (message is Map) {
+        String errorMessage = "";
+        message.forEach((key, value) {
+          if (value is List) {
+            errorMessage += "${value.join(', ')}\n";
+          } else {
+            errorMessage += "$value\n";
+          }
+        });
+        _showError(errorMessage.trim());
+      } else {
+        _showError(message.toString());
+      }
+    } else {
+      _showError(fallbackMessage);
+    }
+  }
+
+  void _showError(String message) {
+    if (Get.context != null) {
+      ScaffoldMessenger.of(
+        Get.context!,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }

@@ -67,123 +67,141 @@ class BookingsTabBarItem extends StatelessWidget {
         }
 
         if ((swapValue && bookings.isEmpty) || !swapValue) {
-          return Center(
-            child: Image.asset(
-              'lib/Assets/Images/No bookings.png',
-              height: MediaQuery.of(context).size.height * 0.25,
-              width: MediaQuery.of(context).size.width * 0.5,
-              fit: BoxFit.contain,
+          return RefreshIndicator(
+            color: colorPrimary,
+            onRefresh: () async {
+              await controller.fetchNurseBookings();
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'lib/Assets/Images/No bookings.png',
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
           );
         }
 
-        return NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollInfo) {
-            if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent &&
-                !controller.isLoadMore &&
-                swapValue) {
-              controller.loadMoreNurseBookings();
-            }
-            return false;
+        return RefreshIndicator(
+          color: colorPrimary,
+          onRefresh: () async {
+            await controller.fetchNurseBookings();
           },
-          child: ListView.builder(
-            itemCount:
-                (swapValue ? bookings.length : 1) +
-                (controller.isLoadMore && swapValue ? 1 : 0),
-            padding: const EdgeInsets.only(bottom: 20),
-            itemBuilder: (context, index) {
-              if (swapValue && index == bookings.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: colorPrimary,
-                        strokeWidth: 2,
-                      ),
-                    ),
-                  ),
-                );
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification scrollInfo) {
+              if (scrollInfo.metrics.pixels ==
+                      scrollInfo.metrics.maxScrollExtent &&
+                  !controller.isLoadMore &&
+                  swapValue) {
+                controller.loadMoreNurseBookings();
               }
-
-              final booking = swapValue ? bookings[index] : null;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (index == 0 && indexValue == 0)
-                    const Padding(
-                      padding: EdgeInsets.only(left: 15, top: 10, bottom: 5),
-                      child: TextStyleInterForSplash(
-                        textAlign: TextAlign.left,
-                        text: Strings.pending,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        size: 14.00,
+              return false;
+            },
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount:
+                  (swapValue ? bookings.length : 1) +
+                  (controller.isLoadMore && swapValue ? 1 : 0),
+              padding: const EdgeInsets.only(bottom: 20),
+              itemBuilder: (context, index) {
+                if (swapValue && index == bookings.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: colorPrimary,
+                          strokeWidth: 2,
+                        ),
                       ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child:
-                        swapValue
-                            ? InkWell(
-                              onTap: () {
-                                if (indexValue == 0 || indexValue == 1)
-                                  Get.to(
-                                    PendingBookingDetails(
-                                      bookingId: booking!['booking_id'],
-                                      hidePayment: indexValue == 0,
-                                    ),
-                                  );
-                                else if (indexValue == 4)
-                                  Get.to(
-                                    OngoingBookingDetails(
-                                      type: "cancelled",
-                                      bookingId:
-                                          booking!['booking_id'] ??
-                                          booking['id'],
-                                    ),
-                                  );
-                              },
-                              child: HomeNurseDetailsWidget(
-                                showButton: false,
-                                buttonText: "",
-                                name: booking?['name'] ?? "Nurse Name",
-                                location: booking?['location'] ?? "Location",
-                                qualification:
-                                    booking?['qualification'] ??
-                                    "Qualification",
-                                experience:
-                                    "${booking?['experience'] ?? 0} Years of Experience",
-                                checkInDate: booking?['checkin_date'] ?? "",
-                                checkInTime: booking?['checkin_time'] ?? "",
-                                languages: _formatLanguages(
-                                  booking?['languages'],
+                  );
+                }
+
+                final booking = swapValue ? bookings[index] : null;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (index == 0 && indexValue == 0)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 15, top: 10, bottom: 5),
+                        child: TextStyleInterForSplash(
+                          textAlign: TextAlign.left,
+                          text: Strings.pending,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          size: 14.00,
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child:
+                          swapValue
+                              ? InkWell(
+                                onTap: () {
+                                  if (indexValue == 0 || indexValue == 1)
+                                    Get.to(
+                                      PendingBookingDetails(
+                                        bookingId: booking!['booking_id'],
+                                        hidePayment: indexValue == 0,
+                                      ),
+                                    );
+                                  else if (indexValue == 4)
+                                    Get.to(
+                                      OngoingBookingDetails(
+                                        type: "cancelled",
+                                        bookingId:
+                                            booking!['booking_id'] ??
+                                            booking['id'],
+                                      ),
+                                    );
+                                },
+                                child: HomeNurseDetailsWidget(
+                                  showButton: false,
+                                  buttonText: "",
+                                  name: booking?['name'] ?? "Nurse Name",
+                                  location: booking?['location'] ?? "Location",
+                                  qualification:
+                                      booking?['qualification'] ??
+                                      "Qualification",
+                                  experience:
+                                      "${booking?['experience'] ?? 0} Years of Experience",
+                                  checkInDate: booking?['checkin_date'] ?? "",
+                                  checkInTime: booking?['checkin_time'] ?? "",
+                                  languages: _formatLanguages(
+                                    booking?['languages'],
+                                  ),
                                 ),
-                              ),
-                            )
-                            : const SizedBox.shrink(),
-                    // InkWell(
-                    //   onTap: () {
-                    //     if (indexValue == 3) {
-                    //       Get.to(
-                    //         DoctorsRequestCancelledScreen(
-                    //           bookingType: 'home',
-                    //         ),
-                    //       );
-                    //     }
-                    //   },
-                    //   child: BookingsDoctorDetailsWidget(
-                    //     showButton: false,
-                    //     buttonText: Strings.makePayment,
-                    //   ),
-                    // ),
-                  ),
-                ],
-              );
-            },
+                              )
+                              : const SizedBox.shrink(),
+                      // InkWell(
+                      //   onTap: () {
+                      //     if (indexValue == 3) {
+                      //       Get.to(
+                      //         DoctorsRequestCancelledScreen(
+                      //           bookingType: 'home',
+                      //         ),
+                      //       );
+                      //     }
+                      //   },
+                      //   child: BookingsDoctorDetailsWidget(
+                      //     showButton: false,
+                      //     buttonText: Strings.makePayment,
+                      //   ),
+                      // ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         );
       },

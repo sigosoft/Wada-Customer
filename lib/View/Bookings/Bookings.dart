@@ -22,6 +22,11 @@ class _BookingsState extends State<Bookings>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<BookingsController>()) {
+        Get.find<BookingsController>().fetchNurseBookings();
+      }
+    });
   }
 
   @override

@@ -202,7 +202,7 @@ class BookingsController extends GetxController {
           .where(
             (b) =>
                 (b['booking_status'].toString() == "0" &&
-                    b['payment_status'].toString() != "1") ||
+                    b['payment_status'].toString() == "1") ||
                 b['booking_status'].toString() == "5", // Rejected
           )
           .toList();

@@ -40,8 +40,24 @@ class LoginController extends GetxController {
         countryCodes = codes.map((e) => e['country_code'].toString()).toList();
         countryIds = codes.map((e) => int.parse(e['id'].toString())).toList();
         update();
+      } else {
+        _handleApiError(response.data, "Failed to fetch country codes");
       }
-    } catch (e) {}
+    } on DioException catch (e) {
+      print("--- API Error (Login Country Codes DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        print("Error Data: ${e.response?.data}");
+        _handleApiError(e.response?.data, "Failed to fetch country codes");
+      } else {
+        _showError(
+          "Failed to fetch country codes. Please check your connection.",
+        );
+      }
+    } catch (e) {
+      print("--- API Error (Login Country Codes General Exception) ---");
+      print("Error fetching country codes: $e");
+      _showError("Something went wrong.");
+    }
   }
 
   Future<void> sendLoginOtp() async {
@@ -78,24 +94,20 @@ class LoginController extends GetxController {
           response.data['status'].toString() == "true") {
         Get.to(const OtpScreen2());
       } else {
-        if (Get.context != null) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(
-              content: Text(response.data['message'] ?? "Failed to send OTP"),
-            ),
-          );
-        }
+        _handleApiError(response.data, "Failed to send OTP");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Login OTP DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        print("Error Data: ${e.response?.data}");
+        _handleApiError(e.response?.data, "Failed to send OTP");
+      } else {
+        _showError("Failed to send OTP. Please check your connection.");
       }
     } catch (e) {
-      print("--- API Error (Login OTP) ---");
+      print("--- API Error (Login OTP General Exception) ---");
       print("Error sending login OTP: $e");
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Something went wrong. Please try again."),
-          ),
-        );
-      }
+      _showError("Something went wrong. Please try again.");
     }
   }
 
@@ -133,22 +145,20 @@ class LoginController extends GetxController {
 
         Get.offAll(() => Home());
       } else {
-        if (Get.context != null) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(content: Text(response.data['message'] ?? "Login failed")),
-          );
-        }
+        _handleApiError(response.data, "Login failed");
+      }
+    } on DioException catch (e) {
+      print("--- API Error (Login DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        print("Error Data: ${e.response?.data}");
+        _handleApiError(e.response?.data, "Login failed");
+      } else {
+        _showError("Login failed. Please check your connection.");
       }
     } catch (e) {
-      print("--- API Error (Login) ---");
+      print("--- API Error (Login General Exception) ---");
       print("Error during login: $e");
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text("Something went wrong. Please try again."),
-          ),
-        );
-      }
+      _showError("Something went wrong. Please try again.");
     }
   }
 
@@ -157,6 +167,27 @@ class LoginController extends GetxController {
     otpController.clear();
     selectedCountryCode = null;
     selectedCountryId = null;
+  }
+
+  void _handleApiError(dynamic data, String fallbackMessage) {
+    if (data is Map && data['message'] != null) {
+      var message = data['message'];
+      if (message is Map) {
+        String errorMessage = "";
+        message.forEach((key, value) {
+          if (value is List) {
+            errorMessage += "${value.join(', ')}\n";
+          } else {
+            errorMessage += "$value\n";
+          }
+        });
+        _showError(errorMessage.trim());
+      } else {
+        _showError(message.toString());
+      }
+    } else {
+      _showError(fallbackMessage);
+    }
   }
 
   void _showError(String message) {
