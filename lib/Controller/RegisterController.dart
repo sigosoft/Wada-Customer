@@ -154,11 +154,8 @@ class Registercontroller extends GetxController {
         "mobile": phoneController.text.trim(),
         "dob": dobController.text.trim(),
         "email": emailController.text.trim(),
+        "referral_code": referralCodeController.text.trim(),
       };
-
-      if (referralCodeController.text.trim().isNotEmpty) {
-        body["referral_code"] = referralCodeController.text.trim();
-      }
 
       FormData formData = FormData.fromMap(body);
 
