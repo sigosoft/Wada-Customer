@@ -9,6 +9,7 @@ import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Profile/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/View/Login/Login.dart';
@@ -109,7 +110,9 @@ class ProfileController extends GetxController {
       if (e.response != null && e.response?.data != null) {
         _handleApiError(e.response?.data, "Failed to fetch country codes");
       } else {
-        _showError("Failed to fetch country codes. Please check your connection.");
+        _showError(
+          "Failed to fetch country codes. Please check your connection.",
+        );
       }
     } catch (e) {
       print("--- API Error (Country Codes General Exception) ---");
@@ -330,18 +333,16 @@ class ProfileController extends GetxController {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(5.0),
-                      child: Image.asset(
-                        imagePath,
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.18,
-                        fit: BoxFit.contain,
+                        width: MediaQuery.of(context).size.height * 0.18,
+                        child: QrImageView(
+                          data: "https://thewada.com/profile?id=${patientData?['id']?.toString() ?? '375467'}",
+                          version: QrVersions.auto,
+                          size: MediaQuery.of(context).size.height * 0.18,
+                          padding: EdgeInsets.zero,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextStyleInterForSplash(
-                      text: qrCodeId,
-                      color: blackTextColor2,
-                      fontWeight: FontWeight.w400,
-                      size: 12.00,
                     ),
                   ],
                 ),

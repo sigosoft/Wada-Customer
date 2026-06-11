@@ -9,11 +9,14 @@ class FamilyMemberController extends GetxController {
   var isLoading = false.obs;
   List<dynamic> membersList = [];
 
+  List<Map<String, dynamic>> relations = [];
+
   @override
   void onInit() {
     super.onInit();
     fetchCountryCodes();
     fetchMembers();
+    fetchRelations();
   }
 
   // Form Fields for Add Member
@@ -24,7 +27,7 @@ class FamilyMemberController extends GetxController {
   final dobController = TextEditingController();
   String? gender; // "1" for Male, "2" for Female
   String? relationId;
-  String? countryCodeId = "1"; // Default to 1
+  String? countryCodeId;
   bool isEmergencyContact = false;
   bool isEditMode = false;
   int? editingMemberId;
@@ -49,6 +52,15 @@ class FamilyMemberController extends GetxController {
     update();
   }
 
+  bool get isGenderSelectable {
+    if (relationId == null) return true;
+    final selectedRelation = relations.firstWhere(
+      (r) => r['id'].toString() == relationId,
+      orElse: () => <String, dynamic>{},
+    );
+    return selectedRelation.isEmpty || selectedRelation['gender'] == null;
+  }
+
   Future<void> fetchCountryCodes() async {
     try {
       String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getCountryCodes}";
@@ -61,17 +73,40 @@ class FamilyMemberController extends GetxController {
         countryCodes = codes.map((e) => e['country_code'].toString()).toList();
         countryIds = codes.map((e) => int.parse(e['id'].toString())).toList();
 
-        if (selectedCountryCode == null && countryCodes.isNotEmpty) {
-          selectedCountryCode = countryCodes[0];
-          countryCodeId = countryIds[0].toString();
-        }
-
         print("FM Country codes fetched: ${countryCodes.length} items");
         update();
       }
     } catch (e) {
       print("--- API Error (FM Country Codes) ---");
       print("Error fetching country codes: $e");
+    }
+  }
+
+  Future<void> fetchRelations() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.getMemberRelations}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        relations = List<Map<String, dynamic>>.from(
+          response.data['data']['relations'] ?? [],
+        );
+        print("Relations fetched: ${relations.length} items");
+        update();
+      }
+    } catch (e) {
+      print("--- API Error (Member Relations) ---");
+      print("Error fetching relations: $e");
     }
   }
 
@@ -83,6 +118,8 @@ class FamilyMemberController extends GetxController {
     dobController.clear();
     gender = null;
     relationId = null;
+    selectedCountryCode = null;
+    countryCodeId = null;
     isEmergencyContact = false;
     update();
   }
@@ -95,6 +132,10 @@ class FamilyMemberController extends GetxController {
     }
     if (dobController.text.trim().isEmpty) {
       _showSnackBar("Error", "Please select date of birth");
+      return;
+    }
+    if (selectedCountryCode == null || selectedCountryCode!.isEmpty) {
+      _showSnackBar("Error", "Please select country code");
       return;
     }
     if (mobileController.text.trim().isEmpty) {
@@ -190,6 +231,10 @@ class FamilyMemberController extends GetxController {
     }
     if (dobController.text.trim().isEmpty) {
       _showSnackBar("Error", "Please select date of birth");
+      return;
+    }
+    if (selectedCountryCode == null || selectedCountryCode!.isEmpty) {
+      _showSnackBar("Error", "Please select country code");
       return;
     }
     if (mobileController.text.trim().isEmpty) {

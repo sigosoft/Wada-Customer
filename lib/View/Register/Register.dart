@@ -74,9 +74,10 @@ class _RegisterState extends State<Register> {
         scrolledUnderElevation: 0,
       ),
       body: GetBuilder<Registercontroller>(
-        init: Get.isRegistered<Registercontroller>()
-            ? Get.find<Registercontroller>()
-            : Get.put(Registercontroller()),
+        init:
+            Get.isRegistered<Registercontroller>()
+                ? Get.find<Registercontroller>()
+                : Get.put(Registercontroller()),
         autoRemove: false,
         builder:
             (controller) => SingleChildScrollView(
@@ -149,7 +150,10 @@ class _RegisterState extends State<Register> {
                         },
                       ),
                       const SizedBox(height: 15),
-                      DateOfBirthField(controller: controller.dobController),
+                      DateOfBirthField(
+                        controller: controller.dobController,
+                        isAbove18: true,
+                      ),
                       const SizedBox(height: 15),
                       GenderDropdownField(
                         name: Strings.gender,

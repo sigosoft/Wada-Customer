@@ -43,9 +43,10 @@ class MapController extends FullLifeCycleController with FullLifeCycleMixin {
   );
 
   @override
-  void dispose() {
+  void onClose() {
+    mapController?.dispose();
     searchController.dispose();
-    super.dispose();
+    super.onClose();
   }
 
   //Permission

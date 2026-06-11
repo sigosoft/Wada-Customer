@@ -181,8 +181,8 @@ class HomeController extends GetxController {
   List<Map<String, String>> homeRowWidgetItems = [];
 
   List<Widget> screenWidgets = [
-    DoctorsListingListing(),
     BookNurse(),
+    DoctorsListingListing(),
     BloodBankListing(),
   ];
 
@@ -286,10 +286,26 @@ class HomeController extends GetxController {
         }
 
         // --- Parse mainServiceNames (horizontal scroll) ---
-        final mainServices = homeData?['mainServiceNames'];
-        if (mainServices != null &&
-            mainServices is List &&
-            mainServices.isNotEmpty) {
+        final mainServicesList = homeData?['mainServiceNames'];
+        if (mainServicesList != null &&
+            mainServicesList is List &&
+            mainServicesList.isNotEmpty) {
+          final mainServices = List.from(mainServicesList);
+          int doctorIndex = mainServices.indexWhere(
+            (s) =>
+                (s['name']?.toString() ?? '').toLowerCase().contains('doctor'),
+          );
+          int nurseIndex = mainServices.indexWhere(
+            (s) =>
+                (s['name']?.toString() ?? '').toLowerCase().contains('nurse') ||
+                (s['name']?.toString() ?? '').toLowerCase().contains('nursing'),
+          );
+          if (doctorIndex != -1 && nurseIndex != -1) {
+            final temp = mainServices[doctorIndex];
+            mainServices[doctorIndex] = mainServices[nurseIndex];
+            mainServices[nurseIndex] = temp;
+          }
+
           homeRowWidgetItems =
               mainServices.map((s) {
                 final imageUrl = _fullImageUrl(s['image']?.toString());

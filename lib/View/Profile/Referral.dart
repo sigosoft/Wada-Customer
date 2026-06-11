@@ -116,20 +116,20 @@ class _ReferralState extends State<Referral> {
                               child: Align(
                                 alignment: Alignment.centerRight,
                                 child: InkWell(
-                                  onTap: () {
+                                  onTap: () async {
                                     if (controller.referralCode.isNotEmpty) {
-                                      Clipboard.setData(
-                                        ClipboardData(
-                                          text: controller.referralCode,
-                                        ),
-                                      );
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Link copied!"),
-                                        ),
-                                      );
+                                      const MethodChannel shareChannel =
+                                          MethodChannel(
+                                            'com.waada.customer/share',
+                                          );
+                                      try {
+                                        await shareChannel.invokeMethod('share', {
+                                          'text':
+                                              "Here is my referral code for WADA: ${controller.referralCode}. Use it when you register!",
+                                        });
+                                      } catch (e) {
+                                        print("Error sharing: $e");
+                                      }
                                     }
                                   },
                                   child: SvgPicture.asset(
@@ -146,7 +146,7 @@ class _ReferralState extends State<Referral> {
                     ),
                   ),
                   TextStyleInterForSplash(
-                    text: Strings.dummy,
+                    text: Strings.referralDescription,
                     fontWeight: FontWeight.w400,
                     color: profileText, // Black text color
                     size: 13.0,

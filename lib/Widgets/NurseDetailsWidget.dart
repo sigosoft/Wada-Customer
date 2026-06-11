@@ -99,14 +99,22 @@ class NurseDetailsWidget extends StatelessWidget {
                                 image,
                                 fit: BoxFit.cover,
                                 errorBuilder:
-                                    (context, error, stackTrace) => Image.asset(
-                                      'lib/Assets/Images/nurse.png',
-                                    ),
+                                    (context, error, stackTrace) =>
+                                        const Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 48,
+                                            color: Color(0xFFAAAAAA),
+                                          ),
+                                        ),
                               ),
                             )
-                            : Image.asset(
-                              'lib/Assets/Images/nurse.png',
-                              fit: BoxFit.contain,
+                            : const Center(
+                              child: Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Color(0xFFAAAAAA),
+                              ),
                             ),
                   ),
                   const SizedBox(height: 3),

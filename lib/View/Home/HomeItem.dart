@@ -169,7 +169,10 @@ class _HomeItemState extends State<HomeItem> {
                               ),
                               const SizedBox(height: 10),
                               OtherServicesGrid(
-                                otherServicesList: controller.otherServicesList,
+                                otherServicesList:
+                                    controller.otherServicesList
+                                        .take(3)
+                                        .toList(),
                                 onTap: () {},
                               ),
                               SizedBox(height: 15),

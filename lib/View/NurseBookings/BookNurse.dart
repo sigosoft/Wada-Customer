@@ -8,6 +8,7 @@ import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/Controller/HomeController.dart';
 import 'package:waada_customerapp/Resource/Colors.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
@@ -37,11 +38,37 @@ class _BookNurseState extends State<BookNurse> {
   String fromDate = "";
   String toDate = "";
   String selectedHourId = "1"; // Default to 4 Hours
+  int searchCount = 0;
 
   @override
   void initState() {
     super.initState();
     homeController.fetchHours();
+    _loadSearchCount();
+  }
+
+  Future<void> _loadSearchCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        searchCount = prefs.getInt('location_search_count') ?? 0;
+      });
+    } catch (e) {
+      print("Error loading search count: $e");
+    }
+  }
+
+  Future<void> _incrementSearchCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final newCount = (prefs.getInt('location_search_count') ?? 0) + 1;
+      await prefs.setInt('location_search_count', newCount);
+      setState(() {
+        searchCount = newCount;
+      });
+    } catch (e) {
+      print("Error incrementing search count: $e");
+    }
   }
 
   void _showLocationBottomSheet(BuildContext context) {
@@ -210,6 +237,7 @@ class _BookNurseState extends State<BookNurse> {
                                   selectedLocation = "Current Location";
                                 });
                               }
+                              _incrementSearchCount();
                               Get.back();
                             } catch (e) {
                               print("Error getting location: $e");
@@ -233,54 +261,58 @@ class _BookNurseState extends State<BookNurse> {
                                 latitude = result['lat'] ?? "";
                                 longitude = result['long'] ?? "";
                               });
+                              _incrementSearchCount();
                             }
                             Get.back();
                           },
                         ),
-                        SizedBox(height: 10),
-                        Text(
-                          Strings.popularSearch,
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                        if (searchCount >= 5) ...[
+                          SizedBox(height: 10),
+                          Text(
+                            Strings.popularSearch,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        SizedBox(
-                          height: 200, // Set a fixed height for the ListView
-                          child: ListView.builder(
-                            itemCount: _popularSearches.length,
-                            itemBuilder: (context, index) {
-                              return _buildLocationItem(
-                                context,
-                                icon: 'lib/Assets/Images/locationIcon.svg',
-                                text: _popularSearches[index]['name']!,
-                                onTap: () async {
-                                  final name = _popularSearches[index]['name']!;
-                                  setState(() {
-                                    selectedLocation = name;
-                                  });
-                                  try {
-                                    List<Location> locations =
-                                        await locationFromAddress(name);
-                                    if (locations.isNotEmpty) {
-                                      setState(() {
-                                        latitude =
-                                            locations.first.latitude.toString();
-                                        longitude =
-                                            locations.first.longitude
-                                                .toString();
-                                      });
+                          SizedBox(height: 10),
+                          SizedBox(
+                            height: 200, // Set a fixed height for the ListView
+                            child: ListView.builder(
+                              itemCount: _popularSearches.length,
+                              itemBuilder: (context, index) {
+                                return _buildLocationItem(
+                                  context,
+                                  icon: 'lib/Assets/Images/locationIcon.svg',
+                                  text: _popularSearches[index]['name']!,
+                                  onTap: () async {
+                                    final name = _popularSearches[index]['name']!;
+                                    setState(() {
+                                      selectedLocation = name;
+                                    });
+                                    try {
+                                      List<Location> locations =
+                                          await locationFromAddress(name);
+                                      if (locations.isNotEmpty) {
+                                        setState(() {
+                                          latitude =
+                                              locations.first.latitude.toString();
+                                          longitude =
+                                              locations.first.longitude
+                                                  .toString();
+                                        });
+                                      }
+                                    } catch (e) {
+                                      print("Geocoding error: $e");
                                     }
-                                  } catch (e) {
-                                    print("Geocoding error: $e");
-                                  }
-                                  Get.back();
-                                },
-                              );
-                            },
+                                    _incrementSearchCount();
+                                    Get.back();
+                                  },
+                                );
+                              },
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     )
                   else
@@ -312,6 +344,7 @@ class _BookNurseState extends State<BookNurse> {
                               } catch (e) {
                                 print("Geocoding error: $e");
                               }
+                              _incrementSearchCount();
                               Get.back();
                             },
                           );

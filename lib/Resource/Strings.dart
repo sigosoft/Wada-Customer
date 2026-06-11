@@ -151,7 +151,7 @@ class Strings {
   static const String viewAll = "View All";
   static const String nurseBookings = "Nurse Bookings";
   static const String doctorBookings = "Doctor Bookings";
-  static const String requests = "Requests";
+  static const String requests = "All Requests";
   static const String completed = "Completed";
   static const String cancelled = "Cancelled";
   static const String pending = "Pending";
@@ -251,6 +251,8 @@ class Strings {
       "This information will go public, so someone might reach out to you.";
   static const String ok = "Ok";
   static const String refferals = "Referral Code";
+  static const String referralDescription =
+      "Share your referral code with friends and family. When they register on WADA using your code, both of you will receive rewards!";
   static const String wellBeBackSoon = "We'll Be Back Soon";
   static const String sorryWereDownForMaintenanceWellBeBackUpShortly =
       "Sorry, we're down for maintenance\nWe'll be back up shortly.";

@@ -6,7 +6,13 @@ import 'package:waada_customerapp/Resource/Strings.dart';
 class RelationshipDropdownField extends StatefulWidget {
   final String? value;
   final Function(String?)? onChanged;
-  const RelationshipDropdownField({super.key, this.value, this.onChanged});
+  final List<Map<String, dynamic>> relations;
+  const RelationshipDropdownField({
+    super.key,
+    this.value,
+    this.onChanged,
+    this.relations = const [],
+  });
 
   @override
   State<RelationshipDropdownField> createState() =>
@@ -16,24 +22,17 @@ class RelationshipDropdownField extends StatefulWidget {
 class _RelationshipDropdownFieldState extends State<RelationshipDropdownField> {
   @override
   Widget build(BuildContext context) {
-    final Map<String, String> relationshipMap = {
-      'Brother': '1',
-      'Sister': '2',
-      'Father': '3',
-      'Mother': '4',
-    };
-
     return Padding(
       padding: EdgeInsets.only(left: 10, right: 10),
       child: DropdownButtonFormField<String>(
         value: widget.value,
         items:
-            relationshipMap.keys
+            widget.relations
                 .map(
-                  (relation) => DropdownMenuItem(
-                    value: relationshipMap[relation],
+                  (relation) => DropdownMenuItem<String>(
+                    value: relation['id'].toString(),
                     child: Text(
-                      relation,
+                      relation['relationship'].toString(),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: Colors.black,

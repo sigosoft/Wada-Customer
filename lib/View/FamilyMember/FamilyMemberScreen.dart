@@ -56,13 +56,24 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                         child:
                             controller.membersList.isEmpty
                                 ? Center(
-                                  child: Text(
-                                    "No family members added",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: profileText,
-                                    ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'lib/Assets/Images/No data.png',
+                                        height: 150,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Text(
+                                        "No family Members added",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: profileText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 )
                                 : ListView.separated(

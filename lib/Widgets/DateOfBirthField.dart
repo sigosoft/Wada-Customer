@@ -5,7 +5,12 @@ import '../Resource/Strings.dart';
 
 class DateOfBirthField extends StatefulWidget {
   final TextEditingController? controller;
-  const DateOfBirthField({super.key, this.controller});
+  final bool isAbove18;
+  const DateOfBirthField({
+    super.key,
+    this.controller,
+    this.isAbove18 = false,
+  });
 
   @override
   State<DateOfBirthField> createState() => _DateOfBirthFieldState();
@@ -21,11 +26,16 @@ class _DateOfBirthFieldState extends State<DateOfBirthField> {
   }
 
   Future<void> _openDatePicker(BuildContext context) async {
+    final DateTime today = DateTime.now();
+    final DateTime lastAllowedDate = widget.isAbove18
+        ? DateTime(today.year - 18, today.month, today.day)
+        : today;
+
     DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: lastAllowedDate,
       firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      lastDate: lastAllowedDate,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

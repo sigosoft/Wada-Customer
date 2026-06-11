@@ -7,6 +7,7 @@ import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Profile/CustomCliprect.dart';
 import 'package:waada_customerapp/View/Profile/EditProfile.dart';
 import 'package:waada_customerapp/Widgets/widgets.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../Resource/Colors.dart'
     show blackTextColor2, colorPrimary, profileText2;
@@ -49,12 +50,14 @@ class DoctorDetailsWidget extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CustomClipRRect(
-                      borderRadius: 60,
-                      imagePath:
-                          patientData?['image'] != null
-                              ? "${ApiConfigs.IMAGE_URL}${patientData!['image']}"
-                              : "lib/Assets/Images/doctorProfileImage.png",
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: const Color(0xFFE4E4E7),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        size: 35,
+                        color: Color(0xFF71717A),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -126,17 +129,14 @@ class DoctorDetailsWidget extends StatelessWidget {
                       child: SizedBox(
                         height: 60.0,
                         width: 60.0,
-                        child: Image.asset("lib/Assets/Images/qrImage.png"),
+                        child: QrImageView(
+                          data:
+                              "https://thewada.com/profile?id=${patientData?['id']?.toString() ?? '375467'}",
+                          version: QrVersions.auto,
+                          size: 60.0,
+                          padding: EdgeInsets.zero,
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    "Id : ${patientData?['id'] ?? "375467"}",
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
                     ),
                   ),
                 ],

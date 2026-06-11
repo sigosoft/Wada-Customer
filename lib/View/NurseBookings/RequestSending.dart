@@ -35,6 +35,18 @@ class _RequestSendingState extends State<RequestSending> {
       appBar: CustomAppBar(label: Strings.details, showCloseIcon: false),
       body: GetBuilder<NurseBookingController>(
         builder: (controller) {
+          final chargeTotals =
+              controller.nurseData?['nurse_charge_totals'] ??
+              controller.nurseData?['nurse']?['nurse_charge_totals'];
+          dynamic matchedTotal;
+          if (chargeTotals is List) {
+            try {
+              matchedTotal = chargeTotals.firstWhere(
+                (c) => c['hour_id'].toString() == controller.hourId.toString(),
+              );
+            } catch (_) {}
+          }
+
           return SingleChildScrollView(
             child: SafeArea(
               child: SizedBox(
@@ -258,6 +270,33 @@ class _RequestSendingState extends State<RequestSending> {
                         Expanded(
                           flex: 2,
                           child: TextStyleInterForSplash(
+                            text: "Hours Selected",
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                            size: 14.00,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            alignment: Alignment.topRight,
+                            child: TextStyleInterForSplash(
+                              text:
+                                  "${matchedTotal?['total_hours'] ?? '0'} Hours",
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              size: 14.00,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextStyleInterForSplash(
                             text: Strings.totalamount,
                             color: Colors.black,
                             fontWeight: FontWeight.w800,
@@ -269,7 +308,8 @@ class _RequestSendingState extends State<RequestSending> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text: "₹${controller.amount}",
+                              text:
+                                  "₹${matchedTotal?['total_rate'] ?? controller.amount}",
                               color: Colors.black,
                               fontWeight: FontWeight.w800,
                               size: 14.00,
@@ -285,7 +325,7 @@ class _RequestSendingState extends State<RequestSending> {
                         onTap: () {
                           _showCancelShiftBottomSheet(context);
                         },
-                        text: Strings.sendRequest,
+                        text: "Send Request",
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -322,7 +362,7 @@ class _RequestSendingState extends State<RequestSending> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  Strings.sentRequest,
+                  "Send Request",
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,

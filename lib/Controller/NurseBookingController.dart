@@ -4,13 +4,16 @@ import 'package:get/get.dart' hide FormData;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/RequestSentSuccess.dart';
 import '../Configs/ApiConfigs.dart';
+import 'ProfileController.dart';
 
 class NurseBookingController extends GetxController {
   final Dio _dio = ApiConfigs.dio;
   List<dynamic> categories = [];
   List<int> selectedCategoryIds = [];
-  List<dynamic> members = [];
-  int? selectedMemberId;
+  List<dynamic> members = [
+    {"id": -1, "name": "Self"},
+  ];
+  int? selectedMemberId = -1;
   bool isLoading = false;
   bool isDetailsLoading = false;
   Map<String, dynamic>? nurseData;
@@ -33,6 +36,9 @@ class NurseBookingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (!Get.isRegistered<ProfileController>()) {
+      Get.put(ProfileController());
+    }
     fetchCategories();
     fetchMembers();
     fetchHours();
@@ -82,10 +88,13 @@ class NurseBookingController extends GetxController {
 
       if (response.statusCode == 200 &&
           response.data['status'].toString() == "true") {
-        members = response.data['data']['members']['data'] ?? [];
-        if (members.isNotEmpty) {
-          selectedMemberId = members[0]['id'];
-        }
+        final List<dynamic> fetchedMembers =
+            response.data['data']['members']['data'] ?? [];
+        members = [
+          {"id": -1, "name": "Self"},
+          ...fetchedMembers,
+        ];
+        selectedMemberId = -1;
         update();
       }
     } catch (e) {
@@ -95,6 +104,20 @@ class NurseBookingController extends GetxController {
 
   Map<String, dynamic>? get selectedMember {
     if (selectedMemberId == null) return null;
+    if (selectedMemberId == -1) {
+      final profileController =
+          Get.isRegistered<ProfileController>()
+              ? Get.find<ProfileController>()
+              : Get.put(ProfileController());
+      final pData = profileController.patientData;
+      return {
+        'id': -1,
+        'name': 'Self',
+        'dob': pData?['dob']?.toString(),
+        'gender': int.tryParse(pData?['gender']?.toString() ?? '') ?? 1,
+        'mobile': pData?['mobile']?.toString() ?? '',
+      };
+    }
     return members.firstWhereOrNull((m) => m['id'] == selectedMemberId);
   }
 
@@ -177,11 +200,27 @@ class NurseBookingController extends GetxController {
         toDate = response.data['data']['to_date'] ?? "";
         hourId = response.data['data']['hour_id'] ?? "";
 
-        final apiAmount =
+        final chargeTotals =
+            response.data['data']['nurse_charge_totals'] ??
+            response.data['data']['nurse']?['nurse_charge_totals'];
+
+        dynamic apiAmount;
+        if (chargeTotals is List) {
+          final matchedCharge = chargeTotals.firstWhere(
+            (c) => c['hour_id'].toString() == hourIdStr.toString(),
+            orElse: () => null,
+          );
+          if (matchedCharge != null) {
+            apiAmount = matchedCharge['price'] ?? matchedCharge['amount'];
+          }
+        }
+
+        apiAmount ??=
             response.data['data']['amount'] ??
             response.data['data']['price'] ??
             response.data['data']['total_amount'] ??
             response.data['data']['total'];
+
         if (apiAmount != null) {
           amount = apiAmount.toString();
         }
@@ -215,14 +254,6 @@ class NurseBookingController extends GetxController {
             content: Text("Please select at least one service requirement"),
           ),
         );
-      }
-      return;
-    }
-    if (notesController.text.trim().isEmpty) {
-      if (Get.context != null) {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(const SnackBar(content: Text("Please enter notes")));
       }
       return;
     }
@@ -260,7 +291,7 @@ class NurseBookingController extends GetxController {
 
       final Map<String, dynamic> data = {
         'nurse_id': nurseData?['id'],
-        'member_id': selectedMemberId,
+        'member_id': selectedMemberId == -1 ? null : selectedMemberId,
         'from_date': fromDate,
         'to_date': toDate,
         'hour_id': hourId,
@@ -270,7 +301,8 @@ class NurseBookingController extends GetxController {
         'location': location,
         'latitude': latitude,
         'longitude': longitude,
-        'note': notesController.text,
+        'note':
+            notesController.text.trim().isEmpty ? null : notesController.text,
       };
 
       // Add healthcare_category_id[0], [1], etc.

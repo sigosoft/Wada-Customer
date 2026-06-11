@@ -49,6 +49,65 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
     }
   }
 
+  /// Returns null if the shift duration is valid, or an error message if not.
+  String? _validateShiftDuration() {
+    final checkinText = controller.checkinTimeController.text.trim();
+    final checkoutText = controller.checkoutTimeController.text.trim();
+
+    if (checkinText.isEmpty || checkoutText.isEmpty) {
+      return "Please select check-in and check-out times";
+    }
+
+    // Parse a "hh:mm AM/PM" string into total minutes from midnight.
+    int? parseToMinutes(String timeStr) {
+      try {
+        final parts = timeStr.split(' ');
+        if (parts.length < 2) return null;
+        final timeParts = parts[0].split(':');
+        int hour = int.parse(timeParts[0]);
+        final int minute = int.parse(timeParts[1]);
+        final String ampm = parts[1].toUpperCase();
+        if (ampm == 'PM' && hour < 12) hour += 12;
+        if (ampm == 'AM' && hour == 12) hour = 0;
+        return hour * 60 + minute;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final int? checkinMinutes = parseToMinutes(checkinText);
+    final int? checkoutMinutes = parseToMinutes(checkoutText);
+
+    if (checkinMinutes == null || checkoutMinutes == null) {
+      return "Invalid time format";
+    }
+
+    // Compute duration in minutes; handle overnight shifts.
+    int durationMinutes = checkoutMinutes - checkinMinutes;
+    if (durationMinutes <= 0) durationMinutes += 24 * 60;
+
+    // Determine required hours from the selected shift type.
+    final requiredHoursStr =
+        controller.shiftHours
+            .firstWhere(
+              (h) => h['id'].toString() == controller.hourId,
+              orElse: () => <String, dynamic>{},
+            )['hour']
+            ?.toString();
+
+    if (requiredHoursStr == null) return null; // cannot determine, skip
+
+    final int? requiredHours = int.tryParse(requiredHoursStr);
+    if (requiredHours == null) return null;
+
+    final int requiredMinutes = requiredHours * 60;
+    if (durationMinutes != requiredMinutes) {
+      return "The selected times must be exactly $requiredHours hour${requiredHours == 1 ? '' : 's'} apart for this shift type";
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,12 +296,6 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                           label: Strings.notes,
                           type: TextInputType.text,
                           height: 80,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return "Please enter notes";
-                            }
-                            return null;
-                          },
                         ),
                       ),
                     ),
@@ -269,12 +322,27 @@ class _NurseBookingDetailsState extends State<NurseBookingDetails> {
                             );
                             return;
                           }
-                          if (controller.notesController.text.trim().isEmpty) {
+
+                          if (controller.checkinTimeController.text
+                                  .trim()
+                                  .isEmpty ||
+                              controller.checkoutTimeController.text
+                                  .trim()
+                                  .isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Please enter notes"),
+                                content: Text(
+                                  "Please select check-in and check-out times",
+                                ),
                               ),
                             );
+                            return;
+                          }
+                          final String? shiftError = _validateShiftDuration();
+                          if (shiftError != null) {
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(shiftError)));
                             return;
                           }
                           Get.to(const RequestSending());

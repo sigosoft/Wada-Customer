@@ -17,6 +17,21 @@ class NurseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? rawImage =
+        nurse['image']?.toString() ??
+        nurse['user']?['image']?.toString() ??
+        nurse['profile_pic']?.toString() ??
+        nurse['user']?['profile_pic']?.toString() ??
+        nurse['profile_image']?.toString() ??
+        nurse['user']?['profile_image']?.toString();
+
+    String image =
+        (rawImage != null && rawImage.isNotEmpty)
+            ? rawImage.startsWith('http')
+                ? rawImage
+                : "${ApiConfigs.IMAGE_URL}$rawImage"
+            : "";
+
     return Container(
       margin: const EdgeInsets.only(left: 15.0, right: 15, bottom: 15),
       padding: const EdgeInsets.all(10.0),
@@ -39,27 +54,36 @@ class NurseItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
-                    width: 110, // Optional: Adjust width
+                    width: 110,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Color(0xFFE4E4E7), // Background color
-                      borderRadius: BorderRadius.circular(8), // Corner radius
+                      color: const Color(0xFFE4E4E7),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child:
-                        (nurse['image'] != null &&
-                                nurse['image'].toString().isNotEmpty)
-                            ? Image.network(
-                              "${ApiConfigs.IMAGE_URL}${nurse['image']}",
-                              fit: BoxFit.contain,
-                              errorBuilder:
-                                  (context, error, stackTrace) => Image.asset(
-                                    'lib/Assets/Images/nurse.png',
-                                    fit: BoxFit.contain,
-                                  ),
+                        image.isNotEmpty
+                            ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                image,
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (context, error, stackTrace) =>
+                                        const Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 48,
+                                            color: Color(0xFFAAAAAA),
+                                          ),
+                                        ),
+                              ),
                             )
-                            : Image.asset(
-                              'lib/Assets/Images/nurse.png',
-                              fit: BoxFit.contain,
+                            : const Center(
+                              child: Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Color(0xFFAAAAAA),
+                              ),
                             ),
                   ),
                   //),
@@ -131,15 +155,19 @@ class NurseItem extends StatelessWidget {
                       children: [
                         SvgPicture.asset("lib/Assets/Images/language.svg"),
                         const SizedBox(width: 5),
-                        Text(
-                          (nurse['nurse_languages'] as List?)
-                                  ?.map((l) => (l is Map) ? l['language'] : l)
-                                  .join(", ") ??
-                              "Languages",
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: greyTextColour,
-                            fontWeight: FontWeight.w500,
+                        Flexible(
+                          child: Text(
+                            (nurse['nurse_languages'] as List?)
+                                    ?.map((l) => (l is Map) ? l['language'] : l)
+                                    .join(", ") ??
+                                "Languages",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: greyTextColour,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -213,9 +241,9 @@ class NurseItem extends StatelessWidget {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
-            itemCount: (nurse['nurse_charges'] as List?)?.length ?? 0,
+            itemCount: (nurse['nurse_charge_totals'] as List?)?.length ?? 0,
             itemBuilder: (context, index) {
-              final charge = (nurse['nurse_charges'] as List)[index];
+              final charge = (nurse['nurse_charge_totals'] as List)[index];
               String hourText = "4 Hours";
               if (charge['hour_id'].toString() == "1") hourText = "4 Hours";
               if (charge['hour_id'].toString() == "2") hourText = "8 Hours";
@@ -306,7 +334,7 @@ class NurseItem extends StatelessWidget {
                   'latitude': Get.arguments?['latitude'],
                   'longitude': Get.arguments?['longitude'],
                   'amount':
-                      (nurse['nurse_charges'] as List?)?.firstWhere(
+                      (nurse['nurse_charge_totals'] as List?)?.firstWhere(
                         (c) =>
                             c['hour_id'].toString() ==
                             Get.arguments?['hour_id'].toString(),

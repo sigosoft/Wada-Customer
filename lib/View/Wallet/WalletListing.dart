@@ -92,7 +92,7 @@ class _WalletListingState extends State<WalletListing> {
                                           ),
                                         ),
                                         Text(
-                                          "1 Coin = ${controller.pointRate} AED",
+                                          "1 Coin = ₹${controller.pointRate.toStringAsFixed(0)}",
                                           style: GoogleFonts.inter(
                                             color: Colors.white,
                                             fontSize: 13,

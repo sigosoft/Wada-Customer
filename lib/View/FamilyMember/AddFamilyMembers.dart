@@ -41,6 +41,7 @@ class _AddFamilyMembersState extends State<AddFamilyMembers> {
       initState: (state) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           state.controller?.fetchCountryCodes();
+          state.controller?.fetchRelations();
         });
       },
       builder: (controller) {
@@ -64,8 +65,25 @@ class _AddFamilyMembersState extends State<AddFamilyMembers> {
                     SizedBox(height: 20),
                     RelationshipDropdownField(
                       value: controller.relationId,
+                      relations: controller.relations,
                       onChanged: (val) {
                         controller.relationId = val;
+                        if (val != null) {
+                          final selectedRelation = controller.relations.firstWhere(
+                            (r) => r['id'].toString() == val,
+                            orElse: () => <String, dynamic>{},
+                          );
+                          if (selectedRelation.isNotEmpty) {
+                            final relGender = selectedRelation['gender'];
+                            if (relGender != null) {
+                              controller.gender = relGender.toString();
+                            } else {
+                              controller.gender = null;
+                            }
+                          }
+                        } else {
+                          controller.gender = null;
+                        }
                         controller.update();
                       },
                     ),
@@ -88,10 +106,12 @@ class _AddFamilyMembersState extends State<AddFamilyMembers> {
                     GenderDropdownField(
                       name: Strings.genderwithstar,
                       value: controller.gender,
-                      onChanged: (val) {
-                        controller.gender = val;
-                        controller.update();
-                      },
+                      onChanged: controller.isGenderSelectable
+                          ? (val) {
+                              controller.gender = val;
+                              controller.update();
+                            }
+                          : null,
                     ),
                     SizedBox(height: 15),
                     CountryCodeAndPhoneNUmber(
