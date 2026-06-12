@@ -283,19 +283,30 @@ class ProfileController extends GetxController {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    SubmitButton(
-                      height: 50.00,
-                      width: MediaQuery.of(context).size.width * 0.40,
-                      text: Strings.no,
-                      color: noButtonColor,
-                      textColor: logoutTextColor,
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: SubmitButton(
+                        height: 50.00,
+                        width: MediaQuery.of(context).size.width * 0.40,
+                        text: Strings.no,
+                        color: noButtonColor,
+                        textColor: logoutTextColor,
+                      ),
                     ),
-                    SubmitButton(
-                      height: 50.00,
-                      width: MediaQuery.of(context).size.width * 0.40,
-                      text: Strings.yes,
-                      color: logoutTextColor,
-                      textColor: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                        deleteAccount();
+                      },
+                      child: SubmitButton(
+                        height: 50.00,
+                        width: MediaQuery.of(context).size.width * 0.40,
+                        text: Strings.yes,
+                        color: logoutTextColor,
+                        textColor: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -305,6 +316,84 @@ class ProfileController extends GetxController {
         );
       },
     );
+  }
+
+  Future<void> deleteAccount() async {
+    BuildContext? context = Get.context;
+    if (context != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(color: colorPrimary),
+          );
+        },
+      );
+    }
+
+    try {
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.deleteAccount}";
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+
+      final response = await _dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      // Dismiss loading dialog
+      if (context != null) {
+        Get.back();
+      }
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        await prefs.remove('auth_token');
+
+        if (Get.isRegistered<LoginController>()) {
+          Get.find<LoginController>().clear();
+        }
+
+        if (Get.context != null) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Text(
+                response.data['message'] ?? "Account deleted successfully",
+              ),
+            ),
+          );
+        }
+        Get.offAll(const LoginScreen());
+      } else {
+        _handleApiError(response.data, "Failed to delete account");
+      }
+    } on DioException catch (e) {
+      // Dismiss loading dialog
+      if (context != null) {
+        Get.back();
+      }
+      print("--- API Error (Delete Account DioException) ---");
+      if (e.response != null && e.response?.data != null) {
+        _handleApiError(e.response?.data, "Failed to delete account");
+      } else {
+        _showError("Failed to delete account. Please check your connection.");
+      }
+    } catch (e) {
+      // Dismiss loading dialog
+      if (context != null) {
+        Get.back();
+      }
+      print("--- API Error (Delete Account General Exception) ---");
+      print("Error deleting account: $e");
+      _showError("Something went wrong while deleting your account.");
+    }
   }
 
   void showCustomPopup(
@@ -337,7 +426,8 @@ class ProfileController extends GetxController {
                         height: MediaQuery.of(context).size.height * 0.18,
                         width: MediaQuery.of(context).size.height * 0.18,
                         child: QrImageView(
-                          data: "https://thewada.com/profile?id=${patientData?['id']?.toString() ?? '375467'}",
+                          data:
+                              "https://thewada.com/profile?id=${patientData?['id']?.toString() ?? '375467'}",
                           version: QrVersions.auto,
                           size: MediaQuery.of(context).size.height * 0.18,
                           padding: EdgeInsets.zero,

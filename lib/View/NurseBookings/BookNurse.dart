@@ -266,53 +266,53 @@ class _BookNurseState extends State<BookNurse> {
                             Get.back();
                           },
                         ),
-                        if (searchCount >= 5) ...[
-                          SizedBox(height: 10),
-                          Text(
-                            Strings.popularSearch,
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          SizedBox(
-                            height: 200, // Set a fixed height for the ListView
-                            child: ListView.builder(
-                              itemCount: _popularSearches.length,
-                              itemBuilder: (context, index) {
-                                return _buildLocationItem(
-                                  context,
-                                  icon: 'lib/Assets/Images/locationIcon.svg',
-                                  text: _popularSearches[index]['name']!,
-                                  onTap: () async {
-                                    final name = _popularSearches[index]['name']!;
-                                    setState(() {
-                                      selectedLocation = name;
-                                    });
-                                    try {
-                                      List<Location> locations =
-                                          await locationFromAddress(name);
-                                      if (locations.isNotEmpty) {
-                                        setState(() {
-                                          latitude =
-                                              locations.first.latitude.toString();
-                                          longitude =
-                                              locations.first.longitude
-                                                  .toString();
-                                        });
-                                      }
-                                    } catch (e) {
-                                      print("Geocoding error: $e");
-                                    }
-                                    _incrementSearchCount();
-                                    Get.back();
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                        // if (searchCount >= 5) ...[
+                        //   SizedBox(height: 10),
+                        //   Text(
+                        //     Strings.popularSearch,
+                        //     style: GoogleFonts.inter(
+                        //       fontSize: 16,
+                        //       fontWeight: FontWeight.w700,
+                        //     ),
+                        //   ),
+                        //   SizedBox(height: 10),
+                        //   SizedBox(
+                        //     height: 200, // Set a fixed height for the ListView
+                        //     child: ListView.builder(
+                        //       itemCount: _popularSearches.length,
+                        //       itemBuilder: (context, index) {
+                        //         return _buildLocationItem(
+                        //           context,
+                        //           icon: 'lib/Assets/Images/locationIcon.svg',
+                        //           text: _popularSearches[index]['name']!,
+                        //           onTap: () async {
+                        //             final name = _popularSearches[index]['name']!;
+                        //             setState(() {
+                        //               selectedLocation = name;
+                        //             });
+                        //             try {
+                        //               List<Location> locations =
+                        //                   await locationFromAddress(name);
+                        //               if (locations.isNotEmpty) {
+                        //                 setState(() {
+                        //                   latitude =
+                        //                       locations.first.latitude.toString();
+                        //                   longitude =
+                        //                       locations.first.longitude
+                        //                           .toString();
+                        //                 });
+                        //               }
+                        //             } catch (e) {
+                        //               print("Geocoding error: $e");
+                        //             }
+                        //             _incrementSearchCount();
+                        //             Get.back();
+                        //           },
+                        //         );
+                        //       },
+                        //     ),
+                        //   ),
+                        // ],
                       ],
                     )
                   else
@@ -562,13 +562,17 @@ class _BookNurseState extends State<BookNurse> {
                   onTap: () {
                     if (selectedLocation.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select a location")),
+                        const SnackBar(
+                          content: Text("Please select a location"),
+                        ),
                       );
                       return;
                     }
                     if (fromDate.isEmpty || toDate.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select a date range")),
+                        const SnackBar(
+                          content: Text("Please select a date range"),
+                        ),
                       );
                       return;
                     }
