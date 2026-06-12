@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:waada_customerapp/Configs/ApiConfigs.dart';
 import 'package:waada_customerapp/View/Home/HomeNurseDetailsCardRowWidget.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/View/NurseBookings/ShareLocationBookingDetails.dart';
@@ -21,10 +22,10 @@ class HomeNurseDetailsWidget extends StatelessWidget {
     this.languages = "English, Hindi",
     this.qualification = "Diploma in General Nursing",
     this.experience = "5 Years of Experience",
-    this.imagePath = 'lib/Assets/Images/nurse.png',
+    this.imagePath = '',
     this.checkInDate = "08 Feb 2025",
     this.checkInTime = "09:30 AM",
-    this.plusLanguages = "Tamil, Malayalam",
+    this.plusLanguages = "",
   });
 
   final bool showButton;
@@ -42,6 +43,40 @@ class HomeNurseDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String finalImage = "";
+    if (imagePath.isNotEmpty && !imagePath.contains("nurse.png")) {
+      finalImage =
+          imagePath.startsWith('http')
+              ? imagePath
+              : "${ApiConfigs.IMAGE_URL}$imagePath";
+    }
+
+    List<String> allLangs = [];
+    if (languages.isNotEmpty && languages != "Languages") {
+      allLangs.addAll(
+        languages.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty),
+      );
+    }
+    if (plusLanguages.isNotEmpty) {
+      allLangs.addAll(
+        plusLanguages
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty),
+      );
+    }
+
+    String mainLanguages = "Languages";
+    String extraLanguages = "";
+    int totalLanguages = allLangs.length;
+
+    if (allLangs.isNotEmpty) {
+      mainLanguages = allLangs.take(2).join(", ");
+      if (allLangs.length > 2) {
+        extraLanguages = allLangs.skip(2).join(", ");
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
       padding: const EdgeInsets.only(top: 5, bottom: 5),
@@ -70,17 +105,26 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child:
-                        imagePath.startsWith('http')
+                        finalImage.isNotEmpty
                             ? Image.network(
-                              imagePath,
+                              finalImage,
                               fit: BoxFit.cover,
                               errorBuilder:
-                                  (_, __, ___) => Image.asset(
-                                    'lib/Assets/Images/nurse.png',
-                                    fit: BoxFit.contain,
+                                  (_, __, ___) => const Center(
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 48,
+                                      color: Color(0xFFAAAAAA),
+                                    ),
                                   ),
                             )
-                            : Image.asset(imagePath, fit: BoxFit.contain),
+                            : const Center(
+                              child: Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Color(0xFFAAAAAA),
+                              ),
+                            ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -128,16 +172,20 @@ class HomeNurseDetailsWidget extends StatelessWidget {
                           SvgPicture.asset("lib/Assets/Images/language.svg"),
                           const SizedBox(width: 5),
                           Text(
-                            languages,
+                            mainLanguages,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: greyTextColour,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          if (plusLanguages.isNotEmpty)
-                            Plusfour(data: plusLanguages, length: 4),
+                          if (totalLanguages > 2) ...[
+                            const SizedBox(width: 8),
+                            Plusfour(
+                              data: extraLanguages,
+                              length: totalLanguages,
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 5),

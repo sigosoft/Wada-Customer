@@ -162,8 +162,15 @@ class BookingsTabBarItem2 extends StatelessWidget {
                               checkInDate: booking?['checkin_date'] ?? "",
                               checkInTime: booking?['checkin_time'] ?? "",
                               languages: _formatLanguages(
-                                booking?['languages'],
+                                  booking?['languages'],
                               ),
+                              imagePath: booking?['image']?.toString() ??
+                                  booking?['user']?['image']?.toString() ??
+                                  booking?['profile_pic']?.toString() ??
+                                  booking?['user']?['profile_pic']?.toString() ??
+                                  booking?['profile_image']?.toString() ??
+                                  booking?['user']?['profile_image']?.toString() ??
+                                  "",
                             ),
                           )
                           : const SizedBox.shrink(),

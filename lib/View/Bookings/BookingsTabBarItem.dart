@@ -179,6 +179,13 @@ class BookingsTabBarItem extends StatelessWidget {
                                   languages: _formatLanguages(
                                     booking?['languages'],
                                   ),
+                                  imagePath: booking?['image']?.toString() ??
+                                      booking?['user']?['image']?.toString() ??
+                                      booking?['profile_pic']?.toString() ??
+                                      booking?['user']?['profile_pic']?.toString() ??
+                                      booking?['profile_image']?.toString() ??
+                                      booking?['user']?['profile_image']?.toString() ??
+                                      "",
                                 ),
                               )
                               : const SizedBox.shrink(),
