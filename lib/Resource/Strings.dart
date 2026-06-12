@@ -113,6 +113,8 @@ class Strings {
   static const String or = "Or";
   static const String dummy =
       "Cupidatat irure theas Laborum magna nulla duis ullamco cillum dolor. Sed ut perspicviatis unde omnis iste natus error sit voluptatem.";
+  static const String shifttypeDescription =
+      "The shift type indicates the duration of the nurse's shift for this booking. Please ensure your selected check-in and check-out times align with the selected shift hours.";
   static const String openCamera = "Open Camera";
   static const String uploaded = "Uploaded";
   static const String uploadmedicalRecords = "Upload  Medical Records";

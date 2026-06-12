@@ -32,25 +32,35 @@ class _ShiftDetailsWidgetState extends State<ShiftDetailsWidget> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 15.0,right: 15,bottom: 20,top: 10),
+            padding: const EdgeInsets.only(left: 15.0, right: 15, bottom: 20, top: 15),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () => Get.back(),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.black,
-                      size: 25,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      Strings.shifttype,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.black,
+                        size: 25,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 5,),
+                const SizedBox(height: 10),
                 Text(
-                  Strings.dummy,
+                  Strings.shifttypeDescription,
                   textAlign: TextAlign.start,
                   style: GoogleFonts.inter(
                     fontSize: 13,
