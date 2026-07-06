@@ -6,6 +6,7 @@ import 'package:waada_customerapp/Controller/LoginController.dart';
 import 'package:waada_customerapp/View/Otp/OtpScreen2.dart';
 import 'package:waada_customerapp/View/Login/Login.dart';
 import 'package:waada_customerapp/View/Home/Home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Registercontroller extends GetxController {
   final Dio _dio = ApiConfigs.dio;
@@ -92,9 +93,11 @@ class Registercontroller extends GetxController {
     }
 
     try {
-      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.sendRegOtp}";
+      String validateUrl =
+          "${ApiConfigs.BASE_URL}${ApiEndPoints.validateCustomerRegistration}";
 
-      FormData formData = FormData.fromMap({
+      FormData validateFormData = FormData.fromMap({
+        "name": firstNameController.text.trim(),
         "first_name": firstNameController.text.trim(),
         "email": emailController.text.trim(),
         "country_code": selectedCountryId?.toString() ?? "2",
@@ -105,25 +108,48 @@ class Registercontroller extends GetxController {
         "referral_code": referralCodeController.text.trim(),
       });
 
-      final response = await _dio.post(url, data: formData);
+      final validateResponse = await _dio.post(
+        validateUrl,
+        data: validateFormData,
+      );
 
-      if (response.statusCode == 200 &&
-          response.data['status'].toString() == "true") {
-        Get.to(const OtpScreen2());
-        if (Get.context != null) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.data['message'] ?? "OTP Sent Successfully",
+      if (validateResponse.statusCode == 200 &&
+          validateResponse.data['status'].toString() == "true") {
+        String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.sendRegOtp}";
+
+        FormData formData = FormData.fromMap({
+          "first_name": firstNameController.text.trim(),
+          "email": emailController.text.trim(),
+          "country_code": selectedCountryId?.toString() ?? "2",
+          "country_code_id": selectedCountryId?.toString() ?? "2",
+          "mobile": phoneController.text.trim(),
+          "dob": dobController.text.trim(),
+          "gender": selectedGender,
+          "referral_code": referralCodeController.text.trim(),
+        });
+
+        final response = await _dio.post(url, data: formData);
+
+        if (response.statusCode == 200 &&
+            response.data['status'].toString() == "true") {
+          Get.to(const OtpScreen2());
+          if (Get.context != null) {
+            ScaffoldMessenger.of(Get.context!).showSnackBar(
+              SnackBar(
+                content: Text(
+                  response.data['message'] ?? "OTP Sent Successfully",
+                ),
               ),
-            ),
-          );
+            );
+          }
+        } else {
+          _showError(response.data['message'] ?? "Failed to send OTP");
         }
       } else {
-        _showError(response.data['message'] ?? "Failed to send OTP");
+        _handleApiError(validateResponse.data);
       }
     } on DioException catch (e) {
-      print("--- API Error (Register OTP DioException) ---");
+      print("--- API Error (Register OTP/Validation DioException) ---");
       if (e.response != null && e.response?.data != null) {
         print("Error Data: ${e.response?.data}");
         _handleApiError(e.response?.data);
@@ -131,8 +157,8 @@ class Registercontroller extends GetxController {
         _showError("Something went wrong. Please try again.");
       }
     } catch (e) {
-      print("--- API Error (Register OTP General Exception) ---");
-      print("Error sending register OTP: $e");
+      print("--- API Error (Register OTP/Validation General Exception) ---");
+      print("Error sending register OTP/validation: $e");
       _showError("Something went wrong. Please try again.");
     }
   }
@@ -175,11 +201,46 @@ class Registercontroller extends GetxController {
             const SnackBar(content: Text("Registration Successful!")),
           );
         }
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+
+        String? token = _findToken(response.data);
+
+        if (token == null) {
+          try {
+            print(
+              "Token not found in register response. Attempting background login fallback...",
+            );
+            String loginUrl = "${ApiConfigs.BASE_URL}${ApiEndPoints.login}";
+            FormData loginFormData = FormData.fromMap({
+              "country_code": selectedCountryId?.toString() ?? "2",
+              "country_code_id": selectedCountryId?.toString() ?? "2",
+              "mobile": phoneController.text.trim(),
+              "otp": otpController.text.trim(),
+            });
+            final loginResponse = await _dio.post(
+              loginUrl,
+              data: loginFormData,
+            );
+            if (loginResponse.statusCode == 200 &&
+                loginResponse.data['status'].toString() == "true") {
+              token = _findToken(loginResponse.data);
+              print("Background login fallback succeeded. Token: $token");
+            } else {
+              print("Background login fallback failed: ${loginResponse.data}");
+            }
+          } catch (e) {
+            print("Error in background login fallback: $e");
+          }
+        }
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (token != null) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('auth_token', token!);
+          }
           if (Get.isRegistered<LoginController>()) {
             Get.find<LoginController>().clear();
           }
-          Get.offAll(() => LoginScreen());
+          Get.offAll(() => Home());
         });
       } else {
         _handleApiError(response.data);
@@ -232,6 +293,26 @@ class Registercontroller extends GetxController {
     } else {
       _showError("Registration failed");
     }
+  }
+
+  String? _findToken(dynamic json) {
+    if (json is Map) {
+      for (var entry in json.entries) {
+        final key = entry.key.toString().toLowerCase();
+        if ((key == 'token' || key == 'auth_token' || key == 'access_token') &&
+            entry.value != null) {
+          return entry.value.toString();
+        }
+        final result = _findToken(entry.value);
+        if (result != null) return result;
+      }
+    } else if (json is List) {
+      for (var item in json) {
+        final result = _findToken(item);
+        if (result != null) return result;
+      }
+    }
+    return null;
   }
 
   void _showError(String message) {

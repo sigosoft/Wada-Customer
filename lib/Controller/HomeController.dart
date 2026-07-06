@@ -21,7 +21,7 @@ class HomeController extends GetxController {
   bool isLoading = false;
 
   String currentAddress = "Fetching location...";
-  String currentCity = "Raipur";
+  String currentCity = "";
 
   @override
   void onInit() {
@@ -40,6 +40,7 @@ class HomeController extends GetxController {
 
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
+        currentCity = "";
         currentAddress = "Location services disabled";
         update();
         return;
@@ -49,6 +50,7 @@ class HomeController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
+          currentCity = "";
           currentAddress = "Location permission denied";
           update();
           return;
@@ -56,6 +58,7 @@ class HomeController extends GetxController {
       }
 
       if (permission == LocationPermission.deniedForever) {
+        currentCity = "";
         currentAddress = "Location permissions permanently denied";
         update();
         return;
@@ -72,7 +75,11 @@ class HomeController extends GetxController {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        currentCity = place.locality ?? "Raipur";
+        currentCity =
+            place.locality ??
+            place.subLocality ??
+            place.administrativeArea ??
+            "";
 
         // Build address string carefully
         List<String> parts = [];
@@ -91,6 +98,7 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       print("Error getting location: $e");
+      currentCity = "";
       currentAddress = "Location not available";
       update();
     }
