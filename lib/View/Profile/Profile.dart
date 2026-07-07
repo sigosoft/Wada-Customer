@@ -53,6 +53,7 @@ class _ProfileState extends State<Profile> {
                     DoctorDetailsWidget(
                       premiumMembership: controller.premiumMembership,
                       patientData: controller.patientData,
+                      isPremium: controller.isPremium,
                       onTapQrCode: () {
                         controller.showCustomPopup(
                           context,

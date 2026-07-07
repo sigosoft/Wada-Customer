@@ -37,9 +37,10 @@ class PendingBookingDetails extends StatefulWidget {
 }
 
 class _PendingBookingDetailsState extends State<PendingBookingDetails> {
-  final BookingsController controller = Get.isRegistered<BookingsController>()
-      ? Get.find<BookingsController>()
-      : Get.put(BookingsController());
+  final BookingsController controller =
+      Get.isRegistered<BookingsController>()
+          ? Get.find<BookingsController>()
+          : Get.put(BookingsController());
 
   @override
   void initState() {
@@ -549,7 +550,8 @@ class _PendingBookingDetailsState extends State<PendingBookingDetails> {
                         ),
                       ],
                     ),
-                    if (!widget.hidePayment) ...[
+                    if (!widget.hidePayment &&
+                        details['booking_status'].toString() == "1") ...[
                       const SizedBox(height: 30),
                       SubmitButtonWidget(
                         onTap: () async {

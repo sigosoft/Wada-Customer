@@ -137,6 +137,7 @@ class NursesListing extends StatelessWidget {
                                     if (index < controller.nurses.length) {
                                       return NurseItem(
                                         nurse: controller.nurses[index],
+                                        isPremiumUser: controller.isPremium,
                                       );
                                     } else {
                                       return const Padding(

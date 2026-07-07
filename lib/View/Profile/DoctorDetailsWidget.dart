@@ -16,12 +16,14 @@ class DoctorDetailsWidget extends StatelessWidget {
   final dynamic onTapQrCode;
   final dynamic premiumMembership;
   final Map<String, dynamic>? patientData;
+  final bool isPremium;
 
   const DoctorDetailsWidget({
     super.key,
     this.onTapQrCode,
     this.premiumMembership = false,
     this.patientData,
+    this.isPremium = false,
   });
 
   @override
@@ -75,11 +77,13 @@ class DoctorDetailsWidget extends StatelessWidget {
                                   size: 16.00,
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              SvgPicture.asset(
-                                'lib/Assets/Images/verifiedIcon.svg',
-                                fit: BoxFit.scaleDown,
-                              ),
+                              if (isPremium) ...[
+                                const SizedBox(width: 4),
+                                SvgPicture.asset(
+                                  'lib/Assets/Images/verifiedIcon.svg',
+                                  fit: BoxFit.scaleDown,
+                                ),
+                              ],
                             ],
                           ),
                           const SizedBox(height: 10),

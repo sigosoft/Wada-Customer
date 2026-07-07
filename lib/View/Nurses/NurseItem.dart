@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Configs/ApiConfigs.dart';
+import '../../Controller/ProfileController.dart';
 import 'package:waada_customerapp/View/NurseBookings/NurseBookingDetails.dart';
 import '../../Resource/Colors.dart';
 import '../../Resource/Strings.dart';
@@ -13,10 +15,25 @@ import 'InfoTooltip.dart';
 
 class NurseItem extends StatelessWidget {
   final Map<String, dynamic> nurse;
-  const NurseItem({super.key, required this.nurse});
+  final bool? isPremiumUser;
+  const NurseItem({super.key, required this.nurse, this.isPremiumUser});
 
   @override
   Widget build(BuildContext context) {
+    final bool isPremiumUser =
+        this.isPremiumUser ??
+        (() {
+          try {
+            final ProfileController profileController =
+                Get.isRegistered<ProfileController>()
+                    ? Get.find<ProfileController>()
+                    : Get.put(ProfileController());
+            return profileController.isPremium;
+          } catch (e) {
+            return false;
+          }
+        })();
+
     String? rawImage =
         nurse['image']?.toString() ??
         nurse['user']?['image']?.toString() ??
@@ -88,9 +105,9 @@ class NurseItem extends StatelessWidget {
                   ),
                   //),
                   const SizedBox(height: 3),
-                  Row(
+                  /* Row(
                     children: [
-                      Text(
+                       Text(
                         Strings.partiallyavailable,
                         style: GoogleFonts.inter(
                           fontSize: 11,
@@ -105,7 +122,7 @@ class NurseItem extends StatelessWidget {
                       const SizedBox(width: 5),
                       Icon(Icons.info_outlined, size: 18, color: Colors.black),
                     ],
-                  ),
+                  ), */
                 ],
               ),
               const SizedBox(width: 5),
@@ -270,7 +287,9 @@ class NurseItem extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "₹${charge['price']}",
+                                    isPremiumUser
+                                        ? "₹${charge['premium_price'] ?? charge['price']}"
+                                        : "₹${charge['price']}",
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -304,16 +323,18 @@ class NurseItem extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      "Get it at ₹400 for premium members!",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        color: colorPrimary,
-                        fontWeight: FontWeight.w600,
+                    if (!isPremiumUser) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        "Get it at ₹${charge['premium_price'] ?? '400'} for premium members!",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: colorPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               );
@@ -334,12 +355,21 @@ class NurseItem extends StatelessWidget {
                   'latitude': Get.arguments?['latitude'],
                   'longitude': Get.arguments?['longitude'],
                   'amount':
-                      (nurse['nurse_charge_totals'] as List?)?.firstWhere(
-                        (c) =>
-                            c['hour_id'].toString() ==
-                            Get.arguments?['hour_id'].toString(),
-                        orElse: () => {'price': '0'},
-                      )['price'],
+                      (() {
+                        final selectedCharge =
+                            (nurse['nurse_charge_totals'] as List?)?.firstWhere(
+                              (c) =>
+                                  c['hour_id'].toString() ==
+                                  Get.arguments?['hour_id'].toString(),
+                              orElse: () => null,
+                            );
+                        return selectedCharge == null
+                            ? '0'
+                            : (isPremiumUser
+                                ? (selectedCharge['premium_price'] ??
+                                    selectedCharge['price'])
+                                : selectedCharge['price']);
+                      })(),
                 },
               );
             },

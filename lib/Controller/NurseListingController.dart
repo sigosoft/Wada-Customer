@@ -11,15 +11,48 @@ class NurseListingController extends GetxController {
   int currentPage = 1;
   bool hasMore = true;
   Map<String, dynamic> lastSearchParams = {};
+  bool isPremium = false;
 
   @override
   void onInit() {
     super.onInit();
-    final Map<String, dynamic>? args = Get.arguments;
-    if (args != null) {
-      fetchNurses(args);
-    } else {
-      fetchNurses({});
+    isLoading = true;
+    update();
+    checkPremiumStatus().then((_) {
+      final Map<String, dynamic>? args = Get.arguments;
+      if (args != null) {
+        fetchNurses(args);
+      } else {
+        fetchNurses({});
+      }
+    });
+  }
+
+  Future<void> checkPremiumStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.premiumMembership}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        final data = response.data['data'];
+        if (data != null) {
+          isPremium = data['is_premium'] == true ||
+              data['is_premium']?.toString() == "true" ||
+              data['is_premium'] == 1 ||
+              data['is_premium']?.toString() == "1";
+        }
+      }
+    } catch (e) {
+      print("Error checking premium status in controller: $e");
     }
   }
 

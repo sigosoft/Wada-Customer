@@ -59,4 +59,7 @@ class ApiEndPoints {
   static String createOrder = "nurse/razor-order";
   static String getMemberRelations = "getMemberRelations";
   static String deleteAccount = "deleteAccount";
+  static String coupons = "coupons";
+  static String premiumMembership = "premium/membership";
+  static String applyCoupon = "applyCoupon";
 }

@@ -118,7 +118,7 @@ class NurseDetailsWidget extends StatelessWidget {
                             ),
                   ),
                   const SizedBox(height: 3),
-                  showPartiallyAvailable
+                  /* showPartiallyAvailable
                       ? Row(
                         children: [
                           Text(
@@ -139,7 +139,7 @@ class NurseDetailsWidget extends StatelessWidget {
                           ),
                         ],
                       )
-                      : Container(),
+                      : Container(), */
                 ],
               ),
               const SizedBox(width: 10),

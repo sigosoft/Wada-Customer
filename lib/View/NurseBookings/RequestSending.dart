@@ -7,6 +7,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:waada_customerapp/Controller/NurseBookingController.dart';
+import 'package:waada_customerapp/Controller/ProfileController.dart';
 import 'package:waada_customerapp/Resource/Strings.dart';
 import 'package:waada_customerapp/View/Login/SubmitButtonWidget.dart';
 import 'package:waada_customerapp/View/SuccessPages/NurseBookingsSuccess/RequestSentSuccess.dart';
@@ -237,7 +238,6 @@ class _RequestSendingState extends State<RequestSending> {
                       size: 15.00,
                     ),
                     const SizedBox(height: 10),
-                    // Bill details logic could be more complex, using placeholders for now
                     Row(
                       children: [
                         Expanded(
@@ -255,7 +255,13 @@ class _RequestSendingState extends State<RequestSending> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text: "₹${controller.amount}",
+                              text: () {
+                                final isPremiumUser =
+                                    Get.find<ProfileController>().isPremium;
+                                final priceKey =
+                                    isPremiumUser ? 'premium_price' : 'price';
+                                return "₹${matchedTotal?[priceKey] ?? controller.amount}";
+                              }(),
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
                               size: 14.00,
@@ -292,6 +298,34 @@ class _RequestSendingState extends State<RequestSending> {
                       ],
                     ),
                     const SizedBox(height: 5),
+                    if (controller.selectedCoupon != null) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: TextStyleInterForSplash(
+                              text: "Total Amount",
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                              size: 14.00,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              alignment: Alignment.topRight,
+                              child: TextStyleInterForSplash(
+                                text: "₹${matchedTotal?['total_rate'] ?? '0'}",
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                size: 14.00,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                    ],
                     Row(
                       children: [
                         Expanded(
@@ -308,8 +342,7 @@ class _RequestSendingState extends State<RequestSending> {
                           child: Container(
                             alignment: Alignment.topRight,
                             child: TextStyleInterForSplash(
-                              text:
-                                  "₹${matchedTotal?['total_rate'] ?? controller.amount}",
+                              text: "₹${controller.amount}",
                               color: Colors.black,
                               fontWeight: FontWeight.w800,
                               size: 14.00,

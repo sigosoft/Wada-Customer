@@ -380,4 +380,95 @@ class NurseBookingController extends GetxController {
     checkoutTimeController.dispose();
     super.onClose();
   }
+
+  Map<String, String>? selectedCoupon;
+
+  void applyCoupon(Map<String, String>? coupon) {
+    selectedCoupon = coupon;
+    update();
+  }
+
+  String getOriginalTotalRate() {
+    final chargeTotals =
+        nurseData?['nurse_charge_totals'] ??
+        nurseData?['nurse']?['nurse_charge_totals'];
+    if (chargeTotals is List) {
+      try {
+        final matchedTotal = chargeTotals.firstWhere(
+          (c) => c['hour_id'].toString() == hourId.toString(),
+        );
+        return matchedTotal['total_rate']?.toString() ?? amount;
+      } catch (_) {}
+    }
+    return amount;
+  }
+
+  Future<bool> applyCouponApi(String couponCode) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.applyCoupon}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final data = {
+        'coupon_code': couponCode,
+        'amount': getOriginalTotalRate(),
+        'from_date': fromDate,
+        'to_date': toDate,
+      };
+
+      print("--- Applying coupon: $data ---");
+      final FormData formData = FormData.fromMap(data);
+
+      final response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      print("--- applyCoupon response: ${response.data} ---");
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        final resData = response.data['data'];
+        if (resData != null) {
+          if (resData['total_amount'] != null) {
+            amount = resData['total_amount'].toString();
+          }
+          selectedCoupon = {
+            'title': resData['title']?.toString() ?? couponCode,
+            'description':
+                resData['title']?.toString() ?? "Coupon applied successfully.",
+            'code': couponCode,
+          };
+          update();
+          return true;
+        }
+      } else {
+        String msg =
+            response.data['message']?.toString() ?? "Failed to apply coupon";
+        Get.snackbar(
+          "Error",
+          msg,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print("Error calling applyCoupon API: $e");
+      Get.snackbar(
+        "Error",
+        "An error occurred while applying the coupon",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    }
+    return false;
+  }
 }

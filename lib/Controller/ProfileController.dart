@@ -28,6 +28,7 @@ class ProfileController extends GetxController {
     super.onInit();
     fetchProfile();
     fetchCountryCodes();
+    fetchPremiumMembership();
     debugPrint("ProfileController initialized");
   }
 
@@ -42,6 +43,7 @@ class ProfileController extends GetxController {
   }
 
   bool premiumMembership = true;
+  bool isPremium = false;
   bool isLoading = false;
   String referralCode = "";
   Map<String, dynamic>? patientData;
@@ -160,6 +162,7 @@ class ProfileController extends GetxController {
         patientData = response.data['data']['patient'];
         print("Profile Data: $patientData");
         populateFields();
+        fetchPremiumMembership();
       } else {
         _handleApiError(response.data, "Failed to fetch profile");
       }
@@ -177,6 +180,36 @@ class ProfileController extends GetxController {
     } finally {
       isLoading = false;
       update();
+    }
+  }
+
+  Future<void> fetchPremiumMembership() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+      String url = "${ApiConfigs.BASE_URL}${ApiEndPoints.premiumMembership}";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final response = await _dio.get(url, options: Options(headers: headers));
+
+      if (response.statusCode == 200 &&
+          response.data['status'].toString() == "true") {
+        final data = response.data['data'];
+        if (data != null) {
+          isPremium = data['is_premium'] == true ||
+              data['is_premium']?.toString() == "true" ||
+              data['is_premium'] == 1 ||
+              data['is_premium']?.toString() == "1";
+        }
+        update();
+      }
+    } catch (e) {
+      print("--- API Error (Premium Membership) ---");
+      print("Error fetching premium membership status: $e");
     }
   }
 

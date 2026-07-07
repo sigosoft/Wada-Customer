@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response, FormData;
@@ -287,4 +288,190 @@ class RazorpayService {
       );
     }
   }
+
+  // Call Backend to Create Premium Order
+  Future<CreateOrderResult> createPremiumOrder(
+    double amount, {
+    bool? autoSubscription,
+  }) async {
+    print(
+      "--- [RazorpayService] createPremiumOrder called: amount=$amount, autoSubscription=$autoSubscription ---",
+    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('auth_token');
+
+      String url = "${ApiConfigs.BASE_URL}premium/razor-order";
+
+      final headers = {
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
+      final data = {
+        'amount': amount.toStringAsFixed(2),
+        if (autoSubscription != null)
+          'auto_subscription': autoSubscription ? '1' : '0',
+      };
+
+      print(
+        "--- [RazorpayService] Requesting createPremiumOrder: POST $url with payload Map: $data ---",
+      );
+      final FormData formData = FormData.fromMap(data);
+
+      final response = await ApiConfigs.dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      print(
+        "--- [RazorpayService] createPremiumOrder response: ${response.statusCode} ---",
+      );
+      print("--- [RazorpayService] Response data: ${response.data} ---");
+
+      if (response.statusCode == 200 && response.data != null) {
+        final responseData = response.data;
+        if (responseData is Map) {
+          var orderId = responseData['order_id'] ?? responseData['id'];
+          if (orderId == null && responseData['data'] is Map) {
+            orderId =
+                responseData['data']['order_id'] ?? responseData['data']['id'];
+          }
+          if (orderId != null) {
+            return CreateOrderResult(orderId: orderId.toString());
+          }
+        }
+      }
+      return CreateOrderResult(errorMessage: "Failed to generate order ID from backend.");
+    } on DioException catch (e) {
+      print("--- [RazorpayService] createPremiumOrder DioException: $e ---");
+      String? apiErrorMessage;
+      if (e.response != null && e.response?.data != null) {
+        final resData = e.response?.data;
+        print("--- [RazorpayService] Exception response data: $resData (type: ${resData.runtimeType}) ---");
+        if (resData is Map) {
+          if (resData['message'] != null) {
+            apiErrorMessage = resData['message'].toString();
+          }
+        } else if (resData is String) {
+          try {
+            final decoded = jsonDecode(resData);
+            if (decoded is Map && decoded['message'] != null) {
+              apiErrorMessage = decoded['message'].toString();
+            }
+          } catch (jsonError) {
+            print("--- [RazorpayService] JSON decode error: $jsonError ---");
+          }
+        }
+      }
+      return CreateOrderResult(
+        errorMessage: apiErrorMessage ?? "Failed to create order on backend.",
+      );
+    } catch (e) {
+      print("--- [RazorpayService] createPremiumOrder General Exception: $e ---");
+      return CreateOrderResult(errorMessage: e.toString());
+    }
+  }
+
+  // Start checkout flow for Premium Membership
+  Future<void> startMembershipPayment({
+    required double amount, // in Rupees (e.g. 1499)
+    required String description,
+    required String contact,
+    required String email,
+    required String key, // Test Key
+    bool? autoSubscription,
+    required Function(PaymentSuccessResponse) onSuccess,
+    required Function(PaymentFailureResponse) onFailure,
+  }) async {
+    print(
+      "--- [RazorpayService] startMembershipPayment called: amount=$amount, autoSubscription=$autoSubscription ---",
+    );
+    _onSuccessCallback = onSuccess;
+    _onFailureCallback = onFailure;
+    _currentBookingType = "premium_membership";
+    _currentBookingId = "";
+
+    // Show loading dialog
+    Get.dialog(
+      const Center(child: CircularProgressIndicator(color: Colors.blue)),
+      barrierDismissible: false,
+    );
+
+    // Call backend to create order
+    final result = await createPremiumOrder(
+      amount,
+      autoSubscription: autoSubscription,
+    );
+
+    // Close loading dialog
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
+
+    if (result.orderId == null) {
+      onFailure(
+        PaymentFailureResponse(
+          0,
+          result.errorMessage ?? "Failed to create order on backend.",
+          const {},
+        ),
+      );
+      return;
+    }
+
+    final orderId = result.orderId!;
+
+    var options = {
+      'key': key,
+      'amount': (amount * 100).toInt(), // in paise
+      'currency': 'INR',
+      'name': 'Wada App',
+      'description': description,
+      'order_id': orderId,
+      'payment_capture':
+          1, // Auto capture payment immediately after authorization
+      'prefill': {
+        'contact': contact.isNotEmpty ? contact : '9876543210',
+        'email': email.isNotEmpty ? email : 'test@test.com',
+      },
+      'notes': {
+        'payment_type': 'Online',
+        'total_amount': amount.toString(),
+        'type': 'premium_membership',
+      },
+      'config': {
+        'display': {
+          'hide': [
+            {'method': 'emi'},
+            {'method': 'paylater'},
+          ],
+          'preferences': {'show_default_blocks': true},
+        },
+      },
+    };
+
+    try {
+      print(
+        "--- [RazorpayService] opening Razorpay checkout with options Map: $options ---",
+      );
+      _razorpay.open(options);
+    } catch (e) {
+      print("--- [RazorpayService] Error opening Razorpay checkout: $e ---");
+      onFailure(
+        PaymentFailureResponse(
+          Razorpay.PAYMENT_CANCELLED,
+          e.toString(),
+          const {},
+        ),
+      );
+    }
+  }
+}
+
+class CreateOrderResult {
+  final String? orderId;
+  final String? errorMessage;
+  CreateOrderResult({this.orderId, this.errorMessage});
 }
